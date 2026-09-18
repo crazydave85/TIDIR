@@ -10,6 +10,11 @@ on:
         required: true
         type: boolean
         default: true # Defaults to true so manual clicks are safe
+      force_assessment:
+        description: 'Force assessment even if no new updates are synced'
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   sync:
@@ -60,7 +65,7 @@ jobs:
   # This job only runs if the sync job detected a change
   run_agents:
     needs: sync
-    if: needs.sync.outputs.has_updates == 'true'
+    if: needs.sync.outputs.has_updates == 'true' || inputs.force_assessment == true    
     runs-on: ubuntu-latest
     steps:
       - name: Checkout updated code
