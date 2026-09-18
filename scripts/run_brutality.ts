@@ -1,44 +1,95 @@
-// 1. Read your agent instructions from your Markdown file
-const agentInstructions = await Bun.file("AGENTS.md").text();
-
-// 2. Read the content of the files that were just updated
-// For a basic test, we'll just send a placeholder string
-const contentToAssess = "Simulated content of updated markdown files..."; 
+import { $ } from "bun";
 
 console.log("🚀 Starting MD Agent assessment with Gemini...");
 
-// 3. Call the Gemini API using native fetch
-const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent", {
+// 1. Read agent instructions
+const agentInstructions = await Bun.file("AGENTS.md").text();
+
+// 2. Dynamically read all Markdown files in the newly synced 'main' branch
+const glob = new Bun.Glob("**/*.md");
+let contentToAssess = "";
+for await (const file of glob.scan(".")) {
+  // Skip the instructions file and hidden/system folders
+  if (file === "AGENTS.md" || file.startsWith(".github/") || file.includes("node_modules")) continue; 
+  const fileContent = await Bun.file(file).text();
+  contentToAssess += `\n\n--- Start of ${file} ---\n${fileContent}\n--- End of ${file} ---\n`;
+}
+
+// 3. System Prompt: Force JSON output so the script can route the decision
+const systemPrompt = `${agentInstructions}
+
+IMPORTANT INSTRUCTIONS:
+Assess the provided markdown files. 
+- If you find major architectural deviations or issues that require discussion, set action to "issue".
+- If you find minor typos or quick fixes that don't need discussion, set action to "pr" and provide the COMPLETE updated content for the files that need changing.
+- If everything is perfect, set action to "none".
+
+You MUST respond with ONLY valid JSON matching this schema:
+{
+  "action": "issue" | "pr" | "none",
+  "title": "Short title for the issue or PR",
+  "body": "Detailed markdown body for the issue/PR explaining the assessment...",
+  "filesToUpdate": [
+    { 
+      "path": "path/to/file.md", 
+      "content": "The COMPLETE new text for this file (required if action is 'pr')" 
+    }
+  ]
+}`;
+
+// 4. Call Gemini (Enforcing JSON output)
+const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
-    // Pass the API key via the x-goog-api-key header
-    "x-goog-api-key": process.env.GEMINI_API_KEY as string 
+    "x-goog-api-key": process.env.GEMINI_API_KEY as string
   },
   body: JSON.stringify({
-    // Gemini separates the system prompt into its own object
-    systemInstruction: {
-      parts: [{ text: agentInstructions }]
-    },
-    // The actual user prompt goes into the contents array
-    contents: [
-      {
-        role: "user",
-        parts: [{ text: `Please assess the following updates:\n\n${contentToAssess}` }]
-      }
-    ]
+    systemInstruction: { parts: [{ text: systemPrompt }] },
+    contents: [{ role: "user", parts: [{ text: contentToAssess }] }],
+    generationConfig: { response_mime_type: "application/json" } 
   })
 });
 
 if (!response.ok) {
-  // Capturing response.text() helps debug specific Gemini API errors (like quota limits)
-  console.error("❌ API request failed:", response.statusText, await response.text());
-  process.exit(1); 
+  console.error("❌ API request failed:", await response.text());
+  process.exit(1);
 }
 
 const data = await response.json();
-// Gemini's response structure differs slightly from OpenAI's
-const assessment = data.candidates[0].content.parts[0].text;
+const assessment = JSON.parse(data.candidates[0].content.parts[0].text);
 
-// 4. Output the result so the GitHub Action can capture it
-console.log(assessment);
+// 5. Execute GitHub commands based on the AI's decision
+console.log(`🤖 AI Decision: ${assessment.action.toUpperCase()}`);
+
+if (assessment.action === "issue") {
+  // Create an issue using the GitHub CLI
+  await $`gh issue create --title ${assessment.title} --body ${assessment.body}`;
+  console.log(`✅ Created Issue: ${assessment.title}`);
+
+} else if (assessment.action === "pr") {
+  // Create a new branch, write the files, commit, and push
+  const branchName = `agent-updates-${Date.now()}`;
+  await $`git checkout -b ${branchName}`;
+
+  for (const file of assessment.filesToUpdate) {
+    await Bun.write(file.path, file.content);
+    console.log(`✏️ Updated: ${file.path}`);
+  }
+
+  await $`git config user.name "github-actions[bot]"`;
+  await $`git config user.email "github-actions[bot]@users.noreply.github.com"`;
+  await $`git add .`;
+  await $`git commit -m ${assessment.title}`;
+  await $`git push origin ${branchName}`;
+  
+  // Open the Pull Request
+  await $`gh pr create --title ${assessment.title} --body ${assessment.body} --head ${branchName}`;
+  console.log(`✅ Created Pull Request: ${assessment.title}`);
+
+} else {
+  console.log("✅ Assessment passed. No action required.");
+}
+
+// 6. Ensure the markdown body is printed so the GitHub Action captures it for the Summary
+console.log(assessment.body);
