@@ -37,28 +37,52 @@ You MUST respond with ONLY valid JSON matching this schema:
   ]
 }`;
 
-// 4. Call Gemini (Enforcing JSON output)
-const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "x-goog-api-key": process.env.GEMINI_API_KEY as string
-  },
-  body: JSON.stringify({
-    systemInstruction: { parts: [{ text: systemPrompt }] },
-    contents: [{ role: "user", parts: [{ text: contentToAssess }] }],
-    generationConfig: { response_mime_type: "application/json" } 
-  })
-});
+// 3. Call the Gemini API with a Retry Loop
+let response;
+const maxRetries = 3;
+let delay = 5000; // Start with a 5-second wait
 
-if (!response.ok) {
-  console.error("❌ API request failed:", await response.text());
-  process.exit(1);
+for (let attempt = 1; attempt <= maxRetries; attempt++) {
+  response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent", { // Note: replace 1.5-flash with whichever version you are currently using
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": process.env.GEMINI_API_KEY as string
+    },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ role: "user", parts: [{ text: contentToAssess }] }],
+      generationConfig: { response_mime_type: "application/json" } 
+    })
+  });
+
+  if (response.ok) {
+    break; // Request succeeded, exit the loop
+  }
+
+  const errorText = await response.text();
+  
+  // If it's a 503 (Unavailable) or 429 (Rate Limit), try again
+  if (response.status === 503 || response.status === 429) {
+    console.warn(`⚠️ API busy (Attempt ${attempt}/${maxRetries}): ${response.status}`);
+    
+    if (attempt < maxRetries) {
+      console.log(`⏳ Waiting ${delay / 1000} seconds before retrying...`);
+      await Bun.sleep(delay);
+      delay *= 2; // Double the wait time for the next attempt (5s -> 10s)
+    } else {
+      console.log("🛑 Max retries reached. Skipping assessment so workflow does not fail.");
+      process.exit(0); // Exits with a success code so the GitHub Action passes
+    }
+  } else {
+    // For fatal errors (like bad API keys or malformed JSON), crash immediately
+    console.error(`❌ Fatal API Error (${response.status}):`, errorText);
+    process.exit(1);
+  }
 }
 
 const data = await response.json();
 const assessment = JSON.parse(data.candidates[0].content.parts[0].text);
-
 // 5. Execute GitHub commands based on the AI's decision
 console.log(`🤖 AI Decision: ${assessment.action.toUpperCase()}`);
 
