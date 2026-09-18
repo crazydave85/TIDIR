@@ -65,27 +65,41 @@ jobs:
   # This job only runs if the sync job detected a change
   run_agents:
     needs: sync
-    if: needs.sync.outputs.has_updates == 'true' || inputs.force_assessment == true    
+    if: needs.sync.outputs.has_updates == 'true' || inputs.force_assessment == true
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout updated code
+      - name: Checkout maintenance branch (gets your scripts)
+        uses: actions/checkout@v4
+
+      - name: Stash agent scripts safely
+        run: |
+          mkdir -p /tmp/agent-tools
+          cp -r scripts /tmp/agent-tools/
+          cp REVIEW.md /tmp/agent-tools/
+
+      - name: Checkout updated code (main branch)
         uses: actions/checkout@v4
         with:
-          ref: main # Ensure it pulls the newly updated main branch
-      
+          ref: main
+          clean: true
+          
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-          
+
       - name: Execute MD Agents
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} 
           GH_TOKEN: ${{ secrets.PAT_TOKEN }} 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
-          DRY_RUN: ${{ inputs.dry_run }} # Passes the toggle state to the script
+          DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          AGENT_OUTPUT=$(bun run ./scripts/run_brutality.ts)
+          # Copy the REVIEW.md file into the main branch workspace so the script finds it
+          cp /tmp/agent-tools/REVIEW.md ./REVIEW.md
+          
+          # Execute the script from the safe stash location
+          AGENT_OUTPUT=$(bun run /tmp/agent-tools/scripts/run_brutality.ts)
           
           echo "### 🤖 MD Agent Assessment Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
