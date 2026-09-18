@@ -43,7 +43,7 @@ const maxRetries = 3;
 let delay = 5000; // Start with a 5-second wait
 
 for (let attempt = 1; attempt <= maxRetries; attempt++) {
-  response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent", { // Note: replace 1.5-flash with whichever version you are currently using
+  response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
