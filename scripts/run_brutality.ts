@@ -63,9 +63,9 @@ const assessment = JSON.parse(data.candidates[0].content.parts[0].text);
 console.log(`🤖 AI Decision: ${assessment.action.toUpperCase()}`);
 
 if (assessment.action === "issue") {
-  // Create an issue using the GitHub CLI
-  await $`gh issue create --title ${assessment.title} --body ${assessment.body}`;
-  console.log(`✅ Created Issue: ${assessment.title}`);
+  // Explicitly target the parent repository 
+  await $`gh issue create --repo Haribu/TIDIR --title ${assessment.title} --body ${assessment.body}`;
+  console.log(`✅ Created Issue in parent repo: ${assessment.title}`);
 
 } else if (assessment.action === "pr") {
   // Create a new branch, write the files, commit, and push
