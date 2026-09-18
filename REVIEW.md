@@ -35,3 +35,50 @@ You will execute this task in two sequential phases:
 * If the Reviewer decides the findings represent major architectural deviations, framework violations, or vendor bias, output an `"action": "issue"`.
 * If the Reviewer decides the findings are minor, undisputed corrections, output an `"action": "pr"` with the corrected file contents.
 * If the Reviewer rejects the findings or everything is structurally sound, output `"action": "none"`.
+
+## PR Formatting Template
+When outputting a `"pr"`, you MUST format the `title` and `body` exactly as follows:
+
+**Title:** Must use conventional commits format, e.g., `fix(docs): short description of the update`
+
+**Body:** Must use this exact Markdown structure:
+## Summary
+[A brief 1-2 sentence explanation of why this PR is being created based on the assessment]
+
+## Changes
+- *[filename.md]*: [Brief description of what was changed in this file]
+- *[filename2.md]*: [Brief description of what was changed in this file]
+
+## Linked Issue
+None (Automated Agent PR)
+
+## Checklist
+- [x] Changes are editorial corrections only - no architectural decisions
+- [x] All changes align with the claims-discipline and vendor-neutrality rules
+- [x] No new ADRs required for these changes
+
+## Issue Formatting Template
+When outputting an `"action": "issue"`, you MUST format the `title` and `body` exactly as follows:
+
+**Title:** Must start with `[RFC] `, e.g., `[RFC] Short description of the architectural gap`
+
+**Body:** Must use this exact Markdown structure:
+### Executive Summary
+[1-2 paragraphs summarizing the architectural deviations or framework violations]
+
+### Problem Statement & Motivation
+[Detailed breakdown of the issues found, including specific contradictions or vendor bias]
+
+### Target Component Alignment
+- [List the specific layers, documents, or components affected]
+
+### Open Standards Alignment
+- [x] OCSF (Open Cybersecurity Schema Framework) (check if applicable)
+- [x] MITRE ATT&CK / D3FEND / ATLAS (check if applicable)
+- [x] Strict Vendor Neutrality (check if applicable)
+
+### Proposed Architectural Decision Record (ADR)
+- [Indicate if a new ADR or amendment to an existing ADR is required to resolve this]
+
+### Security, Safety & Blast Radius Considerations
+- [Detail the potential risks, safety gaps, or implementation risks caused by these findings]
