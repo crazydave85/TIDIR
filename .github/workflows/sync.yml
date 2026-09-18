@@ -61,6 +61,7 @@ jobs:
           ref: main # Ensure it pulls the newly updated main branch
           
       - name: Execute MD Agents
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} 
         run: |
-          echo "Placeholder"
-          # Example: python run_assessment.py
+          AGENT_OUTPUT=$(bun run ./scripts/run_brutality.ts)
