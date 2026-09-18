@@ -33,7 +33,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          SYNC_OUTPUT=$(gh repo sync${{ github.repository }} --branch main --source Haribu/TIDIR 2>&1)
+          SYNC_OUTPUT=$(gh repo sync ${{ github.repository }} --branch main --source Haribu/TIDIR 2>&1)
           
           echo "### 🔄 Fork Sync Result" >> $GITHUB_STEP_SUMMARY
           echo "Attempted to sync \`${{ github.repository }}:main\` with \`Haribu/TIDIR\`." >> $GITHUB_STEP_SUMMARY
