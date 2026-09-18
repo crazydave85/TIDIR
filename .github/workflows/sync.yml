@@ -18,7 +18,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Run the sync and capture the output (combining standard output and errors)
-          SYNC_OUTPUT=$(gh repo sync${{ github.repository }} --branch main --source Haribu/TIDIR 2>&1)
+          SYNC_OUTPUT=$(gh repo sync ${{ github.repository }} --branch main --source Haribu/TIDIR 2>&1)
           
           # 1. Print it to the standard action logs
           echo "$SYNC_OUTPUT"
