@@ -2,28 +2,31 @@ name: Sync Fork with Upstream
 
 on:
   schedule:
-    # Runs every hour. You can adjust the cron syntax if you want it more/less frequent.
     - cron: '0 * * * *' 
-  workflow_dispatch: # Allows you to also trigger this manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Required for the action to push the synced commits to your fork
+      contents: write
+    # Export this variable so the next job can read it
+    outputs:
+      has_updates: ${{ steps.verify.outputs.updated }} 
 
     steps:
+      - name: Record commit hash before sync
+        run: |
+          # Query GitHub directly for the current commit hash of your main branch
+          BEFORE_SHA=$(git ls-remote https://github.com/${{ github.repository }}.git main | awk '{print $1}')
+          echo "BEFORE_SHA=$BEFORE_SHA" >> $GITHUB_ENV
+
       - name: Sync main branch with upstream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Run the sync and capture the output (combining standard output and errors)
-          SYNC_OUTPUT=$(gh repo sync ${{ github.repository }} --branch main --source Haribu/TIDIR 2>&1)
+          SYNC_OUTPUT=$(gh repo sync${{ github.repository }} --branch main --source Haribu/TIDIR 2>&1)
           
-          # 1. Print it to the standard action logs
-          echo "$SYNC_OUTPUT"
-          
-          # 2. Write a formatted result to the Action Summary page
           echo "### 🔄 Fork Sync Result" >> $GITHUB_STEP_SUMMARY
           echo "Attempted to sync \`${{ github.repository }}:main\` with \`Haribu/TIDIR\`." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -31,3 +34,33 @@ jobs:
           echo "\`\`\`text" >> $GITHUB_STEP_SUMMARY
           echo "$SYNC_OUTPUT" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Verify if updates occurred
+        id: verify
+        run: |
+          # Query GitHub again for the new commit hash
+          AFTER_SHA=$(git ls-remote https://github.com/${{ github.repository }}.git main | awk '{print $1}')
+          
+          if [ "$BEFORE_SHA" != "$AFTER_SHA" ]; then
+            echo "updated=true" >> $GITHUB_OUTPUT
+            echo "✅ **Status:** Updates were pulled. Triggering assessment agents." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "updated=false" >> $GITHUB_OUTPUT
+            echo "⏸️ **Status:** No new updates found. Assessment skipped." >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # This job only runs if the sync job detected a change
+  run_agents:
+    needs: sync
+    if: needs.sync.outputs.has_updates == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout updated code
+        uses: actions/checkout@v4
+        with:
+          ref: main # Ensure it pulls the newly updated main branch
+          
+      - name: Execute MD Agents
+        run: |
+          echo "Placeholder"
+          # Example: python run_assessment.py
