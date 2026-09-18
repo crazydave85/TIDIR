@@ -61,6 +61,31 @@ jobs:
             echo "updated=false" >> $GITHUB_OUTPUT
             echo "⏸️ **Status:** No new updates found. Assessment skipped." >> $GITHUB_STEP_SUMMARY
           fi
+          
+      - name: Checkout maintenance branch for syncing
+        if: steps.verify.outputs.updated == 'true'
+        uses: actions/checkout@v7
+        with:
+          ref: fork-maintainance
+          fetch-depth: 0 # Required to fetch all branches so we can merge
+
+      - name: Merge updated main into maintenance branch
+        if: steps.verify.outputs.updated == 'true'
+        run: |
+          # Set up the git bot credentials
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Fetch the newly synced main branch
+          git fetch origin main
+          
+          # Merge main into our current branch (fork-maintainance)
+          git merge origin/main -m "chore: auto-sync maintenance branch with updated main"
+          
+          # Push the changes back to GitHub
+          git push origin fork-maintainance
+          
+          echo "🔄 **Status:** Automatically merged latest \`main\` into \`fork-maintainance\` to keep tools aligned." >> $GITHUB_STEP_SUMMARY
 
   # This job only runs if the sync job detected a change
   run_agents:
