@@ -2,15 +2,15 @@ import { $ } from "bun";
 
 console.log("🚀 Starting MD Agent assessment with Gemini...");
 
-// 1. Read agent instructions
-const agentInstructions = await Bun.file("AGENTS.md").text();
+// 1. Read agent instructions from the new REVIEW.md file
+const agentInstructions = await Bun.file("REVIEW.md").text();
 
 // 2. Dynamically read all Markdown files in the newly synced 'main' branch
 const glob = new Bun.Glob("**/*.md");
 let contentToAssess = "";
 for await (const file of glob.scan(".")) {
-  // Skip the instructions file and hidden/system folders
-  if (file === "AGENTS.md" || file.startsWith(".github/") || file.includes("node_modules")) continue; 
+  // Exclude the REVIEW.md file and hidden/system folders from the assessment
+  if (file === "REVIEW.md" || file.startsWith(".github/") || file.includes("node_modules")) continue; 
   const fileContent = await Bun.file(file).text();
   contentToAssess += `\n\n--- Start of ${file} ---\n${fileContent}\n--- End of ${file} ---\n`;
 }
@@ -19,7 +19,7 @@ for await (const file of glob.scan(".")) {
 const systemPrompt = `${agentInstructions}
 
 IMPORTANT INSTRUCTIONS:
-Assess the provided markdown files. 
+Assess the provided markdown files based on the REVIEW.md criteria. 
 - If you find major architectural deviations or issues that require discussion, set action to "issue".
 - If you find minor typos or quick fixes that don't need discussion, set action to "pr" and provide the COMPLETE updated content for the files that need changing.
 - If everything is perfect, set action to "none".
