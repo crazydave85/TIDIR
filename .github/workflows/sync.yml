@@ -64,7 +64,8 @@ jobs:
           
       - name: Execute MD Agents
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} 
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }} # Uses your PAT to authorize the cross-repo issue creation
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required for the TS script to run 'gh'
         run: |
           AGENT_OUTPUT=$(bun run ./scripts/run_brutality.ts)
