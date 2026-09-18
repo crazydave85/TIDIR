@@ -36,14 +36,14 @@ You MUST respond with ONLY valid JSON matching this schema:
     }
   ]
 }`;
-
 // 3. Call the Gemini API with a Retry Loop
 let response;
-const maxRetries = 3;
-let delay = 5000; // Start with a 5-second wait
+const maxRetries = 5;
+let delay = 10000; // Start with a 10-second wait
 
 for (let attempt = 1; attempt <= maxRetries; attempt++) {
-  response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent", {
+  // Be sure to use your working model version here (e.g. gemini-1.5-flash or whatever you settled on)
+  response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent", { 
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -69,7 +69,7 @@ for (let attempt = 1; attempt <= maxRetries; attempt++) {
     if (attempt < maxRetries) {
       console.log(`⏳ Waiting ${delay / 1000} seconds before retrying...`);
       await Bun.sleep(delay);
-      delay *= 2; // Double the wait time for the next attempt (5s -> 10s)
+      delay *= 2; // Double the wait time for the next attempt (10s -> 20s -> 40s -> 80s)
     } else {
       console.log("🛑 Max retries reached. Skipping assessment so workflow does not fail.");
       process.exit(0); // Exits with a success code so the GitHub Action passes
