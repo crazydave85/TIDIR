@@ -17,4 +17,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh repo sync ${{ github.repository }} --branch main --source Haribu/TIDIR
+          # Run the sync and capture the output (combining standard output and errors)
+          SYNC_OUTPUT=$(gh repo sync${{ github.repository }} --branch main --source Haribu/TIDIR 2>&1)
+          
+          # 1. Print it to the standard action logs
+          echo "$SYNC_OUTPUT"
+          
+          # 2. Write a formatted result to the Action Summary page
+          echo "### 🔄 Fork Sync Result" >> $GITHUB_STEP_SUMMARY
+          echo "Attempted to sync \`${{ github.repository }}:main\` with \`Haribu/TIDIR\`." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Command Output:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`text" >> $GITHUB_STEP_SUMMARY
+          echo "$SYNC_OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
