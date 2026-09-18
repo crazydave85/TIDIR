@@ -147,6 +147,33 @@
       "citation": "Apache Software Foundation. (2021). Apache Iceberg Table Format Specification.",
       "canonical_url": "https://iceberg.apache.org/spec/",
       "applies_to": ["INV-01", "INV-11", "ADR-0002"]
+    },
+    {
+      "id": "FND-17",
+      "topic": "Adversary AI Capabilities & Automated Vulnerability Exploitation",
+      "classification": "Government Cybersecurity Advisory & Empirical Research",
+      "claim_supported": "AI tools lower barriers for reconnaissance, social engineering, and rapid exploitation of known vulnerabilities, while autonomous zero-day discovery and end-to-end bespoke malware synthesis remain bounded by reasoning constraints.",
+      "citation": "National Cyber Security Centre (NCSC-UK). (2024). The Near-Term Impact of AI on the Cyber Threat. UK Government Assessment; Fang, R., Bindu, R., Gupta, A., Zhan, Q., & Kang, D. (2024). LLM Agents can Autonomously Exploit One-day Vulnerabilities. arXiv:2404.08144.",
+      "canonical_url": "https://www.ncsc.gov.uk/report/impact-of-ai-on-cyber-threat",
+      "applies_to": ["INV-04", "ADR-0004", "ADR-0019"]
+    },
+    {
+      "id": "FND-18",
+      "topic": "Adversarial Machine Learning & Training/RAG Data Poisoning",
+      "classification": "Academic Research",
+      "claim_supported": "Adversarial data injection into retrieval-augmented generation (RAG) contexts or training pipelines can systematically distort model inferences; defence mandates cryptographic integrity and deterministic grounding verification.",
+      "citation": "Carlini, N., Jagielski, M., Choquette-Choo, C. A., Paleka, D., Pearce, W., Terzis, A., Tramèr, F., & Lee, K. (2023). Poisoning Language Models During Pre-training. Proceedings of the 40th International Conference on Machine Learning (ICML '23).",
+      "canonical_url": "https://doi.org/10.48550/arXiv.2304.14897",
+      "applies_to": ["INV-02", "ADR-0010", "ADR-0014"]
+    },
+    {
+      "id": "FND-19",
+      "topic": "Adversary Breakout Velocity & Operational Dwell Time",
+      "classification": "Industry Threat Intelligence Benchmark",
+      "claim_supported": "Empirical measurement demonstrates attacker breakout velocity averaging under 62 minutes alongside rapid living-off-the-land traversal, necessitating low-latency telemetry streaming and pre-simulated containment boundaries.",
+      "citation": "CrowdStrike. (2024). Global Threat Report; Mandiant / Google Cloud. (2024). M-Trends 2024 Special Report.",
+      "canonical_url": "https://www.crowdstrike.com/global-threat-report/",
+      "applies_to": ["INV-01", "INV-07", "ADR-0005", "ADR-0021"]
     }
   ]
 }

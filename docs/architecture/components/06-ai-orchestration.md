@@ -99,10 +99,10 @@ Multi-stage investigations require persistent shared memory, auditability, and p
 - **Token Quota Budgets**: Each investigation is allocated a maximum token budget (e.g. 150k tokens) and execution timeout (e.g. 180 seconds) to prevent runaway recursive inference loops.
 
 ### 4. Deterministic Safety Kernel & Zero Trust AI
-TIDIR rejects the assumption that prompt sanitization can deterministically prevent adversarial manipulation. Instead, it enforces a **Zero Trust AI Architecture**:
+TIDIR rejects the assumption that prompt sanitization can deterministically prevent adversarial manipulation ([Greshake et al., 2023](https://doi.org/10.1145/3605764.3623985); [Willison, 2023](https://simonwillison.net/2023/Apr/25/dual-llm-pattern/); [FND-10](/architecture/foundational-research#fnd-10)). Instead, it enforces a **Zero Trust AI Architecture**:
 - **Explicit Adversarial Threat Assumption**: TIDIR assumes adversarial evidence may successfully influence model reasoning. No security boundary therefore depends upon the model correctly distinguishing instructions from data. Consequential effects are bounded by deterministic capability, identity, schema, policy, and execution controls outside the reasoning model:
   1. *Capability-Bounded Permissions*: Agents operate with read-only query capabilities via strongly typed MCP tools. They hold zero administrative or mutating execution credentials.
-  2. *Task-Scoped Ephemeral SVIDs*: SPIFFE/SPIRE mints short-lived X.509 identities ($\le 15\text{m}$) enforcing least-privilege tool contracts at the network layer.
+  2. *Task-Scoped Ephemeral SVIDs*: SPIFFE/SPIRE mints short-lived X.509 identities ($\le 15\text{m}$) enforcing least-privilege tool contracts at the network layer ([FND-02](/architecture/foundational-research#fnd-02), [FND-06](/architecture/foundational-research#fnd-06)).
   3. *Independent Response Authority*: Mutating containment actions are evaluated and authorized exclusively by the deterministic response safety kernel and human incident commanders.
 - **Dual-Plane Data Isolation**: Untrusted external inputs (log messages, command-line arguments, email bodies, CTI text) are strictly isolated in a sandboxed *Data Plane*. System instructions, agent personas, and tool contracts exist exclusively in a signed *Control Plane*.
 - **Deterministic AST Query Validator**: Generated queries pass through an Abstract Syntax Tree (AST) parser before hitting Lakehouse engines. The validator enforces:

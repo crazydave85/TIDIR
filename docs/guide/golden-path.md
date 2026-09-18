@@ -17,7 +17,7 @@ next:
 TIDIR is designed to be understood at multiple depths:
 * **The 60-Second View**: Available on the [Homepage](/) (Problem ➔ Operating Maxim ➔ Architecture-at-a-Glance ➔ 3 Tiers).
 * **The 15-Minute Orientation (This Guide)**: A curated 5-step walkthrough establishing core architectural doctrine and system topology.
-* **The Deep Reference & Interrogation**: Direct exploration of the [11 Invariants](/architecture/00-architectural-invariants), [4-Plane System Model](/architecture/01-system-overview), [Capability Model](/architecture/02-capability-model), [Assurance Map](/architecture/assurance-map), and [21 ADRs](/adr/).
+* **The Deep Reference & Interrogation**: Direct exploration of the [11 Invariants](/architecture/00-architectural-invariants), [4-Plane System Model](/architecture/01-system-overview), [Capability Model](/architecture/02-capability-model), [Foundational Research & Literature](/architecture/foundational-research), [Assurance Map](/architecture/assurance-map), and [21 ADRs](/adr/).
 
 ---
 
@@ -35,7 +35,7 @@ flowchart LR
 ```
 
 ### [Step 1: What is TIDIR?](/guide/what-is-tidir)
-* **Core Takeaway**: SecOps is an asymmetric closed-loop control system. Probabilistic models propose; deterministic policy kernels authorize.
+* **Core Takeaway**: SecOps is an asymmetric closed-loop control system. Probabilistic models propose; deterministic policy kernels authorize. Grounded in [Foundational Research](/architecture/foundational-research).
 * **Reading Time**: 3 minutes.
 
 ### [Step 2: The Architectural Constitution & 11 Invariants](/architecture/00-architectural-invariants)
@@ -51,7 +51,7 @@ flowchart LR
 * **Reading Time**: 3 minutes.
 
 ### [Step 5: Target Threat Model & Assurance Case](/architecture/09-threat-model)
-* **Core Takeaway**: Threat modelling TIDIR itself (T1–T6) and tracing threats to invariants, capabilities, and prescribed validation criteria via the Assurance Case Map.
+* **Core Takeaway**: Threat modelling TIDIR itself (T1–T9) and tracing threats to invariants, capabilities, and prescribed validation criteria via the Assurance Case Map.
 * **Reading Time**: 3 minutes.
 
 ---

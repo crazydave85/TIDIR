@@ -69,6 +69,18 @@ The documentation is organized logically across strategy, capability mapping, de
 
 ---
 
+## 🌐 Open Security Frameworks Alignment
+
+TIDIR synthesizes defensive strategy, analytic taxonomy, API safety, and operational controls into a unified framework alignment:
+
+* **Adversary Tactics & Attack Patterns**: [MITRE ATT&CK](https://attack.mitre.org/) (Enterprise TTPs), [MITRE ATLAS](https://atlas.mitre.org/) (AI/ML Threats), [MITRE CAPEC](https://capec.mitre.org/) (Attack Patterns).
+* **Defensive Countermeasures & Analytics**: [MITRE D3FEND](https://d3fend.mitre.org/) (Defensive Techniques), [D3FEND ACF](https://d3fend.mitre.org/) (Analytic Characterization Framework), [MITRE CAR](https://car.mitre.org/) (Cyber Analytics Repository).
+* **Active Defense & Deception Operations**: [MITRE ENGAGE](https://engage.mitre.org/) (Expose, Affect, Elicit, Understand).
+* **AI & API Tool Safety**: [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/) (Prompt Injection & Agency), [OWASP API Security Top 10](https://owasp.org/API-Security/) (BOLA, Broken Auth, Tool Boundaries).
+* **Enterprise Assurance & Data Schemas**: [CIS Controls v8](https://www.cisecurity.org/controls/v8) (Controls 5, 6, 8, 13, 17), [OCSF](https://ocsf.io/) (Open Cybersecurity Schema Framework), [STIX 2.1 / TAXII](https://oasis-open.github.io/cti-documentation/).
+
+---
+
 ## 🗺️ Roadmap, Research & Release Milestones
 
 TIDIR maintains strict discipline between what is formally specified and verified in the live architecture versus active research and future exploratory ideas.
@@ -98,23 +110,28 @@ These items are actively being scoped into upcoming Architectural Decision Recor
 
 ### 💡 Research & Ideas Backlog (Future Horizon)
 
-Conceptual exploration and mathematical foundations for the post-v1.3 horizon:
+Admission to this backlog is strictly constrained to hypotheses, formalisms, and benchmark designs that challenge, quantify, or test the falsifiability of the core architectural invariants.
 
+* **Reproducible Attack-to-Containment Benchmark Harness (Priority Experimental Vehicle)**:
+  - Construct an open, deterministic evaluation harness replaying standardized attack graphs (e.g. Atomic Red Team, MITRE CALDERA) over synthetic, parameterized OCSF streams.
+  - Empirical targets: Measure MTTC, DAG reconstructability, and containment safety margins under deliberate failure injection (split-brain buses, corrupted tokens, delayed upstream feeds), transforming the TIDIR assurance case from declarative claims into verifiable experimental data.
+* **Invariant Violation & Failure-Boundary Research (Adversarial Self-Evaluation)**:
+  - Stress-test the architectural constitution by asking: *Under what combinations of compromised control-plane components, stale policy, identity failure, partial network partition, and adversarial telemetry can a nominally TIDIR-compliant implementation violate `INV-01` through `INV-11`?*
+  - Identify the minimum set of environmental and cryptographic assumptions that must fail before each claimed safety property ceases to hold, laying the groundwork for formal model checking and property-based verification.
 * **TIDIR Core / Minimum Viable Architecture (MVA)**:
   - Formally specify the reference implementation for the leanest TIDIR-compliant deployment: `Telemetry Ingress ➔ OCSF Normalization ➔ Lakehouse / Hot Storage ➔ Polyglot DaC ➔ Findings ➔ Case Management ➔ Policy-Gated Actuation` (see [ADR-0012](docs/adr/0012-ai-orchestration-runtime-mcp-and-mvp-roadmap.md)).
 * **Reference Workload Models ($W_1, W_2, W_3$)**:
-  - Replace ungrounded latency/throughput metrics with parameterized workload models:
+  - Replace ungrounded latency/throughput metrics with explicit, parameterized workload vectors:
     $$W = \{\text{EPS}, \text{bytes/event}, \text{entities/day}, \text{cardinality}, \text{retention}, \text{hot \%}, \text{query concurrency}, \text{enrichment fanout}\}$$
-  - Define benchmark profiles: $W_1$ (Mid-Market, 25k EPS), $W_2$ (Enterprise, 250k EPS), and $W_3$ (Hyperscale, 1M EPS).
-* **Formal Bayesian Evidence Calibration Math**:
-  - Provide concrete mathematical treatment and worked scenarios for dependency-aware evidence aggregation.
-  - Contrast naive conditional independence $P(\text{Compromise} \mid E_1, E_2, E_3)$ with TIDIR DAG-governed lineage fusion.
-* **Multi-Dimensional Containment Monotonicity ($R_{\text{attacker}}, A_{\text{business}}$)**:
-  - Expand the Security-State Monotonicity invariant into a multi-objective state space balancing attacker reachability reduction against business operability and availability budgets.
+  - Define TIDIR benchmark reference profiles (for reproducible evaluation, not universal industry definitions): $W_1$ (Mid-Market Reference, 25k EPS), $W_2$ (Enterprise Reference, 250k EPS), and $W_3$ (Hyperscale Reference, 1M EPS).
+* **Formal Bayesian Evidence Calibration & Lineage Fusion**:
+  - Provide formal mathematical treatment and worked scenarios for dependency-aware evidence aggregation.
+  - Empirically and mathematically attack the boundary: examine how far dependencies propagate up the provenance DAG, how partial vs complete dependence is distinguished without full generative models, and how to prevent false-confidence compounding without over-complicating runtime inference.
+* **Multi-Dimensional Containment Constraints ($R_{\text{attacker}} \mid C_{\text{availability}}$)**:
+  - *Strictly experimental exploration*: Investigate whether business operability and service availability can be modeled as **deterministic constraints on permissible containment candidates** without weakening the underlying security partial order.
+  - *Core Guardrail*: Availability must never be modeled as an optimization trade-off variable against attacker reachability (which would dangerously permit *"attacker reachability increased slightly, but availability improved sufficiently"*). Monotonicity remains non-negotiable: $R(s_{\text{post}}) \subseteq R(s_{\text{pre}})$.
 * **SecOps Unit Economics Framework**:
   - Model telemetry economics as a first-class architectural dimension: $\Delta(\text{Marginal Defensive Value}) / \Delta(\text{Compute} + \text{Storage} + \text{Human Cost})$.
-* **Reproducible Attack-to-Containment Benchmark Harness**:
-  - Build an open, reproducible test harness replaying standardized attack chains (e.g. Atomic Red Team, CALDERA) over synthetic OCSF streams to benchmark MTTC and DAG reconstructability under induced failures.
 
 ---
 

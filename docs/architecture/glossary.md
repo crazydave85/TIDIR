@@ -11,7 +11,7 @@ To maintain intellectual credibility and prevent jargon proliferation, TIDIR exp
 
 1. <span style="background: #064e3b; color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">ESTABLISHED</span> **Established Concepts**: Industry-standard patterns and foundational computer science principles directly adopted by TIDIR. We retain their standard terminology rather than inventing proprietary names (e.g. *least privilege*, *circuit breakers*, *dead-letter queues*, *append-only logs*, *workload identity*).
 2. <span style="background: #1e1b4b; color: #a855f7; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">ADAPTED</span> **Adapted Concepts**: Established engineering concepts applied specifically to autonomous cyber defence problems (e.g. *compensating transactions adapted to perimeter reachability*, *SRE alert error budgets applied to detection fidelity*).
-3. <span style="background: #0c4a6e; color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">TIDIR-SPECIFIC</span> **TIDIR-Specific Concepts**: Novel syntheses, formal safety properties, or architectures intentionally defined by TIDIR to address unsolved constraints in modern SecOps (e.g. *Confidence–Authority Separation*, *Security-State Monotonicity*, *Evidential Independence*).
+3. <span style="background: #0c4a6e; color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">TIDIR-SPECIFIC</span> **TIDIR-Specific Concepts**: Novel syntheses, formal safety properties, or architectures intentionally defined by TIDIR to address safety and operational constraints in modern SecOps (e.g. *Confidence–Authority Separation*, *Security-State Monotonicity*, *Evidential Independence*).
 
 ---
 
@@ -64,12 +64,12 @@ Before examining specialized terms, it is essential to state what TIDIR does **n
 ---
 
 ### Telemetry Preservation
-<span style="background: #0c4a6e; color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">TIDIR-SPECIFIC</span> · **Invariants**: `INV-01` · **ADRs**: `ADR-0002` · **Capabilities**: `CAP-TEL-001`
+<span style="background: #1e1b4b; color: #a855f7; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">ADAPTED</span> · **Invariants**: `INV-01` · **ADRs**: `ADR-0002` · **Capabilities**: `CAP-TEL-001`
 
 - **Plain-English Definition**: Security telemetry must never be thrown away simply because no active detection rule currently searches for it. Raw forensic evidence is preserved in open formats for historical investigation.
 - **Concrete Engineering Example**: DNS query logs containing uncommon query record types are not queried by active detection rules. Rather than discarding them, the telemetry fabric ingests and normalizes them into OCSF, storing unmapped vendor fields in JSON columns within long-term lakehouse partitions.
-- **Technical Explanation**: An invariant (`INV-01`) mandating that line-rate event streams be written into open, columnar storage (e.g. Parquet/Iceberg on object storage) with unmapped attributes preserved under structured catch-all fields (`unmapped_data`), independent of whether any current detection query references the event.
-- **Why TIDIR Uses It**: Volume-based SIEM licensing historically forced organizations to filter and drop raw telemetry at the collection boundary. When a novel zero-day is disclosed months later, security teams are blind during retrospective investigations.
+- **Technical Explanation**: An adapted data-engineering pattern formalized as a mandatory architectural invariant (`INV-01`). The underlying architecture adapts established big-data patterns (open columnar lakehouse storage, schema evolution, and decoupled object storage) into a non-negotiable security invariant: line-rate event streams must be preserved in vendor-neutral representations (e.g. Parquet/Iceberg) with unmapped attributes retained in structured catch-all fields (`unmapped_data`), strictly prohibiting edge-side semantic filtering.
+- **Why TIDIR Uses It**: Volume-based SIEM licensing historically forced organizations to filter and drop raw telemetry at the collection boundary. When a novel zero-day is disclosed months later, security teams are blind during retrospective investigations. While data lakehouses are standard engineering practice, adapting them into an inviolable operational rule ensures forensic reconstructability regardless of changing commercial licensing or detection priorities.
 
 ---
 

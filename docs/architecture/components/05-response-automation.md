@@ -89,9 +89,9 @@ flowchart TB
 
 ## 3. Architectural Capability Archetypes & Protocol Standards
 
-| Subsystem Component | Functional Architecture Pattern | Data Model & Protocol Standards |
-| :--- | :--- | :--- |
-| **Containment Orchestrator** | Monotonic state machine with forward recovery, fail-closed escalation, and idempotent retry semantics. | Declarative workflow DAG (JSON/YAML specification); stateful execution tokens. |
-| **Connector Integration Bus** | Asynchronous message bus with circuit breaker patterns, backpressure management, and dead-letter routing. | CloudEvents specification; REST/gRPC bi-directional streaming interfaces. |
-| **Consensus & Gating Engine** | Cryptographic multi-signature consensus workflow with timeout escalations and webhook-based interactive authorisation. | Public key signatures; out-of-band push notifications with ephemeral verification tokens. |
-| **Execution Audit Ledger** | Append-only event stream with tamper-evident cryptographic sealing for every forward containment and escalation mutation. | RFC 3161 timestamps; immutable signed transaction log. |
+| Subsystem Component | Functional Architecture Pattern | Data Model & Protocol Standards | Framework Alignment |
+| :--- | :--- | :--- | :--- |
+| **Containment Orchestrator** | Monotonic state machine with forward recovery, fail-closed escalation, and idempotent retry semantics. | Declarative workflow DAG (JSON/YAML specification); stateful execution tokens. | **CIS v8:** Control 17.6, 17.7<br>[`d3f:ProcessTermination`](https://d3fend.mitre.org/technique/d3f:ProcessTermination/) |
+| **Connector Integration Bus** | Asynchronous message bus with circuit breaker patterns, backpressure management, and dead-letter routing. | CloudEvents specification; REST/gRPC bi-directional streaming interfaces. | **OWASP API:** `API10:2023`<br>[`d3f:NetworkIsolation`](https://d3fend.mitre.org/technique/d3f:NetworkIsolation/) |
+| **Consensus & Gating Engine** | Cryptographic multi-signature consensus workflow with timeout escalations and webhook-based interactive authorisation. | Public key signatures; out-of-band push notifications with ephemeral verification tokens. | **CIS v8:** Control 17.8<br>[`d3f:AccessPolicyAdministration`](https://d3fend.mitre.org/technique/d3f:AccessPolicyAdministration/) |
+| **Execution Audit Ledger** | Append-only event stream with tamper-evident cryptographic sealing for every forward containment and escalation mutation. | RFC 3161 timestamps; immutable signed transaction log. | **CIS v8:** Control 17.9, 8.12<br>[`d3f:FileHashing`](https://d3fend.mitre.org/technique/d3f:FileHashing/) |

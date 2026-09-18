@@ -73,9 +73,10 @@ flowchart TB
 
 ## 3. Architectural Capability Archetypes & Protocol Standards
 
-| Sub-component | Functional Architecture Pattern | Data Model & Protocol Standards |
-| :--- | :--- | :--- |
-| **Stream Detection** | Distributed event-driven stream processor with sliding-window state storage and microsecond event-time watermarking. | Declarative stream predicates; in-memory state snapshots. |
-| **Batch Analytics Engine** | Distributed SQL query engine supporting columnar object storage pruning and vectorized query execution. | SQL:2016 standard queries; columnar open table format manifests. |
-| **Rule Specification** | Polyglot declarative detection specification (vendor-neutral YAML metadata envelope with target-optimized execution blocks). | YAML schema mapping to OCSF Class attributes; native KQL, SPL, and SQL query blocks. |
-| **Adversary Emulation Runner** | Automated test harness executing atomic adversary techniques against staging sensors. | MITRE ATT&CK technique IDs; non-destructive atomic execution manifests. |
+| Sub-component | Functional Architecture Pattern | Data Model & Protocol Standards | Framework & ACF Archetype |
+| :--- | :--- | :--- | :--- |
+| **Stream Detection** | Distributed event-driven stream processor with sliding-window state storage and microsecond event-time watermarking. | Declarative stream predicates; in-memory state snapshots. | **D3FEND ACF:** Symbolic Logic<br>[`d3f:ProcessSpawnAnalysis`](https://d3fend.mitre.org/technique/d3f:ProcessSpawnAnalysis/) |
+| **Batch Analytics Engine** | Distributed SQL query engine supporting columnar object storage pruning and vectorized query execution. | SQL:2016 standard queries; columnar open table format manifests. | **D3FEND ACF:** Statistical Analysis<br>[MITRE CAR Analytic Models](https://car.mitre.org/) |
+| **Rule Specification** | Polyglot declarative detection specification (vendor-neutral YAML metadata envelope with target-optimized execution blocks; [ADR-0019](../../adr/0019-polyglot-detection-as-code-and-native-engine-adaptation.md)). | YAML schema mapping to OCSF Class attributes; native KQL, SPL, and SQL query blocks. | [MITRE CAR](https://car.mitre.org/) Data Models & ATT&CK Mappings |
+| **Adversary Emulation Runner** | Automated test harness executing atomic adversary techniques against staging sensors. | MITRE ATT&CK technique IDs; non-destructive atomic execution manifests. | MITRE ATT&CK & [ADR-0007](../../adr/0007-continuous-automated-purple-teaming-and-multi-model-consensus.md) |
+| **Bayesian Multi-Signal Risk Lens** | Dependency-aware evidence compounding mitigating the Base Rate Fallacy across orthogonal telemetry vectors. | Composite probability vector $(P(\text{Breach} \mid E_1, \dots, E_n))$; OCSF finding metadata. | **D3FEND ACF:** Statistical Analysis<br>[`d3f:UserBehaviorAnalysis`](https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/) |

@@ -157,9 +157,14 @@ export default withMermaid(
       ]
     ],
     themeConfig: {
+      outline: {
+        level: [2, 3],
+        label: "On this page"
+      },
       nav: [
         { text: "Start Here", link: "/guide/what-is-tidir" },
         { text: "Architecture", link: "/architecture/00-architectural-invariants" },
+        { text: "Research", link: "/architecture/foundational-research" },
         { text: "Capabilities", link: "/architecture/02-capability-model" },
         { text: "Components", link: "/architecture/components/01-threat-intelligence" },
         { text: "ADRs", link: "/adr/" },
@@ -174,6 +179,7 @@ export default withMermaid(
             items: [
               { text: "What is TIDIR?", link: "/guide/what-is-tidir" },
               { text: "15-Minute Golden Path", link: "/guide/golden-path" },
+              { text: "Foundational Research & Literature", link: "/architecture/foundational-research" },
               { text: "Assurance Case Map", link: "/architecture/assurance-map" }
             ]
           },
@@ -202,6 +208,7 @@ export default withMermaid(
             text: "Foundations & Decisions",
             items: [
               { text: "Architectural Invariants", link: "/architecture/00-architectural-invariants" },
+              { text: "Foundational Research & Literature", link: "/architecture/foundational-research" },
               { text: "System Overview & 4-Plane Model", link: "/architecture/01-system-overview" },
               { text: "ADR Registry", link: "/adr/" }
             ]
@@ -213,6 +220,7 @@ export default withMermaid(
             items: [
               { text: "Architectural Invariants & Constitution", link: "/architecture/00-architectural-invariants" },
               { text: "System Overview & 4-Plane Model", link: "/architecture/01-system-overview" },
+              { text: "Foundational Research & Literature", link: "/architecture/foundational-research" },
               { text: "Glossary & Concept Taxonomy", link: "/architecture/glossary" },
               { text: "Target Threat Model", link: "/architecture/09-threat-model" },
               { text: "Assurance Case Map", link: "/architecture/assurance-map" }
@@ -247,7 +255,8 @@ export default withMermaid(
           {
             text: "Architecture Decisions: Overview",
             items: [
-              { text: "ADR Registry Overview", link: "/adr/" }
+              { text: "ADR Registry Overview", link: "/adr/" },
+              { text: "Foundational Research & Literature", link: "/architecture/foundational-research" }
             ]
           },
           {

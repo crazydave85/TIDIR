@@ -52,3 +52,9 @@ Chosen option: **Dual-Plane Data Isolation with Schema-Constrained Extraction & 
 
 * Introduces preprocessing compute latency ($\lt 150\,\text{ms}$) to parse and structure free-form text into typed schemas before agent ingestion.
 * Complex unstructured narratives (e.g., free-text threat blogs) must pass through a schema-extraction stage before ingest into the agent knowledge graph.
+
+### Scientific & Literature Grounding
+
+* **Indirect Prompt Injection**: [Greshake et al. (2023)](https://doi.org/10.1145/3605764.3623985), *Not What You've Signed Up For: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection* (ACM AISEC '23); [FND-10](/architecture/foundational-research#fnd-10).
+* **Dual LLM Security Pattern**: [Willison (2023)](https://simonwillison.net/2023/Apr/25/dual-llm-pattern/), *The Dual LLM Pattern: A Security Architecture for Language Models Processing Untrusted Input*; [FND-11](/architecture/foundational-research#fnd-11).
+* **Separation of Policy & Mechanism**: [Saltzer & Schroeder (1975)](https://doi.org/10.1109/PROC.1975.9939), *The Protection of Information in Computer Systems* (IEEE); [FND-02](/architecture/foundational-research#fnd-02).

@@ -23,6 +23,9 @@ hero:
       text: Explore System Architecture
       link: /architecture/01-system-overview
     - theme: alt
+      text: Scientific Research Foundations
+      link: /architecture/foundational-research
+    - theme: alt
       text: Assurance Case Map
       link: /architecture/assurance-map
 
@@ -165,7 +168,19 @@ flowchart LR
 
 ---
 
-## 6. Explore by Role & Architectural Intent
+## 6. Open Security Frameworks Alignment
+
+TIDIR synthesizes defensive strategy, analytic taxonomy, API safety, and operational controls into a unified multi-framework alignment:
+
+* **Adversary Tactics & Attack Patterns**: [MITRE ATT&CK](https://attack.mitre.org/) (Enterprise TTPs), [MITRE ATLAS](https://atlas.mitre.org/) (AI/ML Threats), [MITRE CAPEC](https://capec.mitre.org/) (Attack Patterns).
+* **Defensive Countermeasures & Analytics**: [MITRE D3FEND](https://d3fend.mitre.org/) (Defensive Techniques), [D3FEND ACF](https://d3fend.mitre.org/) (Analytic Characterization Framework), [MITRE CAR](https://car.mitre.org/) (Cyber Analytics Repository).
+* **Active Defense & Deception Operations**: [MITRE ENGAGE](https://engage.mitre.org/) (Expose, Affect, Elicit, Understand).
+* **AI & API Tool Safety**: [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/) (Prompt Injection & Agency), [OWASP API Security Top 10](https://owasp.org/API-Security/) (BOLA, Broken Auth, Tool Boundaries).
+* **Enterprise Assurance & Data Schemas**: [CIS Controls v8](https://www.cisecurity.org/controls/v8) (Controls 5, 6, 8, 13, 17), [OCSF](https://ocsf.io/) (Open Cybersecurity Schema Framework), [STIX 2.1 / TAXII](https://oasis-open.github.io/cti-documentation/).
+
+---
+
+## 7. Explore by Role & Architectural Intent
 
 Select an entry point tailored to your focus:
 
@@ -215,7 +230,7 @@ Select an entry point tailored to your focus:
 
 ---
 
-## 7. Open Source & Machine Access
+## 8. Open Source & Machine Access
 
 TIDIR is published as an open-source reference standard under the **Apache 2.0 License**:
 

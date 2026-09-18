@@ -8,10 +8,10 @@
 ## The Challenge: Asymmetric Deficit in Security Operations
 
 Modern security operations are trapped in an escalating asymmetry:
-* **Attackers** leverage automated tooling, zero-day exploit exchanges, and AI-accelerated malware synthesis to traverse enterprise networks at machine velocity.
-* **Defenders** remain encumbered by proprietary data silos, restrictive ingestion licensing penalties, alert fatigue (the Base Rate Fallacy), and brittle, manual triage runbooks.
+* **Attackers** leverage automated vulnerability scanning, opportunistic exploit scripts, and emerging LLM-assisted vulnerability exploitation ([NCSC Assessment on AI and Cyber Threat](https://www.ncsc.gov.uk/report/impact-of-ai-on-cyber-threat); [Fang et al., 2024](https://arxiv.org/abs/2404.08144)), while relying on living-off-the-land techniques to achieve average breakout times under 62 minutes ([CrowdStrike Global Threat Report](https://www.crowdstrike.com/global-threat-report/)).
+* **Defenders** remain encumbered by proprietary data silos, restrictive ingestion licensing penalties, alert fatigue mathematically driven by the Base-Rate Fallacy ([Axelsson 2000](https://doi.org/10.1145/357830.357849)), and brittle, manual triage runbooks.
 
-Traditional Security Information and Event Management (SIEM) and Security Orchestration, Automation, and Response (SOAR) stacks attempt to bridge this gap through heuristic alert rules and unconstrained playbook scripts. In practice, this produces either paralysis (thousands of low-fidelity alerts) or dangerous fragility (uncontrolled automation causing self-inflicted business outages).
+Traditional Security Information and Event Management (SIEM) and Security Orchestration, Automation, and Response (SOAR) stacks attempt to bridge this gap through heuristic alert rules and unconstrained playbook scripts. In practice, this produces either paralysis (thousands of low-fidelity alerts) or dangerous fragility (uncontrolled automation causing self-inflicted business outages). Detailed lineage of these claims is cataloged in [Foundational Research & Literature](/architecture/foundational-research).
 
 ---
 
@@ -47,9 +47,10 @@ Rather than treating AI agents or statistical classifiers as autonomous decision
 
 ## Next Steps on the Golden Path
 
-To explore the architecture systematically, proceed through the 5-step architectural orientation:
+To explore the architecture systematically, proceed through the architectural orientation:
 
 * ➡️ **Step 2**: [The Architectural Constitution & Invariants](/architecture/00-architectural-invariants)
 * ➡️ **Step 3**: [System Overview & The 4-Plane Model](/architecture/01-system-overview)
+* ➡️ **Scientific Foundations**: [Foundational Research & Literature](/architecture/foundational-research)
 * ➡️ **Step 4**: [The Capability & Service Delivery Model](/architecture/02-capability-model)
 * ➡️ **Step 5**: [The Target Threat Model & Assurance Case](/architecture/09-threat-model)

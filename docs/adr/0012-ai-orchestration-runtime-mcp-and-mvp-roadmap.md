@@ -91,9 +91,10 @@ To optimize compute economics and latency, the Gateway routes prompts dynamicall
 - **Tier 1 (High-Velocity Cloud Models):** Mid-tier conversational and query generation models. Handles natural language to OCSF SQL translation, single-turn threat advisory summarization, and triage dossier drafting.
 - **Tier 2 (Cloud Frontier Reasoning Models):** Multi-hop reasoning models with extended thinking capabilities. Reserved for lead orchestrator planning, novel adversary campaign correlation across disparate entity graphs, and root-cause hypothesis debate.
 
-#### C. Deterministic Safety Kernel
+#### C. Deterministic Safety Kernel & OWASP API Security Compliance
 - **Agent Trust Boundary (Dual-Plane Isolation):** Treats all telemetry payloads, email bodies, file paths, and external CTI as untrusted data planes. Instructions come exclusively from versioned, cryptographically hashed control prompts. Prompt injection is assumed possible; the architecture prevents successful injection from becoming unauthorized authority.
 - **Deterministic AST Validator:** Every SQL or streaming query synthesized by an LLM is parsed into an Abstract Syntax Tree (AST) before database execution. Any query containing mutating keywords (`DROP`, `DELETE`, `UPDATE`, `INSERT`, `ALTER`) or missing mandatory partition bounds is rejected deterministically.
+- **OWASP API Security Top 10 (2023) Compliance for MCP:** MCP tool interfaces enforce strict typed schemas (Zod/Pydantic) countering `API1:2023` (Broken Object Level Authorization) via tenant-scoped SVIDs, `API2:2023` (Broken Authentication) via mTLS attestation, and `API4:2023` (Unrestricted Resource Consumption) via deterministic hop and cost circuit breakers ([ADR-0015](/adr/0015-sandboxed-agent-execution-otlp-convergence-and-ephemeral-identity)).
 
 ---
 

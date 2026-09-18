@@ -93,6 +93,19 @@ The operational bottleneck to automated response is the fear of isolating a legi
 
 ---
 
+### 4. MITRE ENGAGE & D3FEND Framework Alignment
+
+TIDIR's Ambient Deception Fabric aligns directly with [MITRE ENGAGE](https://engage.mitre.org/) for active cyber defense and [MITRE D3FEND](https://d3fend.mitre.org/):
+
+| MITRE ENGAGE Strategic Goal | Tactical Engagement Activity | MITRE D3FEND Countermeasure | TIDIR Implementation Primitive |
+| :--- | :--- | :--- | :--- |
+| **Expose (`EAC-1`)** | Lures & Canary Files | [`d3f:DecoyFile`](https://d3fend.mitre.org/technique/d3f:DecoyFile/) | Filesystem lures (`draft_financials.xlsx`) in file shares acting as anti-ransomware tripwires. |
+| **Affect (`EAC-2`)** | Honeytokens & Fake Accounts | [`d3f:DecoyUserCredential`](https://d3fend.mitre.org/technique/d3f:DecoyUserCredential/) | Canary AWS/Azure access keys and bogus Active Directory SPNs that trigger immediate containment. |
+| **Elicit (`EAC-3`)** | Interactive Decoy Environments | [`d3f:DecoyEnvironment`](https://d3fend.mitre.org/technique/d3f:DecoyEnvironment/) | Transparent session redirection to sandboxed microVMs logging adversary lateral movement toolchains. |
+| **Understand (`EAC-4`)** | Forensic Correlation | [`d3f:UserBehaviorAnalysis`](https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/) | Correlation of decoy interactions into the Incident Decision DAG with zero benign operational noise. |
+
+---
+
 ## Consequences
 
 ### Positive Consequences
