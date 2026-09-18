@@ -62,30 +62,41 @@ const assessment = JSON.parse(data.candidates[0].content.parts[0].text);
 // 5. Execute GitHub commands based on the AI's decision
 console.log(`🤖 AI Decision: ${assessment.action.toUpperCase()}`);
 
+const repoName = process.env.GITHUB_REPOSITORY;
+const isDryRun = process.env.DRY_RUN === "true";
+
 if (assessment.action === "issue") {
-  // Explicitly target the parent repository 
-  await $`gh issue create --repo Haribu/TIDIR --title ${assessment.title} --body ${assessment.body}`;
-  console.log(`✅ Created Issue in parent repo: ${assessment.title}`);
-
-} else if (assessment.action === "pr") {
-  // Create a new branch, write the files, commit, and push
-  const branchName = `agent-updates-${Date.now()}`;
-  await $`git checkout -b ${branchName}`;
-
-  for (const file of assessment.filesToUpdate) {
-    await Bun.write(file.path, file.content);
-    console.log(`✏️ Updated: ${file.path}`);
+  if (isDryRun) {
+    console.log(`[DRY RUN] 🛡️ Would have created Issue in Haribu/TIDIR: ${assessment.title}`);
+  } else {
+    await $`gh issue create --repo Haribu/TIDIR --title ${assessment.title} --body ${assessment.body}`;
+    console.log(`✅ Created Issue in parent repo: ${assessment.title}`);
   }
 
-  await $`git config user.name "github-actions[bot]"`;
-  await $`git config user.email "github-actions[bot]@users.noreply.github.com"`;
-  await $`git add .`;
-  await $`git commit -m ${assessment.title}`;
-  await $`git push origin ${branchName}`;
+} else if (assessment.action === "pr") {
+  const branchName = `agent-updates-${Date.now()}`;
   
-  // Open the Pull Request
-  await $`gh pr create --title ${assessment.title} --body ${assessment.body} --head ${branchName}`;
-  console.log(`✅ Created Pull Request: ${assessment.title}`);
+  if (isDryRun) {
+    console.log(`[DRY RUN] 🛡️ Would have created PR to Haribu/TIDIR from branch: ${branchName}`);
+    console.log(`[DRY RUN] 🛡️ PR Title: ${assessment.title}`);
+    console.log(`[DRY RUN] 🛡️ Files it wanted to update: ${assessment.filesToUpdate.map((f: any) => f.path).join(', ')}`);
+  } else {
+    await $`git checkout -b ${branchName}`;
+
+    for (const file of assessment.filesToUpdate) {
+      await Bun.write(file.path, file.content);
+      console.log(`✏️ Updated: ${file.path}`);
+    }
+
+    await $`git config user.name "github-actions[bot]"`;
+    await $`git config user.email "github-actions[bot]@users.noreply.github.com"`;
+    await $`git add .`;
+    await $`git commit -m ${assessment.title}`;
+    await $`git push origin ${branchName}`;
+    
+    await $`gh pr create --repo Haribu/TIDIR --base main --title ${assessment.title} --body ${assessment.body} --head ${branchName}`;
+    console.log(`✅ Created Pull Request: ${assessment.title}`);
+  }
 
 } else {
   console.log("✅ Assessment passed. No action required.");
