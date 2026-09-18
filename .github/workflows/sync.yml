@@ -67,6 +67,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main # Ensure it pulls the newly updated main branch
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
           
       - name: Execute MD Agents
         env:
