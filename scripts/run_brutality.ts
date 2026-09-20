@@ -35,15 +35,99 @@ You MUST respond with ONLY valid JSON matching this schema:
       "content": "The COMPLETE new text for this file (required if action is 'pr')" 
     }
   ]
-}`;
-// 3. Call the Gemini API with a Retry Loop
+}
+
+CRITICAL JSON FORMATTING REQUIREMENT:
+Your output MUST be strictly valid JSON. Any backslashes (such as in LaTeX math formulas like \\lt, \\le, \\log, or in file paths) MUST be double-escaped as \\\\ inside JSON strings so that invalid escape characters (like \\l) are never produced.`;
+
+// Helper: Sanitize invalid backslash escape sequences and raw control characters inside JSON strings
+function sanitizeJsonString(jsonStr: string): string {
+  let inString = false;
+  let result = "";
+  for (let i = 0; i < jsonStr.length; i++) {
+    const char = jsonStr[i];
+    if (!inString) {
+      if (char === '"') inString = true;
+      result += char;
+    } else {
+      if (char === '"') {
+        inString = false;
+        result += char;
+      } else if (char === "\\") {
+        const next = jsonStr[i + 1];
+        if (next === undefined) {
+          result += "\\\\";
+        } else if (['"', "\\", "/", "b", "f", "n", "r", "t"].includes(next)) {
+          result += "\\" + next;
+          i++;
+        } else if (next === "u" && /^[0-9a-fA-F]{4}$/.test(jsonStr.slice(i + 2, i + 6))) {
+          result += jsonStr.slice(i, i + 6);
+          i += 5;
+        } else {
+          // Invalid escape character (e.g. \l from LaTeX \lt or \le, \a, etc.)
+          // Double the backslash so JSON.parse treats it as an escaped backslash literal
+          result += "\\\\";
+        }
+      } else if (char === "\n") {
+        result += "\\n";
+      } else if (char === "\r") {
+        result += "\\r";
+      } else if (char === "\t") {
+        result += "\\t";
+      } else {
+        result += char;
+      }
+    }
+  }
+  return result;
+}
+
+// Helper: Safely extract and parse JSON from model output
+function parseAssessmentJson(rawText: string): any {
+  let cleaned = rawText.trim();
+  if (cleaned.includes("```json")) {
+    const match = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (match && match[1]) {
+      cleaned = match[1].trim();
+    }
+  } else if (cleaned.startsWith("```")) {
+    cleaned = cleaned.replace(/^```\s*\n?/, "").replace(/\n?```\s*$/, "").trim();
+  }
+
+  if (!cleaned.startsWith("{") && cleaned.includes("{")) {
+    const firstBrace = cleaned.indexOf("{");
+    const lastBrace = cleaned.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+      cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+    }
+  }
+
+  try {
+    return JSON.parse(cleaned);
+  } catch (initialErr: any) {
+    console.warn(`⚠️ Direct JSON parse failed (${initialErr.message}). Attempting automatic escape-character sanitization...`);
+    const sanitized = sanitizeJsonString(cleaned);
+    try {
+      return JSON.parse(sanitized);
+    } catch (sanitizedErr: any) {
+      console.error("❌ Failed to parse JSON even after sanitization:", sanitizedErr.message);
+      console.error("--- RAW MODEL OUTPUT START ---");
+      console.error(rawText);
+      console.error("--- RAW MODEL OUTPUT END ---");
+      throw sanitizedErr;
+    }
+  }
+}
+
+// 4. Call the Gemini API with a Retry Loop
 let response;
 const maxRetries = 5;
 let delay = 10000; // Start with a 10-second wait
 
 for (let attempt = 1; attempt <= maxRetries; attempt++) {
   // Be sure to use your working model version here (e.g. gemini-1.5-flash or whatever you settled on)
-  response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent", { 
+  const model = process.env.GEMINI_MODEL || "gemini-3.6-flash";
+  response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, { 
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -52,7 +136,29 @@ for (let attempt = 1; attempt <= maxRetries; attempt++) {
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: systemPrompt }] },
       contents: [{ role: "user", parts: [{ text: contentToAssess }] }],
-      generationConfig: { response_mime_type: "application/json" } 
+      generationConfig: { 
+        response_mime_type: "application/json",
+        response_schema: {
+          type: "OBJECT",
+          properties: {
+            action: { type: "STRING", enum: ["issue", "pr", "none"] },
+            title: { type: "STRING" },
+            body: { type: "STRING" },
+            filesToUpdate: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  path: { type: "STRING" },
+                  content: { type: "STRING" }
+                },
+                required: ["path", "content"]
+              }
+            }
+          },
+          required: ["action", "title", "body"]
+        }
+      } 
     })
   });
 
@@ -81,13 +187,28 @@ for (let attempt = 1; attempt <= maxRetries; attempt++) {
   }
 }
 
+if (!response || !response.ok) {
+  console.error("❌ Fatal: No successful response received from Gemini API.");
+  process.exit(1);
+}
+
 const data = await response.json();
-const assessment = JSON.parse(data.candidates[0].content.parts[0].text);
+const candidate = data.candidates?.[0];
+const rawText = candidate?.content?.parts?.[0]?.text;
+
+if (!rawText) {
+  console.error("❌ No text content returned by Gemini API. Response payload:", JSON.stringify(data, null, 2));
+  process.exit(1);
+}
+
+const assessment = parseAssessmentJson(rawText);
+
 // 5. Execute GitHub commands based on the AI's decision
-console.log(`🤖 AI Decision: ${assessment.action.toUpperCase()}`);
+console.log(`🤖 AI Decision: ${(assessment.action || "NONE").toUpperCase()}`);
 
 const repoName = process.env.GITHUB_REPOSITORY;
 const isDryRun = process.env.DRY_RUN === "true";
+const filesToUpdate = Array.isArray(assessment.filesToUpdate) ? assessment.filesToUpdate : [];
 
 if (assessment.action === "issue") {
   if (isDryRun) {
@@ -103,11 +224,11 @@ if (assessment.action === "issue") {
   if (isDryRun) {
     console.log(`[DRY RUN] 🛡️ Would have created PR to Haribu/TIDIR from branch: ${branchName}`);
     console.log(`[DRY RUN] 🛡️ PR Title: ${assessment.title}`);
-    console.log(`[DRY RUN] 🛡️ Files it wanted to update: ${assessment.filesToUpdate.map((f: any) => f.path).join(', ')}`);
+    console.log(`[DRY RUN] 🛡️ Files it wanted to update: ${filesToUpdate.map((f: any) => f.path).join(', ')}`);
   } else {
     await $`git checkout -b ${branchName}`;
 
-    for (const file of assessment.filesToUpdate) {
+    for (const file of filesToUpdate) {
       await Bun.write(file.path, file.content);
       console.log(`✏️ Updated: ${file.path}`);
     }
@@ -127,4 +248,4 @@ if (assessment.action === "issue") {
 }
 
 // 6. Ensure the markdown body is printed so the GitHub Action captures it for the Summary
-console.log(assessment.body);
+console.log(assessment.body || "No assessment body provided.");
