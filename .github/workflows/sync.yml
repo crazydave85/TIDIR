@@ -103,7 +103,7 @@ jobs:
           cp REVIEW.md /tmp/agent-tools/
 
       - name: Checkout updated code (main branch)
-        uses: actions/checkout@7
+        uses: actions/checkout@v7
         with:
           ref: main
           clean: true
