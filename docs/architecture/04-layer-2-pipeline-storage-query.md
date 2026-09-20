@@ -89,6 +89,13 @@ Not all telemetry possesses equal analytical value. Storing petabytes of high-vo
 2. **Tier B (Forensic / Compliance Bulk)**: Bypasses the indexing tier entirely. Batched directly into open columnar files in object storage for cost-effective retention and scheduled batch query.
 3. **Tier C (Governed Data Compaction & Noise Pruning)**: Operational chatter (e.g., sensor heartbeats, health-check pings, unmutated status polling) is aggregated into rolling statistical metrics or deduplicated at ingress according to explicit evidence-retention policies.
 4. **Data Redaction & Tokenization**: Sensitive fields (PII, tokens, or credentials captured in command lines) are tokenized or masked prior to persistence.
+5. **Agentic Telemetry Ingress & Trace Forking (The $10\times$ Agent Volume Multiplier)**:
+   - Autonomous security agents and multi-agent meshes generate approximately $10\times$ more telemetry than traditional human or static service workloads. Every task produces distributed reasoning traces, Model Context Protocol (MCP) tool execution logs, in-memory blackboard checkpoints, and model prompt-response pairs.
+   - Ingesting this flood directly into the Hot Analytical Index tier would cause unsustainable indexing cost escalation and disk I/O contention.
+   - Layer 2 enforces **Agent Trace Forking**:
+     - *Trace Lineage Separation*: Raw agent reasoning envelopes, OpenTelemetry (OTel) spans, and complete tool-call payloads bypass the hot inverted-index tier entirely.
+     - *Columnar Lakehouse Streaming Ingress*: Traces stream directly into an append-only Parquet or Iceberg table in the Security Lakehouse tier, partitioned by investigation identifier and timestamp.
+     - *Forensic Traceability*: Only high-level agent lifecycle events (task creation, hypothesis completion, and proposed containment actions) write to the Hot Analytical Index for operational dashboarding. Full agent execution lineage remains queryable on demand from the lakehouse.
 
 > [!IMPORTANT]
 > **Constitutional Preservation Boundary (Invariant 1 Compliance)**  
@@ -159,6 +166,21 @@ Layer 2 provides four computational engines designed for distinct temporal and a
 4. **Machine Learning & Feature Store Engine**:
    - Computes rolling statistical entity features (e.g., mean outbound transfer volume per workload, user typical access windows).
    - Generates and persists vector embeddings for similarity clustering across security events and execution graphs.
+
+### Selective Context Retrieval & Analytical Pushdown for AI Workloads
+
+Feeding raw, unbounded telemetry logs into Large Language Model (LLM) or Small Language Model (SLM) context windows creates severe operational bottlenecks: excessive token costs, increased inference latency, and cognitive attention degradation across long context windows.
+
+Layer 2 resolves this by enforcing **Selective Context Retrieval** across the data fabric:
+
+1. **In-Storage Analytical Pushdown**:
+   - AI agents never scan or ingest raw event streams directly.
+   - When an autonomous specialist agent investigates a hypothesis (such as calculating connection frequency or identifying rare parent processes), the agent issues an Abstract Syntax Tree (AST)-validated query to Layer 2 compute engines (Lakehouse SQL or streaming state stores).
+   - The query executes in-place at the storage layer, performing aggregation, filtering, and set projection close to the data.
+
+2. **Compacted Evidence Dossiers**:
+   - Layer 2 returns strictly structured, minimal summary payloads: unique entity counts, distinct IP lists, or compressed graph edges rather than thousands of raw log lines.
+   - This keeps agent prompts within optimal attention budgets (under $10\text{k}$ tokens), slashes cloud inference costs, and ensures decisions are grounded in mathematically verified aggregates rather than probabilistic model-side approximations.
 
 ---
 

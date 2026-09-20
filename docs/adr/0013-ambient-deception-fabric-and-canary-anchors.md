@@ -8,7 +8,7 @@ Technical Story: [Deception & Canary Architecture]
 
 ## Context and Problem Statement
 
-A central failure mode of enterprise detection engineering is the **Base Rate Fallacy**: in an environment processing billions of benign events daily, even detection rules with high statistical specificity (e.g. $99.9\%$) inevitably generate overwhelming volumes of false-positive alerts. Furthermore, fear of false positives cripples response automation; security leadership hesitates to authorize autonomous host isolation or session revocation when an alert might stem from a legitimate administrative script or developer utility.
+A central failure mode of enterprise detection engineering is the **Base Rate Fallacy**: in an environment processing billions of benign events daily, even detection rules with high statistical specificity (e.g. 99.9%) inevitably generate overwhelming volumes of false-positive alerts. Furthermore, fear of false positives cripples response automation; security leadership hesitates to authorize autonomous host isolation or session revocation when an alert might stem from a legitimate administrative script or developer utility.
 
 Traditional deception solutions attempted to solve this by deploying complex, high-maintenance honeynet subnets or dedicated virtual appliances. These systems suffer from heavy operational overhead, distinct network footprints easily fingerprinted and bypassed by sophisticated adversaries, and poor integration into mainstream SecOps pipelines.
 

@@ -125,12 +125,19 @@ flowchart LR
 1. **Canonical OCSF Machine Identity Mapping**:
    - Machine authentication transactions map to OCSF Class 3002 (`Authentication`), explicitly flagging `actor.user.type = "Service"` or `"Machine"`.
    - Workload identity creations, credential assignments, and permission grants map to OCSF Class 3005 (`Entity Management`).
-2. **Non-Human Identity Behavioral Profiling**:
-   - Unlike human users, healthy machine identities follow predictable patterns (consistent API call distributions, fixed VPC origin subnets, uniform request velocities).
-   - The Layer 3 analytics engine constructs rolling 14-day behavioral profiles for every active NHI:
-     - **API Surface Profiling**: Alerts on service accounts invoking rarely accessed administration endpoints (e.g. `iam:CreateAccessKey`, `sts:GetFederationToken`).
-     - **Origin Geolocation & VPC Deviation**: Flags machine tokens minted in internal cloud VPCs that are suddenly replayed from external public IP ranges or unapproved cloud regions (stolen token replay).
-     - **Dormancy Awakening**: Alerts when a service account inactive for $\gt 30$ days suddenly generates high-velocity read or export queries.
+2. **Non-Human Identity Behavioral Profiling & Agentic UEBA**:
+   - Traditional User and Entity Behaviour Analytics (UEBA) was engineered for human operators. It relies heavily on human-centric baselines: circadian rhythms, office shift hours, interactive keyboard or mouse dynamics, and geographical travel anomalies.
+   - Autonomous AI agents and machine workloads execute non-interactively at wire speed across ephemeral cloud clusters. Applying human circadian heuristics to autonomous agent meshes results in intolerable false-positive rates or total detection blindness.
+   - The Layer 3 analytics engine constructs rolling behavioral profiles across two operational classes:
+     - **Cloud Service Accounts & Workload Identities**:
+       - *API Surface Profiling*: Alerts on service accounts invoking rarely accessed administration endpoints (such as `iam:CreateAccessKey` or `sts:GetFederationToken`).
+       - *Origin Geolocation & VPC Deviation*: Flags machine tokens minted in internal cloud Virtual Private Clouds (VPCs) that are suddenly replayed from external public IP ranges or unapproved cloud regions (indicating stolen token replay).
+       - *Dormancy Awakening*: Alerts when a service account inactive for $\gt 30\text{ days}$ (more than 30 days) suddenly generates high-velocity read or export queries.
+     - **Autonomous AI Agents & Execution Meshes (Agentic UEBA)**:
+       - *Tool-Call Entropy*: Evaluates mathematical variance across the sequence, diversity, and argument schemas of Model Context Protocol (MCP) tool invocations. A blue triage agent tasked with network log analysis that suddenly begins invoking IAM key-generation tools exhibits anomalous tool-call entropy, indicating prompt injection or subversion.
+       - *Iteration Frequency & Burst Ratios*: Measures rapid spikes in turn cadence and tool-call velocity. This distinguishes normal step-wise investigations from runaway recursive loops, resource-exhaustion attacks, or adversary-driven automated data exfiltration.
+       - *Token Distribution Variance*: Tracks shifts in input-to-output token ratios ($\text{Tokens}_{\text{in}} / \text{Tokens}_{\text{out}}$). Sudden token inflation or deflation signals context stuffing, data leakage, prompt extraction, or unconstrained model babbling.
+       - *Graph Recursion & Branching Factor*: Monitors divergence from standard specialist investigation Directed Acyclic Graph (DAG) templates. Alerts fire when an agent exceeds expected sub-task fan-out bounds before reaching a triage hypothesis.
 
 ---
 

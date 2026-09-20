@@ -58,6 +58,17 @@ function checkHtmlFile(filePath: string) {
     console.error(`❌ [Unrendered Math Delimiter Leak] in ${relativePath}: contains unrendered raw math dollar expressions`);
     errorsFound++;
   }
+
+  // Check 6: Swallowed math or fragmented TeX comments in text nodes
+  if (
+    content.includes("( or {") ||
+    content.includes("Over  of all") ||
+    content.includes("True Positive Rate ( )") ||
+    content.includes("True Negative Rate ( )")
+  ) {
+    console.error(`❌ [Swallowed Math Regression] in ${relativePath}: contains fragmented or swallowed math text`);
+    errorsFound++;
+  }
 }
 
 function traverse(dir: string) {

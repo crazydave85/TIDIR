@@ -273,7 +273,36 @@ flowchart TB
 
 ---
 
-## 3. Dedicated AI Threat Modeling & Defense-in-Depth
+## 3. Compound Multi-Plane Adversary Campaigns
+
+While isolated threat vectors ($\text{T}_1$ to $\text{T}_9$) model discrete attack primitives, sophisticated adversaries execute **compound campaigns** that cross trust boundaries and exploit the interaction between defensive planes. The architecture must demonstrate compositional safety: the property that composing safe individual subsystems does not yield an unsafe composite state.
+
+The three benchmark compound campaigns below illustrate how TIDIR maintains safety when adversaries chain multi-stage attacks across the system:
+
+### Campaign C1: Sensor Spoofing to Containment Sabotage & Break-Glass Hijacking
+* **Adversary Strategy**: The adversary breaches an edge sensor network or compromises an external threat feed ($\text{T}_1, \text{T}_2$). They inject crafted beacon events mimicking high-velocity ransomware activity to provoke automated containment. When automated playbooks isolate a network switch, enterprise operations are disrupted. The adversary leverages the ensuing crisis to socially engineer or force invocation of an unauthenticated Break-Glass protocol ($\text{T}_6, \text{T}_7$) to hijack privileged execution tokens.
+* **TIDIR Compositional Defence**:
+  1. *Evidential Cross-Validation*: The Risk Lens requires corroboration across orthogonal sensor domains (`sensor_domains` $\ge 2$). Ingested single-stream beacon floods are throttled by token-bucket rate limiters ($\beta_{\text{override}} \le N_{\max}/\Delta t$).
+  2. *Pre-Execution Blast-Radius Boundary*: Invariant 6 (Bounded Autonomy) and Critical Asset Immunity enforce deterministic blocks on core routing switches, refusing disruptive automated isolation regardless of composite score.
+  3. *Audited Multi-Signature Break-Glass*: Invoking emergency break-glass requires cryptographic dual-authorization and instantly broadcasts signed audit records across out-of-band channels (Invariant 9), preventing unilateral identity theft.
+
+### Campaign C2: Indirect Prompt Injection to Semantic Exfiltration via Read-Only AST
+* **Adversary Strategy**: The adversary embeds prompt injection instructions inside an HTTP User-Agent header or audit log ($\text{T}_4$). When an autonomous triage agent investigates an alert, the payload hijacks model reasoning. Blocked from shell execution by the Agent Trust Boundary, the compromised agent attempts data exfiltration by generating a syntactically valid `SELECT` query targeting sensitive employee records, using high-cardinality aggregation and timing side-channels ($\text{T}_9$).
+* **TIDIR Compositional Defence**:
+  1. *Multi-Tier Query Safety Boundary*: The deterministic query boundary goes beyond syntax AST checking (`SELECT`-only) to enforce **semantic data authorization**: dataset-level tenant scoping blocks queries against non-telemetry datasets (HR, finance, customer PII), and dynamic masking redacts secrets.
+  2. *Resource Ceilings & Anti-DoS*: The query engine enforces strict byte-scan limits (max 50 GB) and query execution timeouts ($\le 15\text{s}$), rendering timing-delay side-channels ineffective.
+  3. *Inference & Redaction Pipeline*: Triage briefings pass through automated redaction before display, preventing unauthorized data extraction.
+
+### Campaign C3: Supply-Chain TCB Subversion to State-Machine Escalation
+* **Adversary Strategy**: An adversary compromises an upstream library in the CI/CD deployment pipeline ($\text{T}_8$, Supply Chain). The backdoored build subtly modifies the policy compiler or introduces a bypass in the containment state machine to trigger non-monotonic rollback ($s_{n+1} \succ s_n$) during active incidents, restoring adversary reachability while reporting success.
+* **TIDIR Compositional Defence**:
+  1. *Transitive Implementation TCB Hardening*: Hermetic build pipelines with reproducible builds, in-toto cryptographic provenance attestations, and SLSA Level 3 supply-chain verification protect the deployment pipeline.
+  2. *Cryptographically Signed GitOps Governance*: Containment policies are immutable, signed artifacts requiring dual human cryptographic keys; runtime APIs cannot mutate policy logic.
+  3. *Connector-Level Independent Verification*: Actuation connectors independently verify reachability preconditions before applying mutations, refusing non-monotonic rollback requests even if emitted by the central orchestrator.
+
+---
+
+## 4. Dedicated AI Threat Modeling & Defense-in-Depth
 
 Modern SecOps architectures increasingly integrate Large Language Models (LLMs) and Small Language Models (SLMs) for advisory parsing, query compilation, and triage summarisation. TIDIR treats AI components not as trusted reasoning oracles, but as probabilistic workers operating in a Zero Trust environment governed by the **TIDIR Trust Doctrine Maxim**:
 
@@ -293,10 +322,30 @@ The table below synthesises how the TIDIR target architecture neutralises the ke
 | **AI-06** | **Excessive Agency** | [`AML.T0053`](https://atlas.mitre.org/) (Excessive Agency / Goal Hijacking) | [`LLM06`](https://owasp.org/www-project-top-10-for-large-language-model-applications/) | **Read-Only Capability Boundary**: Triage agents possess zero mutating infrastructure credentials. All containment actions require explicit response safety kernel evaluation. | **INV-05** (Least Capability)<br>[ADR-0004](/adr/0004-defensive-ai-runtime-and-prompt-injection-firewall) | [FND-02: Saltzer & Schroeder (1975)](/architecture/foundational-research#fnd-02)<br>[FND-17: NCSC (2024)](/architecture/foundational-research#fnd-17) |
 | **AI-07** | **System Prompt / Data Leakage** | [`AML.T0024`](https://atlas.mitre.org/) (ML Artifact Extraction) | [`LLM07`](https://owasp.org/www-project-top-10-for-large-language-model-applications/) | **Least-Privilege Ephemeral SVIDs**: Agents receive short-lived SPIFFE SVIDs ($\le 15\text{m}$) scoped to specific query tasks; PII/credential redaction runs inline before model ingestion. | **INV-05** (Least Capability)<br>[ADR-0015](/adr/0015-sandboxed-agent-execution-otlp-convergence-and-ephemeral-identity) | [FND-03: NIST SP 800-207 (2020)](/architecture/foundational-research#fnd-03)<br>[FND-06: CNCF SPIFFE (2020)](/architecture/foundational-research#fnd-06) |
 | **AI-08** | **Autonomous Hallucination Cascade** | [`AML.T0040`](https://atlas.mitre.org/) (Adversarial ML Perturbations) | [`LLM09`](https://owasp.org/www-project-top-10-for-large-language-model-applications/) | **Proposer/Challenger Dual-Model Arbiter**: Incident hypotheses require consensus between two independent model families; groundings must trace to raw telemetry records. | **INV-03** (Evidential Independence)<br>[ADR-0007](/adr/0007-continuous-automated-purple-teaming-and-multi-model-consensus) | [FND-01: Axelsson (2000)](/architecture/foundational-research#fnd-01)<br>[FND-12: Endsley (1995)](/architecture/foundational-research#fnd-12) |
+| **AI-09** | **Agent Evasion & Skip-Detection** | [`AML.T0015`](https://atlas.mitre.org/) (Evade ML Model) | [`LLM01`](https://owasp.org/www-project-top-10-for-large-language-model-applications/)<br>[`LLM04`](https://owasp.org/www-project-top-10-for-large-language-model-applications/) | **Deterministic Rule Backstops & Attention Anchoring**: Probabilistic triage agents cannot unilaterally suppress alerts; tripped loop-breakers or context truncations force human operator escalation. | **INV-04** (Authority Separation)<br>**INV-08** (Degraded Defence)<br>[ADR-0017](/adr/0017-agent-fleet-control-plane-and-runtime-observability)<br>[ADR-0021](/adr/0021-graceful-degradation-automated-fallback-and-continuity-plan-b) | [FND-01: Axelsson (2000)](/architecture/foundational-research#fnd-01)<br>[FND-13: Bainbridge (1983)](/architecture/foundational-research#fnd-13) |
+
+### Agent Evasion, Skip-Detection & Context Manipulation Tactics
+
+As security operations transition to autonomous multi-agent triage, adversaries evolve from bypassing static signatures to actively manipulating agentic reasoning patterns:
+
+1. **Context Window Exhaustion & Attention Decoupling**:
+   - Adversaries inject large volumes of syntactically valid but semantically benign command-line parameters or log noise.
+   - This pushes genuine attack indicators outside the model's active attention span or triggers aggressive summarization truncation, causing the agent to miss malicious arguments.
+   - *TIDIR Mitigation*: Layer 2 enforces selective context retrieval and analytical pushdown, delivering compact structured feature dossiers rather than raw log dumps to the agent context.
+
+2. **Probabilistic Triage Suppression (Skip-Detection)**:
+   - Attackers disguise malicious operations using administrative idioms, harmless utility wrappers, or deceptive commentary.
+   - The goal is to keep model confidence below alert elevation thresholds (for instance, inducing an ambiguous 60% confidence score that causes autonomous agents to deprioritize or auto-close alerts).
+   - *TIDIR Mitigation*: Invariant 4 dictates that probabilistic models propose but deterministic policy authorizes. Deprioritizing or closing high-severity alerts requires deterministic rule validation; borderline verdicts are escalated to human incident commanders or challenger models.
+
+3. **Loop-Breaker & Timeout Inducement**:
+   - Attackers intentionally construct circular dependencies or slow secondary responses during agent reconnaissance steps (such as hanging external DNS lookups).
+   - This intentionally triggers the supervisor's semantic loop breaker or 180-second timeout, aborting automated investigation before root cause is established.
+   - *TIDIR Mitigation*: Under Invariant 8 (Degraded Defence) and ADR-0017, whenever a loop breaker or resource timeout trips, the case state does not silently close; it preserves its partial investigation blackboard and escalates to a human operator with a structured dead-end brief.
 
 ---
 
-## 4. Multi-Framework Assurance Matrix (ATT&CK $\times$ ATLAS $\times$ CAPEC $\times$ D3FEND $\times$ CIS)
+## 5. Multi-Framework Assurance Matrix (ATT&CK $\times$ ATLAS $\times$ CAPEC $\times$ D3FEND $\times$ CIS)
 
 To ensure seamless operational cross-referencing across enterprise threat matrices, adversarial AI taxonomies, offensive attack patterns, and formal defensive benchmarks, the matrix below establishes the unified multi-framework assurance graph:
 
@@ -314,7 +363,7 @@ To ensure seamless operational cross-referencing across enterprise threat matric
 
 ---
 
-## 5. Trust Boundaries & Network Segmentation
+## 6. Trust Boundaries & Network Segmentation
 
 TIDIR enforces five explicit security perimeters:
 
@@ -326,7 +375,7 @@ TIDIR enforces five explicit security perimeters:
 
 ---
 
-## 6. Security & Verification Strategy
+## 7. Security & Verification Strategy
 
 The integrity of these threat mitigations is maintained through four continuous engineering disciplines:
 * **Chaos Security Engineering ([ADR-0008](/adr/0008-secops-error-budgets-and-chaos-security-engineering)):** Regular injection of simulated pipeline latency, corrupted OCSF payloads, and dead-letter queue flooding to verify backpressure resilience.
@@ -336,7 +385,7 @@ The integrity of these threat mitigations is maintained through four continuous 
 
 ---
 
-## 7. The TIDIR Assurance Case Map
+## 8. The TIDIR Assurance Case Map
 
 To prove internal consistency and demonstrate that architectural invariants directly mitigate identified threats, the matrix below establishes the complete, bi-directional assurance graph:
 

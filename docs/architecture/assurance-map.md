@@ -43,6 +43,50 @@ The table below maps each adversarial threat to its governing invariant, underpi
 
 ---
 
+## 3. Structured Assurance Cases (GSN: Claim · Argument · Evidence · Assumptions · Defeaters)
+
+Traceability demonstrates design intent; genuine assurance requires structured argument. Following Goal Structuring Notation (GSN) principles, TIDIR articulates its core safety properties across five explicit dimensions:
+
+### Case 1: Prompt Injection Immunity from Unauthorized Actuation
+* **Claim**: Indirect prompt injection payloads embedded in untrusted telemetry cannot induce unauthorized environmental mutations or policy bypasses.
+* **Argument & Mechanism**: Untrusted telemetry is isolated in the Data Plane; AI reasoning models operate strictly in an advisory, read-only capacity with task-scoped ephemeral SVIDs ($\le 15\text{m}$); proposed mutations must pass across the Agent Trust Boundary to the deterministic policy kernel and blast-radius simulator.
+* **Assurance Evidence**: Continuous Evals-as-Code test suites ([ADR-0006](/adr/0006-agent-evaluation-harness-evals-as-code)), automated adversarial prompt fuzzing, and kernel verification proving analytical SVIDs possess zero mutating infrastructure permissions.
+* **Environmental Assumptions**: SPIFFE/SPIRE workload attestation authority remains uncompromised; Defence Control Plane network boundary is isolated from direct untrusted ingress; connector proxies enforce cryptographic bearer token scopes.
+* **Defeaters & Falsifiers**:
+  1. *Stolen Control-Plane Key*: Adversary acquires private signing keys for the declarative policy compiler.
+  2. *Confused-Deputy Connector*: Infrastructure connector contains an injection vulnerability in its parameter serialization logic, executing commands outside the validated schema.
+  3. *Supply Chain Subversion*: Compromised CI/CD pipeline injects a backdoor into the policy compiler binary.
+
+### Case 2: Model-Bounded Containment Monotonicity ($\hat{\mathcal{R}}_A(s', \mathcal{M}_t) \subseteq \hat{\mathcal{R}}_A(s, \mathcal{M}_t)$)
+* **Claim**: Downstream API timeouts or connector failures during automated containment cannot restore adversary reachability relative to the validated environmental model $\mathcal{M}_t$.
+* **Argument & Mechanism**: Containment state machines execute asymmetric forward Sagas; reverse compensation on established perimeters is strictly forbidden; partial failures freeze existing barriers and escalate forward to outer network perimeters.
+* **Assurance Evidence**: Chaos engineering fault injection ([ADR-0008](/adr/0008-secops-error-budgets-and-chaos-security-engineering)), simulated API partition tests, and programmatic model-checking of state transition tables.
+* **Environmental Assumptions**: The environmental topology and identity model $\mathcal{M}_t$ accurately captures current network routes, trust domains, and fallback authentication pathways; target infrastructure APIs support idempotent retry.
+* **Defeaters & Falsifiers**:
+  1. *Unmodelled Fallback Pathways*: Isolating an IdP session causes an application to fall back to unmanaged local credentials unknown to model $\mathcal{M}_t$.
+  2. *Asymmetric Network Routing*: Host isolation severs defensive telemetry streams before confirming network-layer egress shutdown, blinding the control plane to lateral movement.
+  3. *Isolation Lease Deadlock*: An unratified isolation lease expires during a prolonged operator outage without successfully triggering forward boundary escalation.
+
+### Case 3: Evidential Independence & Non-Inflated Risk Compounding
+* **Claim**: Co-derived detection alerts sharing common raw observation lineage cannot masquerade as independent corroborating evidence or artificially trigger automated containment.
+* **Argument & Mechanism**: The canonical finding contract mandates explicit citation of `source_observation_ids` and `derivation_chain`; the Risk Lens applies ancestral discounting, penalizing co-derived signals to their residual information gain.
+* **Assurance Evidence**: Historical lakehouse backtesting demonstrating $\ge 75\%$ reduction in alert noise; unit test fixtures verifying that duplicate detections from a single parent event yield a single evidence increment.
+* **Environmental Assumptions**: Upstream sensors and parsers faithfully generate and preserve unique, immutable observation identifiers; the in-memory graph correlation window is sufficiently sized to link causally related events.
+* **Defeaters & Falsifiers**:
+  1. *Identifier Collision or Stripping*: A buggy collector generates duplicate or random observation IDs, masking shared ancestry from the graph correlator.
+  2. *Uncalibrated Overlap Heuristic*: The overlap discounting parameter $\text{Overlap}(e_1, e_2)$ underestimates cross-domain correlation, allowing closely coupled sensors (e.g. host network connections vs firewall flows) to inflate posterior risk.
+
+### Case 4: Deterministic Reconstructability of Defensive Lineage
+* **Claim**: Any consequential defensive finding, analytical hypothesis, policy evaluation, or response mutation can be deterministically reconstructed after the fact from immutable records.
+* **Argument & Mechanism**: Every event, proposal, and authorization decision is committed as a cryptographically linked node in the Incident Decision DAG, sealed with RFC 3161 timestamps and persisted to WORM object storage.
+* **Assurance Evidence**: Cryptographic Merkle tree verification audits over archived dossiers, tamper-detection canary assertions, and full post-incident deterministic replay simulations.
+* **Environmental Assumptions**: RFC 3161 Time-Stamp Authorities (TSAs) remain cryptographically trustworthy; object storage WORM retention policies cannot be administratively shortened.
+* **Defeaters & Falsifiers**:
+  1. *Pre-Ingestion Log Modification*: An attacker with root kernel access tampers with memory before raw events are committed to the local NVMe spool.
+  2. *Time-Stamp Authority Compromise*: Rogue or compromised TSA certificate authorities issuing backdated or forged timestamp tokens.
+
+---
+
 ## Machine-Readable Model Access
 
 The complete relationship graph is compiled deterministically during documentation build and exposed as standard JSON for automated agent retrieval and CI conformance testing:

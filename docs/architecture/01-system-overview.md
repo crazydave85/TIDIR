@@ -21,6 +21,28 @@ with deterministic controls wrapped around all probabilistic stages:
 
 ---
 
+## Strategic Context: The Four Generations & The Shadow Risk Register
+
+### The Four Generations of Cyber Engineering
+To understand why TIDIR is architected as an integrated Cyber Defence Control System rather than an unbundled collection of discrete security tools, consider the historical evolution of the cyber engineering discipline across four distinct archetypes:
+
+1. **Generation 1: The Gatekeeper (Pre-2010)**: Focused on static perimeter defence, network access control lists (ACLs), stateful firewalls, and manual host patching. Control was maintained through physical and logical network boundaries—an operating model that dissolved with the advent of distributed cloud infrastructure, microservices, and dynamic ephemeral APIs.
+2. **Generation 2: The Integrator (2010–2020)**: Characterized by the explosion of point solutions, Software-as-a-Service (SaaS), and best-of-breed product acquisition. Security engineers lived inside vendor graphical user interfaces ("ClickOps"), acting as human routers manually copying data between unintegrated consoles ("swivel-chair security").
+3. **Generation 3: The Builder (2020–Present)**: Recognizing that security is fundamentally a software and systems problem, Gen 3 adopted software engineering discipline: Infrastructure-as-Code (IaC), GitOps, version-controlled Detection-as-Code (DaC), and automated Continuous Integration and Continuous Delivery (CI/CD) pipelines.
+4. **Generation 4: The Optimiser (TIDIR Target Architecture, 2023+)**: Resolves the scalability, cost, and cognitive crisis of Gen 3. Ingesting every log into monolithic indices is financially unsustainable; running thousands of uncalibrated rules creates crushing alert fatigue. Gen 4 engineering treats security operations as an optimized distributed data systems and bounded artificial intelligence (AI) problem: combining line-rate schema validation (OCSF), unbundled query engines on columnar lakehouses, and autonomous agent orchestration governed by deterministic safety boundaries.
+
+### The Shadow Risk Register: Engineering Constraints as Business Risk Acceptance
+In conventional Security Operations Centers (SOCs), operational compromises are routinely justified as mere engineering constraints, storage quotas, or performance tuning. In practice, **every engineering constraint functions as an unacknowledged proxy for business risk acceptance**—creating an invisible **Shadow Risk Register**:
+
+* **Telemetry Sampling & Sensor Dropping**: When an engineering team deploys lightweight endpoint sensors or truncates telemetry streams to save bandwidth or central processing unit (CPU) cycles, they implicitly accept the business risk of **data blindness** to novel zero-day memory injections and living-off-the-land techniques.
+* **Alert Tuning for False Positives**: When detection engineers tune out noisy rules to protect analysts from alert fatigue, they prioritize precision over recall—implicitly accepting the business risk of **silent false negatives**, where slight adversary mutations evade overly restrictive detection queries.
+* **Superficial Queue Speed-Running**: When human analysts are overwhelmed by alert volume and forced to speed-run ticket queues to satisfy Mean Time to Respond (MTTR) Service Level Agreements (SLAs), the organisation implicitly accepts the risk of **shallow investigations**, sacrificing proactive threat hunting for reactive queue clearing.
+* **Hesitant or Partial Containment**: When automated response is restricted to single-host isolation out of fear of disrupting business operations, the organisation implicitly accepts the risk of **unmitigated lateral movement** and rapid enterprise-wide compromise.
+
+**TIDIR's Mission**: The 11 Architectural Invariants of TIDIR systematically eliminate the Shadow Risk Register. By decoupling storage into cost-effective lakehouses (preserving unmapped raw telemetry), applying dependency-aware Bayesian risk compounding (surfacing weak, correlated signals without alert flooding), and enforcing mathematically monotonic containment state machines, TIDIR converts hidden operational compromises into transparent, governed, and verifiable architectural guarantees.
+
+---
+
 ## 1. System Topology & Control Loop
 
 The architecture operates across two orthogonal dimensions:
@@ -29,7 +51,9 @@ The architecture operates across two orthogonal dimensions:
 
 ### 1.1 Operational Runtime Pipeline
 
-The operational pipeline processes security events in a strict directional flow from point-of-origin generation to automated mitigation, with an outer perimeter feedback channel for attributed threat intelligence and visibility calibration:
+The operational pipeline processes security events in a strict directional flow from point-of-origin generation to automated mitigation, with an outer perimeter feedback channel for attributed threat intelligence and visibility calibration.
+
+Layer 1 anchors ingestion in the **SOC Visibility Quad**—incorporating machine-readable Logs, Endpoint events, Network metadata, and Application / Cloud / Artificial Intelligence (AI) execution traces—supplemented by enterprise asset context and Cyber Threat Intelligence (CTI):
 
 ```mermaid
 flowchart TB
@@ -149,7 +173,7 @@ In modern security operations, components operate under differing security assum
 | **LLM Reasoning Agents** | **Yes** (Vulnerable to indirect injection) | Proposal Only | Read-only permissions, deterministic AST validation, task-scoped SVIDs ($\le 15\text{m}$, max 15 minutes). |
 | **Challenger Models (Audit)** | **Yes** (Adversarial but probabilistic) | Verification Proposal | Independent model lineage, consensus arbitration; cannot execute mutations directly. |
 | **MCP Query Tools** | **Potentially** (Tool drift / injection) | Bounded Read-Only Query | Strongly typed JSON schemas, SELECT-only enforcement, parameter array sanitization. |
-| **Deterministic AST Validator** | **Trusted Computing Base (TCB)** | Query Policy Enforcement | Compiles SQL syntax into abstract syntax trees; rejects non-SELECT AST statements. |
+| **Deterministic Query Safety Boundary** | **Trusted Computing Base (TCB)** | Query & Resource Governance | Syntactic AST validation (SELECT-only), semantic tenant/dataset authorization, query timeout & byte scan limits, and inferential privacy guards. |
 | **SPIFFE/SPIRE Identity Authority** | **Trusted Computing Base (TCB)** | Machine Identity Authority | Issues short-lived cryptographic X.509 SVIDs bound to attested workload attributes. |
 | **Containment State Machine** | **Highly Trusted** | Policy-Gated Mutation | Monotonic forward state transitions, connector circuit breakers, bounded isolation leases. |
 | **Policy Safety Kernel** | **Trusted Computing Base (TCB)** | Deterministic Authorization | Pre-execution blast-radius scoring, hard invariant gating, immutable rule evaluation. |
@@ -169,27 +193,49 @@ To answer the fundamental question—*"what governs the systems that govern defe
 
 1. **The Telemetry Data Plane (Untrusted Inputs)**:
    - *What it does*: Ingests high-throughput event streams, buffers records at the network edge, normalizes raw payloads into OCSF schemas, and writes long-term forensic logs to object storage lakehouses.
-   - *Security Posture*: **Assumed hostile**. Telemetry inputs may contain malicious exploits, malformed payloads, or prompt injection strings. Operates with strongly typed schemas and zero instruction execution.
-2. **The Analytical Plane (Advisory Analysis & Reasoning)**:
-   - *What it does*: Evaluates streaming detection rules, executes scheduled batch analytical queries, models entity correlation graphs, and hosts AI triage agent meshes.
-   - *Security Posture*: **Advisory only**. Analyzes observations and proposes hypotheses, but possesses zero operational authority. All communication passes across the Agent Trust Boundary using strictly read-only, ephemeral credentials.
-3. **The Defence Control Plane (Deterministic Security Kernel)**:
-   - *What it does*: Evaluates declarative security policies, verifies identity attestation, checks blast-radius limits, enforces critical asset immunity, and monitors the master Emergency Stop (E-Stop).
+   - *Security Posture*: **Untrusted data territory**. Subject to line-rate schema validation and isolated Dead-Letter Queues (DLQs). Telemetry cannot directly trigger state mutations.
+2. **The Analytical & Inference Plane (Probabilistic Reasoning)**:
+   - *What it does*: Correlates signals across the in-memory execution graph, executes streaming and batch detection rules, synthesizes threat intelligence, and runs specialist AI agent meshes for triage and hypothesis generation.
+   - *Security Posture*: **Read-only advisory plane**. Operates inside the Agent Trust Boundary under strict capability constraints with zero mutation authority.
+3. **The Defence Control Plane (Deterministic Authority Kernel)**:
+   - *What it does*: Evaluates policy invariants, validates proposed containment actions against asset criticality matrices, runs pre-execution blast-radius simulations, mints task-scoped identity certificates (SVIDs), and provides an audited Break-Glass Emergency Flight Deck.
    - *Security Posture*: **Hardened Trusted Computing Base (TCB)**. Operates deterministically using immutable policies compiled via cryptographically signed GitOps workflows. Decoupled from the primary data bus to ensure telemetry flooding cannot paralyze control.
-4. **The Actuation Plane (Task-Scoped Execution)**:
-   - *What it does*: Interacts with infrastructure APIs, endpoint EDR agents, network switches, firewalls, and identity providers to enforce containment and remediation actions.
+4. **The Response & Actuation Plane (Monotonic Environmental Mutation)**:
+   - *What it does*: Dispatches containment actions across infrastructure connectors, EDR agents, cloud IAM APIs, and network firewalls using forward-escalating Saga orchestrators.
    - *Security Posture*: **Task-scoped and monotonic**. Connectors execute actions using short-lived cryptographic identity certificates ($\le 15\text{ minutes}$). If an execution encounters an error, the state machine freezes in place or escalates forward ($s_{n+1} \preceq s_n$); it never rolls back security boundaries.
 
-### 3.2 TCB Minimisation: Small Deterministic Kernel, Large Untrusted Ecosystem
+### 3.2 TCB Minimisation: Logical Authorization Kernel vs. Transitive Implementation TCB
 
-TIDIR achieves system defensibility by minimizing the size of its **Trusted Computing Base (TCB)**. Rather than trusting hundreds of complex microservices, external threat feeds, and probabilistic AI models, TIDIR isolates the untrusted analytical ecosystem outside a lean, deterministic core:
+TIDIR achieves system defensibility by strictly bounding its **Trusted Computing Base (TCB)**. Rather than trusting hundreds of complex microservices, external threat feeds, and probabilistic AI models, TIDIR isolates the untrusted analytical ecosystem outside a lean, deterministic core.
 
-$$\text{TCB} = \{\text{Identity Authority (SPIFFE/SPIRE)}, \text{Declarative Policy Kernel (OPA/Cedar)}, \text{Containment State Machine}, \text{Cryptographic Evidence DAG}\}$$
+Architecturally, TIDIR distinguishes between the **Logical Authorization TCB** and the **Transitive Implementation TCB**:
 
-*Accessible Explanation: The Trusted Computing Base consists of exactly four components: the Identity Authority, the Policy Kernel, the Containment State Machine, and the Evidence DAG. If any component outside this set is compromised or behaves unpredictably, the deterministic TCB prevents unauthorized changes to infrastructure.*
+#### 1. The Logical Authorization TCB
+The minimal set of core architectural abstractions required to validate, authorize, and seal every defensive action:
+
+$$\text{TCB}_{\text{logical}} = \{\text{Identity Authority (SPIFFE/SPIRE)}, \text{Declarative Policy Kernel (OPA/Cedar)}, \text{Containment State Machine}, \text{Cryptographic Evidence DAG}\}$$
+
+*Accessible Explanation: At the logical architecture level, exactly four functions authorize environmental mutation: the Identity Authority, the Policy Kernel, the Containment State Machine, and the Evidence DAG. If any component outside this set is compromised or behaves unpredictably, the deterministic logical TCB prevents unauthorized mutations.*
+
+#### 2. The Transitive Implementation TCB
+While the logical kernel is intentionally compact, real-world security engineering must acknowledge the **transitive implementation dependencies** that underpin it. A production TIDIR implementation must explicitly enumerate, harden, and audit its physical supply chain:
+- **Deployment & Distribution Pipeline**: Cryptographically signed GitOps CI/CD runners, reproducible builds, and hermetic packaging.
+- **Hardware & Cryptographic Roots**: Hardware Security Modules (HSMs) and Trusted Platform Modules (TPMs) anchoring signing keys and attestation roots.
+- **Runtime Environment**: Hardened Linux microVMs/hypervisors, kernel eBPF verifiers, and memory-safe connector binaries.
+- **Temporal & Network Infrastructure**: RFC 3161 timestamping authorities, authenticated NTP daemons, and dedicated out-of-band control networks.
+
+*Rule of Implementation: TIDIR minimizes the logical authorization TCB to four core abstractions; enterprise deployments MUST enumerate and verify the complete transitive implementation TCB supporting them.*
 
 * **Immutable Policy Governance**: Policies governing blast-radius limits, Tier 0 asset immunity, and invariant rules cannot be modified via API calls, prompt instructions, or runtime agents. They are compiled via cryptographically signed GitOps workflows requiring dual human sign-off.
 * **Control-Plane Isolation**: The Defence Control Plane maintains an out-of-band communication channel decoupled from the primary telemetry streaming bus. Telemetry floods or denial-of-service attacks cannot paralyze defensive authorization or human E-Stop flight decks.
+
+### 3.3 Epistemic Verification Taxonomy: Precision in Claims
+
+To prevent ambiguous claims of correctness, TIDIR enforces a strict three-tier verification taxonomy:
+
+1. **Specification-Validated / Structurally Verified**: The architecture schemas, invariants, bi-directional traceability graphs, and diagram syntaxes are programmatically asserted and internally consistent across all machine-readable definitions (e.g. via `./verify`).
+2. **Empirically Validated**: Operational properties, latency bounds, error budgets, and failure modes are demonstrated via reproducible execution on physical testbeds and attack replays (e.g. the Attack-to-Containment Benchmark Harness).
+3. **Formally Verified**: State-machine invariants and reachability contracts are mathematically proven using symbolic verifiers or formal methods.
 
 ---
 

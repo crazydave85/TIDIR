@@ -18,11 +18,11 @@
       "term": "Security-State Monotonicity",
       "classification": "TIDIR-specific",
       "plain_english": "When an automated response action partially fails, the system must never roll back security barriers or leave the network more exposed than before the incident occurred. Recovery only moves forward.",
-      "technical_definition": "A formal invariant (INV-07) stipulating that every containment state transition must satisfy R(s_{post}) ⊆ R(s_{pre}), meaning post-transition attacker reachability is a subset of, or equal to, pre-transition attacker reachability. If an API call fails mid-playbook, traditional distributed rollback is prohibited in favour of forward containment escalation.",
+      "technical_definition": "A formal invariant (INV-07) stipulating that every containment state transition must satisfy R_hat_A(s_{post}, M_t) ⊆ R_hat_A(s_{pre}, M_t), meaning post-transition attacker reachability relative to the validated environmental model M_t is a subset of, or equal to, pre-transition reachability. If an API call fails mid-playbook, traditional distributed rollback is prohibited in favour of forward containment escalation.",
       "why_tidir_uses_it": "Traditional SOAR playbooks apply relational database transaction logic (commit or rollback). If an endpoint isolation succeeds but firewall rule application times out, rolling back the isolation re-opens network reachability for an active adversary.",
       "concrete_example": "An automated response tries to isolate a compromised workstation by revoking Kerberos tickets and isolating the switch port. If the switch API times out after tickets are revoked, the state machine does not restore the Kerberos tickets; it freezes the endpoint state and escalates containment to the upstream core firewall.",
-      "formalism": "R(s_{post}) ⊆ R(s_{pre})",
-      "related_identifiers": ["INV-07", "ADR-0007", "CAP-RSP-002"]
+      "formalism": "\\hat{\\mathcal{R}}_A(s_{\\text{post}}, \\mathcal{M}_t) \\subseteq \\hat{\\mathcal{R}}_A(s_{\\text{pre}}, \\mathcal{M}_t)",
+      "related_identifiers": ["INV-07", "ADR-0005", "CAP-RSP-002"]
     },
     {
       "id": "evidential-independence",
@@ -39,7 +39,7 @@
       "term": "Telemetry Preservation",
       "classification": "TIDIR-specific",
       "plain_english": "Security telemetry must never be thrown away simply because no active detection rule currently searches for it. Raw forensic evidence is preserved in open formats for historical investigation.",
-      "technical_definition": "An invariant (INV-01) mandating that line-rate event streams be written into open, columnar storage (e.g. Parquet/Iceberg on object storage) with unmapped attributes preserved under structured catch-all fields (unmapped_data), independent of whether any current detection query references the event.",
+      "technical_definition": "An invariant (INV-01) mandating that line-rate event streams be written into open, columnar storage (e.g. Parquet/Iceberg on object storage) with unmapped attributes preserved under structured catch-all fields (unmapped_data), unless explicit governed policies (statutory data minimization, privacy regulations such as GDPR, legal privilege, or credential scrubbing) require transformation or destruction.",
       "why_tidir_uses_it": "Volume-based SIEM licensing historically forced organizations to filter and drop raw telemetry at the collection boundary. When a novel zero-day is disclosed months later, security teams are blind during retrospective investigations.",
       "concrete_example": "DNS query logs containing uncommon query record types are not queried by active detection rules. Rather than discarding them, the telemetry fabric ingests and normalizes them into OCSF, storing unmapped vendor fields in JSON columns within long-term lakehouse partitions.",
       "related_identifiers": ["INV-01", "ADR-0002", "CAP-TEL-001"]
@@ -119,10 +119,10 @@
       "term": "Critical Asset Immunity (Tier 0 Protection)",
       "classification": "Adapted",
       "plain_english": "Core business infrastructure—such as domain controllers, payment gateways, and hospital life-support switches—is permanently shielded from automated shutdown or network disconnection. Only human operators can approve actions on these systems.",
-      "technical_definition": "A pre-execution policy boundary (INV-06, ADR-0007) designating Tier 0 business assets as strictly exempt from automated disruptive containment. Autonomous agents may collect telemetry and propose actions, but policy kernels deterministically block destructive mutations on Tier 0 assets.",
+      "technical_definition": "A pre-execution policy boundary (INV-06, ADR-0005) designating Tier 0 business assets as strictly exempt from automated disruptive containment. Autonomous agents may collect telemetry and propose actions, but policy kernels deterministically block destructive mutations on Tier 0 assets.",
       "why_tidir_uses_it": "Automated security actions must never cause greater business disruption than the threat they seek to mitigate. Disconnecting a core transaction database during peak business hours can inflict severe operational catastrophe.",
       "concrete_example": "An EDR alert indicates an unverified privilege escalation attempt on the primary Active Directory domain controller. While ordinary workstations are automatically quarantined, the Tier 0 policy intercepts the request, blocks automated isolation, initiates non-destructive credential resets, and triggers a Priority-1 human paging event.",
-      "related_identifiers": ["INV-06", "ADR-0007", "CAP-RSP-001"]
+      "related_identifiers": ["INV-06", "ADR-0005", "CAP-RSP-001"]
     }
   ]
 }

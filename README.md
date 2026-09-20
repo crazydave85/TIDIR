@@ -83,7 +83,7 @@ TIDIR synthesizes defensive strategy, analytic taxonomy, API safety, and operati
 
 ## 🗺️ Roadmap, Research & Release Milestones
 
-TIDIR maintains strict discipline between what is formally specified and verified in the live architecture versus active research and future exploratory ideas.
+TIDIR maintains strict discipline between what is specification-validated in the target architecture versus empirically validated through experimental testbeds and future research.
 
 ### ✅ Delivered Milestones
 
@@ -118,18 +118,27 @@ Admission to this backlog is strictly constrained to hypotheses, formalisms, and
 * **Invariant Violation & Failure-Boundary Research (Adversarial Self-Evaluation)**:
   - Stress-test the architectural constitution by asking: *Under what combinations of compromised control-plane components, stale policy, identity failure, partial network partition, and adversarial telemetry can a nominally TIDIR-compliant implementation violate `INV-01` through `INV-11`?*
   - Identify the minimum set of environmental and cryptographic assumptions that must fail before each claimed safety property ceases to hold, laying the groundwork for formal model checking and property-based verification.
-* **TIDIR Core / Minimum Viable Architecture (MVA)**:
-  - Formally specify the reference implementation for the leanest TIDIR-compliant deployment: `Telemetry Ingress ➔ OCSF Normalization ➔ Lakehouse / Hot Storage ➔ Polyglot DaC ➔ Findings ➔ Case Management ➔ Policy-Gated Actuation` (see [ADR-0012](docs/adr/0012-ai-orchestration-runtime-mcp-and-mvp-roadmap.md)).
+* **Compositional Safety & Cross-Plane Consistency (Local-to-System Safety)**:
+  - Investigate whether the satisfaction of isolated component contracts is sufficient to guarantee `INV-01` through `INV-11` at the system level.
+  - Construct adversarial interleavings involving stale policy distribution, delayed telemetry, concurrent containment playbooks, identity rotation, and split-brain control states to identify emergent invariant violations despite locally conformant components.
+  - Determine which invariants require global coordination, causal ordering, distributed fencing, or cross-plane saga locks rather than purely local boundary enforcement.
+* **Normalization Fidelity & Irreversible Information Loss (Semantic Preservation)**:
+  - Quantify and mitigate semantic degradation across the telemetry transformation pipeline (`raw telemetry ➔ parser ➔ OCSF mapping ➔ enrichment ➔ finding`).
+  - Investigate which source telemetry semantics cannot be mapped losslessly into standardized OCSF schemas, whether unmapped raw preservation (`INV-01`) sufficiently mitigates forensic loss, and whether adversaries can exploit normalization ambiguity to blind downstream Detection-as-Code rules.
+  - Evaluate how schema evolution and parser version shifts impact historical replay and cryptographic provenance (`INV-02`).
+* **Formal Provenance Scalability & Lineage Fusion (`INV-02` & `INV-03`)**:
+  - Resolve the operational tension between forensic fidelity, dependency calibration, and graph cardinality in evidence provenance.
+  - Attack the boundary: *Can `INV-02`'s provenance requirement represent aggregate, negative, statistical, and model-derived evidence without either exploding lineage cardinality or weakening reconstructability?*
+  - Examine how far dependencies propagate up the provenance DAG, how partial vs complete dependence is distinguished without full generative models, and how to prevent false-confidence compounding without over-complicating runtime inference.
+* **Multi-Dimensional Containment Constraints ($R_{\text{attacker}} \mid C_{\text{availability}}$)**:
+  - *Strictly experimental exploration*: Investigate whether business operability and service availability can be modeled as **deterministic constraints on permissible containment candidates** without weakening the underlying security partial order.
+  - *Core Guardrail*: Availability must never be modeled as an optimization trade-off variable against attacker reachability (which would dangerously permit *"attacker reachability increased slightly, but availability improved sufficiently"*). Monotonicity remains non-negotiable: $R(s_{\text{post}}) \subseteq R(s_{\text{pre}})$.
 * **Reference Workload Models ($W_1, W_2, W_3$)**:
   - Replace ungrounded latency/throughput metrics with explicit, parameterized workload vectors:
     $$W = \{\text{EPS}, \text{bytes/event}, \text{entities/day}, \text{cardinality}, \text{retention}, \text{hot \%}, \text{query concurrency}, \text{enrichment fanout}\}$$
   - Define TIDIR benchmark reference profiles (for reproducible evaluation, not universal industry definitions): $W_1$ (Mid-Market Reference, 25k EPS), $W_2$ (Enterprise Reference, 250k EPS), and $W_3$ (Hyperscale Reference, 1M EPS).
-* **Formal Bayesian Evidence Calibration & Lineage Fusion**:
-  - Provide formal mathematical treatment and worked scenarios for dependency-aware evidence aggregation.
-  - Empirically and mathematically attack the boundary: examine how far dependencies propagate up the provenance DAG, how partial vs complete dependence is distinguished without full generative models, and how to prevent false-confidence compounding without over-complicating runtime inference.
-* **Multi-Dimensional Containment Constraints ($R_{\text{attacker}} \mid C_{\text{availability}}$)**:
-  - *Strictly experimental exploration*: Investigate whether business operability and service availability can be modeled as **deterministic constraints on permissible containment candidates** without weakening the underlying security partial order.
-  - *Core Guardrail*: Availability must never be modeled as an optimization trade-off variable against attacker reachability (which would dangerously permit *"attacker reachability increased slightly, but availability improved sufficiently"*). Monotonicity remains non-negotiable: $R(s_{\text{post}}) \subseteq R(s_{\text{pre}})$.
+* **TIDIR Core / Minimum Viable Architecture (MVA)**:
+  - Formally specify the reference implementation for the leanest TIDIR-compliant deployment: `Telemetry Ingress ➔ OCSF Normalization ➔ Lakehouse / Hot Storage ➔ Polyglot DaC ➔ Findings ➔ Case Management ➔ Policy-Gated Actuation` (see [ADR-0012](docs/adr/0012-ai-orchestration-runtime-mcp-and-mvp-roadmap.md)).
 * **SecOps Unit Economics Framework**:
   - Model telemetry economics as a first-class architectural dimension: $\Delta(\text{Marginal Defensive Value}) / \Delta(\text{Compute} + \text{Storage} + \text{Human Cost})$.
 

@@ -37,7 +37,7 @@ Rather than treating AI agents or statistical classifiers as autonomous decision
 
 ## The 5 Core Principles That Define TIDIR
 
-1. **Confidence is not Authority**: Epistemic confidence ($99.9\%$ likelihood of compromise) does not confer operational authority to sever network links or isolate hosts. Authority is independently derived from policy, identity, and blast-radius constraints.
+1. **Confidence is not Authority**: Epistemic confidence (99.9% likelihood of compromise) does not confer operational authority to sever network links or isolate hosts. Authority is independently derived from policy, identity, and blast-radius constraints.
 2. **Evidence Requires Provenance and Independence**: Every assertion must link to immutable raw telemetry. Correlated derivations sharing common upstream ancestry are discounted rather than double-counted.
 3. **Probabilistic Reasoning Must Remain Bounded**: Generative models and autonomous triage agents operate behind the **Agent Trust Boundary**, consuming typed schemas rather than raw executable text strings.
 4. **Defensive Actuation Must Respect Security-State Monotonicity**: Partial failure during containment cannot silently regress security posture ($s_{n+1} \preceq s_n$). Forward compensation is permitted; reopening compromised perimeters is not.

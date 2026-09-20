@@ -76,6 +76,13 @@ flowchart TB
    - **Incident Replay Simulator**: Hydrates historical lakehouse telemetry partitions and purple-team attack injections into an isolated sandbox for blind operator check-rides.
    - **Dual-Blind Mutual Calibration**: Benchmarks human dossiers against shadow agent findings, simultaneously surfacing analyst blind spots and generating golden ground truth to prevent AI model drift.
 
+6. **Agentic User Interface (AG-UI) Supervisory Model & Agent-to-Agent (A2A) Protocols**:
+   - **Agent-to-Agent (A2A) Communication Protocol**: Inter-agent collaboration between the Lead Triage Orchestrator, specialist subagents (Host, Identity, Network), and the Adversarial Challenger is mediated through structured, machine-readable communication contracts rather than free-form natural language prompting. Agents coordinate tasks, request contextual enrichments, and negotiate hypothesis evaluations using strongly typed schemas (JSON-RPC over internal message buses) authenticated by ephemeral workload identities (SPIFFE Verifiable Identity Documents - SVIDs).
+   - **Agentic UI (AG-UI) Supervisory Workbench**: Rather than treating Artificial Intelligence (AI) as an uninspectable black box or a superficial chat assistant, the workbench implements an **Agentic User Interface (AG-UI)** designed for human supervisory steering, transparency, and calibrated trust:
+     - *Causal Hypothesis Visualisation*: Exposes agent hypotheses as inspectable Directed Acyclic Graphs (DAGs) linking premises, cited raw OCSF observation identifiers, confidence levels, and dissenting challenger opinions.
+     - *Bi-Directional Supervisory Steering*: Operators can actively steer ongoing agent investigations using structured control inputs (e.g. expanding timeline scope, adjusting evidential threshold bounds, or instructing subagents to pursue alternative pivot paths).
+     - *Deterministic Execution Gates*: In strict accordance with the TIDIR Trust Doctrine, agents are architecturally prohibited from self-authorizing state mutations or containment actions; all recommended interventions are presented through structured AG-UI consensus action cards requiring explicit cryptographic human approval.
+
 ---
 
 ## 3. Architectural Capability Archetypes & Protocol Standards
@@ -86,3 +93,4 @@ flowchart TB
 | **Relational Execution Graph** | In-memory property graph engine with supernode pruning and degree-constrained breadth-first search. | Directed Acyclic Graph (DAG) format; OCSF entity relationship schemas. |
 | **Tamper-Evident Evidence Locker** | Immutable object storage with Object Lock (WORM) and cryptographic checksum validation. | RFC 3161 cryptographic timestamps; SHA-256 evidence integrity manifests. |
 | **Analyst Workbench Interface** | Component-driven reactive micro-frontend architecture supporting progressive disclosure and canvas-based graph rendering. | WebSocket bi-directional state synchronisation; microsecond UTC temporal streams. |
+| **Agent Collaboration & Supervision** | Standardized inter-agent messaging and human supervisory steering cockpit. | Agent-to-Agent (A2A) JSON-RPC over mTLS/SPIFFE; Agentic UI (AG-UI) streaming state contracts. |

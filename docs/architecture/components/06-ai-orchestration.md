@@ -105,10 +105,11 @@ TIDIR rejects the assumption that prompt sanitization can deterministically prev
   2. *Task-Scoped Ephemeral SVIDs*: SPIFFE/SPIRE mints short-lived X.509 identities ($\le 15\text{m}$) enforcing least-privilege tool contracts at the network layer ([FND-02](/architecture/foundational-research#fnd-02), [FND-06](/architecture/foundational-research#fnd-06)).
   3. *Independent Response Authority*: Mutating containment actions are evaluated and authorized exclusively by the deterministic response safety kernel and human incident commanders.
 - **Dual-Plane Data Isolation**: Untrusted external inputs (log messages, command-line arguments, email bodies, CTI text) are strictly isolated in a sandboxed *Data Plane*. System instructions, agent personas, and tool contracts exist exclusively in a signed *Control Plane*.
-- **Deterministic AST Query Validator**: Generated queries pass through an Abstract Syntax Tree (AST) parser before hitting Lakehouse engines. The validator enforces:
-  1. Strict read-only syntax (`SELECT` only; all `DROP`, `UPDATE`, `DELETE`, `INSERT` commands throw fatal errors).
-  2. Mandatory temporal boundaries (queries without `time >= NOW() - INTERVAL` constraints are rejected to prevent table-scan resource exhaustion).
-  3. Strict partition key filtering (must filter on tenant or cluster keys).
+- **Deterministic Query Safety Boundary (Syntactic AST, Semantic Authorization & Resource Governance)**: Generated queries pass through a multi-tier deterministic query safety boundary before hitting Lakehouse or graph engines:
+  1. *Syntactic AST Validation*: Compiles SQL/query syntax into an Abstract Syntax Tree (AST); strictly restricts execution to read-only statements (`SELECT` only; unconditionally rejecting `DROP`, `UPDATE`, `DELETE`, `INSERT`, `ALTER`, dynamic execution statements, and dangerous procedural User-Defined Functions / UDFs).
+  2. *Semantic Data Authorization*: Enforces fine-grained tenant boundaries, attribute-based table and column access controls (blocking unauthorized access to HR, executive, payment, or legally privileged data), and dynamic column masking for PII/secrets.
+  3. *Resource Ceilings & Anti-DoS Controls*: Enforces mandatory temporal query windows (`time >= NOW() - INTERVAL`), strict partition key filtering, scanned byte ceilings (max 50 GB per query), and query execution timeouts ($\le 15\text{s}$) to prevent compute-exhaustion denial-of-service and timing side-channels.
+  4. *Inferential Reconstruction Guards*: Disallows high-frequency micro-targeted aggregate queries designed to infer protected individual attributes through differential analysis.
 
 ### 5. Agent Fleet Supervisor & Control Plane Management
 To prevent zombie worker accumulation, runaway background tasks, and unmonitored subagent sprawl during major multi-stage incidents, TIDIR mandates an active **Agent Fleet Supervisor & Lifecycle Kernel** (ADR-0017):

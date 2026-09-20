@@ -5,15 +5,16 @@
 
 ---
 
-The Telemetry & Data Fabric provides the foundational data infrastructure for TIDIR. It guarantees reliable, high-throughput ingestion from heterogeneous security data sources, real-time normalisation into the Open Cybersecurity Schema Framework (OCSF), and tier-optimised storage across hot analytical indices and durable lakehouse repositories.
+The Telemetry & Data Fabric provides the foundational data infrastructure for TIDIR. It guarantees reliable, high-throughput ingestion across the **SOC Visibility Quad** (Logs, Endpoint, Network, and Application / Cloud / Artificial Intelligence runtime observability), real-time normalisation into the Open Cybersecurity Schema Framework (OCSF), and tier-optimised storage across hot analytical indices and durable lakehouse repositories.
 
 ```mermaid
 flowchart TB
-  subgraph Collectors ["Telemetry Collection"]
+  subgraph Collectors ["Telemetry Collection (SOC Visibility Quad)"]
     AGENTS["Endpoint Sensors (Host Telemetry & Kernel Collectors)"]
     CLOUD_INGEST["Cloud Connectors (Control Plane & Infrastructure Logs)"]
     NET_INGEST["Network Probes (Session Flows & Protocol Metadata)"]
     AUTH_INGEST["Identity Logs (Authentication & Federation Events)"]
+    APP_INGEST["Application & AI Observability (eBPF Traces, API Telemetry & LLM Logs)"]
   end
 
   subgraph IngestionStream ["Streaming Pipeline"]
@@ -31,6 +32,7 @@ flowchart TB
   CLOUD_INGEST --> STREAM_BUS
   NET_INGEST --> STREAM_BUS
   AUTH_INGEST --> STREAM_BUS
+  APP_INGEST --> STREAM_BUS
 
   STREAM_BUS --> SCHEMA_NORM
   SCHEMA_NORM -->|Failed Validation| DLQ
@@ -49,11 +51,12 @@ flowchart TB
 
 2. **OCSF Schema Normalisation**:
    - Decouple raw vendor telemetry from detection logic.
-   - Mapping catalog for:
+   - Mapping catalog across the SOC Visibility Quad:
      - Host Activity (Process Creation, Network Connections, File Operations) -> OCSF System Activity / Process Activity classes.
      - Cloud Management Plane -> OCSF Cloud / Account Activity classes.
      - Network Flows -> OCSF Network Activity classes.
      - Identity / Auth Events -> OCSF Authentication / Identity classes.
+     - Application & AI Observability (API transactions, eBPF system call hooks, model inference audits, SaaS logs) -> OCSF Application Activity / API Activity classes.
    - Dead-Letter Queue (DLQ) for non-conforming or unparseable payloads with automated alerting.
 
 3. **Dual-Tier Storage Architecture**:

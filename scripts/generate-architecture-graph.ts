@@ -91,7 +91,7 @@ const model: ArchitecturalModel = {
       title: "Absence of current detection value does not justify destruction of forensic evidence",
       normative: true,
       maxim: "Absence of current detection value does not justify destruction of forensic evidence.",
-      property: "Raw forensic evidence is never discarded solely because no active detection rule consumes it; ingested telemetry must survive in an open, vendor-neutral representation.",
+      property: "Raw forensic evidence is preserved in open, vendor-neutral formats unless explicitly governed by statutory minimization, legal privilege, or credential sanitization policies; arbitrary edge dropping is prohibited.",
       reference_pattern: "Line-rate stream ingestion into open columnar lakehouses (e.g. Apache Iceberg / Parquet) on object storage."
     },
     {
@@ -145,7 +145,7 @@ const model: ArchitecturalModel = {
       title: "Partial failure cannot silently restore attacker reachability (s_{n+1} <= s_n)",
       normative: true,
       maxim: "Partial failure cannot silently restore attacker reachability.",
-      property: "Component failure cannot silently increase attacker reachability ($s_{n+1} \\preceq s_n$, where $R(s_{\\text{post}}) \\subseteq R(s_{\\text{pre}})$: post-transition reachability is a subset of pre-transition reachability).",
+      property: "Component failure cannot silently increase attacker reachability relative to the validated environmental model ($s_{n+1} \\preceq s_n$, where $\\hat{\\mathcal{R}}_A(s_{\\text{post}}, \\mathcal{M}_t) \\subseteq \\hat{\\mathcal{R}}_A(s_{\\text{pre}}, \\mathcal{M}_t)$).",
       reference_pattern: "Monotonic state machines executing forward perimeter escalation rather than rolling back security barriers."
     },
     {

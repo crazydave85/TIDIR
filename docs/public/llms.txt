@@ -8,13 +8,13 @@ For full-text ingestion across all core specifications in a single file, see: ht
 
 ## The TIDIR Architectural Constitution (11 Invariants)
 
-1. **Telemetry Preservation**: Raw forensic evidence is never discarded solely because no active detection rule consumes it; ingested telemetry must survive in an open, vendor-neutral representation.
+1. **Telemetry Preservation**: Raw forensic evidence is preserved in open, vendor-neutral formats unless explicitly governed by statutory minimization, legal privilege, or credential sanitization policies; arbitrary edge dropping is prohibited.
 2. **Evidence Traceability**: Every consequential alert, finding, or incident assertion must be deterministically traceable to underlying raw observations.
 3. **Evidential Independence**: Correlated derivations sharing common raw telemetry ancestry cannot masquerade as independent evidence; co-derived signals must be discounted.
 4. **No Self-Granting Authority (Authority Separation)**: Probabilistic models propose; deterministic policies authorise. Reasoning agents operate strictly in read-only analysis mode.
 5. **Least Capability & Ephemeral Identity**: Every machine actor receives only task-scoped, ephemeral authority with cryptographic workload identity (TTL $\le 15\text{m}$, max 15 minutes).
 6. **Bounded Autonomy & Blast Radius**: Autonomous execution has strict temporal, financial, computational, and blast-radius limits with critical asset immunity.
-7. **Reachability Monotonicity (Fail-Secure Posture)**: Component failure cannot silently increase attacker reachability ($s_{n+1} \preceq s_n$, where $R(s_{\text{post}}) \subseteq R(s_{\text{pre}})$: post-transition reachability is a subset of pre-transition reachability).
+7. **Reachability Monotonicity (Fail-Secure Posture)**: Component failure cannot silently increase attacker reachability relative to the validated environmental model ($s_{n+1} \preceq s_n$, where $\hat{\mathcal{R}}_A(s_{\text{post}}, \mathcal{M}_t) \subseteq \hat{\mathcal{R}}_A(s_{\text{pre}}, \mathcal{M}_t)$).
 8. **Graceful Defensive Degradation**: Loss of an advanced capability reduces sophistication, never total visibility (graceful degradation and Plan B fallbacks).
 9. **Human Recoverability & Break-Glass Flight Decks**: Autonomous control planes always preserve independently accessible manual flight decks and master break-glass emergency stops.
 10. **Reconstructability (The Incident Decision DAG)**: Consequential decisions and containment actions can be deterministically reconstructed after the fact via the Incident Decision DAG.

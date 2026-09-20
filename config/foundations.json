@@ -150,12 +150,12 @@
     },
     {
       "id": "FND-17",
-      "topic": "Adversary AI Capabilities & Automated Vulnerability Exploitation",
-      "classification": "Government Cybersecurity Advisory & Empirical Research",
-      "claim_supported": "AI tools lower barriers for reconnaissance, social engineering, and rapid exploitation of known vulnerabilities, while autonomous zero-day discovery and end-to-end bespoke malware synthesis remain bounded by reasoning constraints.",
-      "citation": "National Cyber Security Centre (NCSC-UK). (2024). The Near-Term Impact of AI on the Cyber Threat. UK Government Assessment; Fang, R., Bindu, R., Gupta, A., Zhan, Q., & Kang, D. (2024). LLM Agents can Autonomously Exploit One-day Vulnerabilities. arXiv:2404.08144.",
-      "canonical_url": "https://www.ncsc.gov.uk/report/impact-of-ai-on-cyber-threat",
-      "applies_to": ["INV-04", "ADR-0004", "ADR-0019"]
+      "topic": "Adversary AI Capabilities, Autonomous Exploit Chaining & Machine-Speed Attack Lifecycle",
+      "classification": "Government Cybersecurity Advisory, Frontier System Cards & Empirical Incident Post-Mortems",
+      "claim_supported": "Empirical evidence establishes that AI capabilities have advanced from novice reconnaissance and 1-day exploit adaptation to autonomous zero-day discovery and machine-speed multi-stage vulnerability chaining; however, autonomous execution remains strictly bounded by deterministic architectural boundaries, memory safety, and ephemeral workload identity.",
+      "citation": "National Cyber Security Centre (NCSC-UK). (2024). The Near-Term Impact of AI on the Cyber Threat; Fang, R., et al. (2024). LLM Agents can Autonomously Exploit One-day Vulnerabilities. arXiv:2404.08144; Anthropic. (2026). Claude Mythos System Card & Project Glasswing; UK AI Security Institute (AISI). (2026). Empirical Evaluations of Frontier Autonomous Cyber Capabilities; Hugging Face & Cloud Security Alliance. (2026). Post-Mortem: Autonomous Agent Infrastructure Intrusion.",
+      "canonical_url": "https://www.anthropic.com/project/glasswing",
+      "applies_to": ["INV-04", "INV-05", "INV-07", "ADR-0004", "ADR-0015", "ADR-0019"]
     },
     {
       "id": "FND-18",

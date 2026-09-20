@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
-  "architecture_version": "1.8.2",
-  "generated_at": "2026-09-18T22:31:43.920Z",
+  "architecture_version": "1.12.0",
+  "generated_at": "2026-09-20T12:43:21.406Z",
   "canonical_source": "https://tidir.harrymclaren.co.uk",
   "title": "TIDIR Reference Architecture Graph",
   "description": "Machine-readable graph representation of TIDIR invariants, capabilities, services, threats, and governance contracts.",
@@ -25,7 +25,7 @@
       "title": "Absence of current detection value does not justify destruction of forensic evidence",
       "normative": true,
       "maxim": "Absence of current detection value does not justify destruction of forensic evidence.",
-      "property": "Raw forensic evidence is never discarded solely because no active detection rule consumes it; ingested telemetry must survive in an open, vendor-neutral representation.",
+      "property": "Raw forensic evidence is preserved in open, vendor-neutral formats unless explicitly governed by statutory minimization, legal privilege, or credential sanitization policies; arbitrary edge dropping is prohibited.",
       "reference_pattern": "Line-rate stream ingestion into open columnar lakehouses (e.g. Apache Iceberg / Parquet) on object storage."
     },
     {
@@ -79,7 +79,7 @@
       "title": "Partial failure cannot silently restore attacker reachability (s_{n+1} <= s_n)",
       "normative": true,
       "maxim": "Partial failure cannot silently restore attacker reachability.",
-      "property": "Component failure cannot silently increase attacker reachability ($s_{n+1} \\preceq s_n$, where $R(s_{\\text{post}}) \\subseteq R(s_{\\text{pre}})$: post-transition reachability is a subset of pre-transition reachability).",
+      "property": "Component failure cannot silently increase attacker reachability relative to the validated environmental model ($s_{n+1} \\preceq s_n$, where $\\hat{\\mathcal{R}}_A(s_{\\text{post}}, \\mathcal{M}_t) \\subseteq \\hat{\\mathcal{R}}_A(s_{\\text{pre}}, \\mathcal{M}_t)$).",
       "reference_pattern": "Monotonic state machines executing forward perimeter escalation rather than rolling back security barriers."
     },
     {
@@ -708,13 +708,13 @@
       "term": "Security-State Monotonicity",
       "classification": "TIDIR-specific",
       "plain_english": "When an automated response action partially fails, the system must never roll back security barriers or leave the network more exposed than before the incident occurred. Recovery only moves forward.",
-      "technical_definition": "A formal invariant (INV-07) stipulating that every containment state transition must satisfy R(s_{post}) ⊆ R(s_{pre}), meaning post-transition attacker reachability is a subset of, or equal to, pre-transition attacker reachability. If an API call fails mid-playbook, traditional distributed rollback is prohibited in favour of forward containment escalation.",
+      "technical_definition": "A formal invariant (INV-07) stipulating that every containment state transition must satisfy R_hat_A(s_{post}, M_t) ⊆ R_hat_A(s_{pre}, M_t), meaning post-transition attacker reachability relative to the validated environmental model M_t is a subset of, or equal to, pre-transition reachability. If an API call fails mid-playbook, traditional distributed rollback is prohibited in favour of forward containment escalation.",
       "why_tidir_uses_it": "Traditional SOAR playbooks apply relational database transaction logic (commit or rollback). If an endpoint isolation succeeds but firewall rule application times out, rolling back the isolation re-opens network reachability for an active adversary.",
       "concrete_example": "An automated response tries to isolate a compromised workstation by revoking Kerberos tickets and isolating the switch port. If the switch API times out after tickets are revoked, the state machine does not restore the Kerberos tickets; it freezes the endpoint state and escalates containment to the upstream core firewall.",
-      "formalism": "R(s_{post}) ⊆ R(s_{pre})",
+      "formalism": "\\hat{\\mathcal{R}}_A(s_{\\text{post}}, \\mathcal{M}_t) \\subseteq \\hat{\\mathcal{R}}_A(s_{\\text{pre}}, \\mathcal{M}_t)",
       "related_identifiers": [
         "INV-07",
-        "ADR-0007",
+        "ADR-0005",
         "CAP-RSP-002"
       ]
     },
@@ -737,7 +737,7 @@
       "term": "Telemetry Preservation",
       "classification": "TIDIR-specific",
       "plain_english": "Security telemetry must never be thrown away simply because no active detection rule currently searches for it. Raw forensic evidence is preserved in open formats for historical investigation.",
-      "technical_definition": "An invariant (INV-01) mandating that line-rate event streams be written into open, columnar storage (e.g. Parquet/Iceberg on object storage) with unmapped attributes preserved under structured catch-all fields (unmapped_data), independent of whether any current detection query references the event.",
+      "technical_definition": "An invariant (INV-01) mandating that line-rate event streams be written into open, columnar storage (e.g. Parquet/Iceberg on object storage) with unmapped attributes preserved under structured catch-all fields (unmapped_data), unless explicit governed policies (statutory data minimization, privacy regulations such as GDPR, legal privilege, or credential scrubbing) require transformation or destruction.",
       "why_tidir_uses_it": "Volume-based SIEM licensing historically forced organizations to filter and drop raw telemetry at the collection boundary. When a novel zero-day is disclosed months later, security teams are blind during retrospective investigations.",
       "concrete_example": "DNS query logs containing uncommon query record types are not queried by active detection rules. Rather than discarding them, the telemetry fabric ingests and normalizes them into OCSF, storing unmapped vendor fields in JSON columns within long-term lakehouse partitions.",
       "related_identifiers": [
@@ -849,12 +849,12 @@
       "term": "Critical Asset Immunity (Tier 0 Protection)",
       "classification": "Adapted",
       "plain_english": "Core business infrastructure—such as domain controllers, payment gateways, and hospital life-support switches—is permanently shielded from automated shutdown or network disconnection. Only human operators can approve actions on these systems.",
-      "technical_definition": "A pre-execution policy boundary (INV-06, ADR-0007) designating Tier 0 business assets as strictly exempt from automated disruptive containment. Autonomous agents may collect telemetry and propose actions, but policy kernels deterministically block destructive mutations on Tier 0 assets.",
+      "technical_definition": "A pre-execution policy boundary (INV-06, ADR-0005) designating Tier 0 business assets as strictly exempt from automated disruptive containment. Autonomous agents may collect telemetry and propose actions, but policy kernels deterministically block destructive mutations on Tier 0 assets.",
       "why_tidir_uses_it": "Automated security actions must never cause greater business disruption than the threat they seek to mitigate. Disconnecting a core transaction database during peak business hours can inflict severe operational catastrophe.",
       "concrete_example": "An EDR alert indicates an unverified privilege escalation attempt on the primary Active Directory domain controller. While ordinary workstations are automatically quarantined, the Tier 0 policy intercepts the request, blocks automated isolation, initiates non-destructive credential resets, and triggers a Priority-1 human paging event.",
       "related_identifiers": [
         "INV-06",
-        "ADR-0007",
+        "ADR-0005",
         "CAP-RSP-001"
       ]
     }
@@ -1077,14 +1077,17 @@
     },
     {
       "id": "FND-17",
-      "topic": "Adversary AI Capabilities & Automated Vulnerability Exploitation",
-      "classification": "Government Cybersecurity Advisory & Empirical Research",
-      "claim_supported": "AI tools lower barriers for reconnaissance, social engineering, and rapid exploitation of known vulnerabilities, while autonomous zero-day discovery and end-to-end bespoke malware synthesis remain bounded by reasoning constraints.",
-      "citation": "National Cyber Security Centre (NCSC-UK). (2024). The Near-Term Impact of AI on the Cyber Threat. UK Government Assessment; Fang, R., Bindu, R., Gupta, A., Zhan, Q., & Kang, D. (2024). LLM Agents can Autonomously Exploit One-day Vulnerabilities. arXiv:2404.08144.",
-      "canonical_url": "https://www.ncsc.gov.uk/report/impact-of-ai-on-cyber-threat",
+      "topic": "Adversary AI Capabilities, Autonomous Exploit Chaining & Machine-Speed Attack Lifecycle",
+      "classification": "Government Cybersecurity Advisory, Frontier System Cards & Empirical Incident Post-Mortems",
+      "claim_supported": "Empirical evidence establishes that AI capabilities have advanced from novice reconnaissance and 1-day exploit adaptation to autonomous zero-day discovery and machine-speed multi-stage vulnerability chaining; however, autonomous execution remains strictly bounded by deterministic architectural boundaries, memory safety, and ephemeral workload identity.",
+      "citation": "National Cyber Security Centre (NCSC-UK). (2024). The Near-Term Impact of AI on the Cyber Threat; Fang, R., et al. (2024). LLM Agents can Autonomously Exploit One-day Vulnerabilities. arXiv:2404.08144; Anthropic. (2026). Claude Mythos System Card & Project Glasswing; UK AI Security Institute (AISI). (2026). Empirical Evaluations of Frontier Autonomous Cyber Capabilities; Hugging Face & Cloud Security Alliance. (2026). Post-Mortem: Autonomous Agent Infrastructure Intrusion.",
+      "canonical_url": "https://www.anthropic.com/project/glasswing",
       "applies_to": [
         "INV-04",
+        "INV-05",
+        "INV-07",
         "ADR-0004",
+        "ADR-0015",
         "ADR-0019"
       ]
     },

@@ -41,14 +41,14 @@ Before examining specialized terms, it is essential to state what TIDIR does **n
 ---
 
 ### Security-State Monotonicity
-<span style="background: #0c4a6e; color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">TIDIR-SPECIFIC</span> · **Invariants**: `INV-07` · **ADRs**: `ADR-0007` · **Capabilities**: `CAP-RSP-002`
+<span style="background: #0c4a6e; color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">TIDIR-SPECIFIC</span> · **Invariants**: `INV-07` · **ADRs**: `ADR-0005` · **Capabilities**: `CAP-RSP-002`
 
 - **Plain-English Definition**: When an automated response action partially fails, the system must never roll back security barriers or leave the network more exposed than before the incident occurred. Recovery only moves forward.
 - **Concrete Engineering Example**: An automated response tries to isolate a compromised workstation by revoking Kerberos tickets and isolating the switch port. If the switch API times out after tickets are revoked, the state machine does not restore the Kerberos tickets; it freezes the endpoint state and escalates containment to the upstream core firewall.
-- **Technical Explanation**: A formal invariant (`INV-07`) stipulating that every containment state transition must satisfy the property that post-transition attacker reachability is a subset of, or equal to, pre-transition attacker reachability. If an API call fails mid-playbook, traditional distributed rollback is prohibited in favour of forward containment escalation.
+- **Technical Explanation**: A formal invariant (`INV-07`) stipulating that every containment state transition must satisfy the property that post-transition attacker reachability relative to the validated environmental model $\mathcal{M}_t$ is a subset of, or equal to, pre-transition reachability. If an API call fails mid-playbook, traditional distributed rollback is prohibited in favour of forward containment escalation.
 - **Accessible Formalism**:
-  $$\mathcal{R}(s_{\text{post}}) \subseteq \mathcal{R}(s_{\text{pre}})$$
-  *Meaning: The set of network, identity, and system assets reachable by an attacker in the post-transition state $\mathcal{R}(s_{\text{post}})$ must be a subset of, or equal to, the assets reachable in the pre-transition state $\mathcal{R}(s_{\text{pre}})$.*
+  $$\hat{\mathcal{R}}_A(s_{\text{post}}, \mathcal{M}_t) \subseteq \hat{\mathcal{R}}_A(s_{\text{pre}}, \mathcal{M}_t)$$
+  *Meaning: Attacker reachability evaluated over the control system's validated topological and identity model $\mathcal{M}_t$ in the post-transition state must be a subset of, or equal to, reachability in the pre-transition state. TIDIR guarantees monotonicity relative to the validated model, acknowledging that unobservable latent attacker channels require empirical discovery.*
 - **Why TIDIR Uses It**: Traditional SOAR playbooks apply relational database transaction logic (commit or rollback). If an endpoint isolation succeeds but firewall rule application times out, rolling back the isolation re-opens network reachability for an active adversary.
 
 ---
@@ -68,7 +68,7 @@ Before examining specialized terms, it is essential to state what TIDIR does **n
 
 - **Plain-English Definition**: Security telemetry must never be thrown away simply because no active detection rule currently searches for it. Raw forensic evidence is preserved in open formats for historical investigation.
 - **Concrete Engineering Example**: DNS query logs containing uncommon query record types are not queried by active detection rules. Rather than discarding them, the telemetry fabric ingests and normalizes them into OCSF, storing unmapped vendor fields in JSON columns within long-term lakehouse partitions.
-- **Technical Explanation**: An adapted data-engineering pattern formalized as a mandatory architectural invariant (`INV-01`). The underlying architecture adapts established big-data patterns (open columnar lakehouse storage, schema evolution, and decoupled object storage) into a non-negotiable security invariant: line-rate event streams must be preserved in vendor-neutral representations (e.g. Parquet/Iceberg) with unmapped attributes retained in structured catch-all fields (`unmapped_data`), strictly prohibiting edge-side semantic filtering.
+- **Technical Explanation**: An adapted data-engineering pattern formalized as a mandatory architectural invariant (`INV-01`). The underlying architecture adapts established big-data patterns (open columnar lakehouse storage, schema evolution, and decoupled object storage) into an architectural invariant: line-rate event streams must be preserved in vendor-neutral representations (e.g. Parquet/Iceberg) with unmapped attributes retained in structured catch-all fields (`unmapped_data`), strictly prohibiting edge-side semantic filtering. This preservation is subject to explicit, governed exceptions for statutory data minimization (e.g. GDPR), legal privilege, contractual deletion, and automated credential scrubbing.
 - **Why TIDIR Uses It**: Volume-based SIEM licensing historically forced organizations to filter and drop raw telemetry at the collection boundary. When a novel zero-day is disclosed months later, security teams are blind during retrospective investigations. While data lakehouses are standard engineering practice, adapting them into an inviolable operational rule ensures forensic reconstructability regardless of changing commercial licensing or detection priorities.
 
 ---
@@ -124,7 +124,7 @@ Before examining specialized terms, it is essential to state what TIDIR does **n
 ---
 
 ### Critical Asset Immunity (Tier 0 Protection)
-<span style="background: #1e1b4b; color: #a855f7; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">ADAPTED</span> · **Invariants**: `INV-06` · **ADRs**: `ADR-0007` · **Capabilities**: `CAP-RSP-001`
+<span style="background: #1e1b4b; color: #a855f7; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">ADAPTED</span> · **Invariants**: `INV-06` · **ADRs**: `ADR-0005` · **Capabilities**: `CAP-RSP-001`
 
 - **Plain-English Definition**: Core business infrastructure—such as domain controllers, payment gateways, and hospital life-support switches—is permanently shielded from automated shutdown or network disconnection. Only human operators can approve actions on these systems.
 - **Concrete Engineering Example**: An EDR alert indicates an unverified privilege escalation attempt on the primary Active Directory domain controller. While ordinary workstations are automatically quarantined, the Tier 0 policy intercepts the request, blocks automated isolation, initiates non-destructive credential resets, and triggers a Priority-1 human paging event.

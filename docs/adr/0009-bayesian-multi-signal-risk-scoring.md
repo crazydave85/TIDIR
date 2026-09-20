@@ -74,13 +74,18 @@ independence_class: "SAME_OBSERVATION_DERIVATION" # SAME_OBSERVATION_DERIVATION,
   - `correlation_group`: Shared entity or infrastructure boundary (e.g. host UUID, user SID, private subnet).
   - `independence_class`: Classification of orthogonality (`SAME_OBSERVATION_DERIVATION`, `SAME_SENSOR_FAMILY`, or `CROSS_DOMAIN_ORTHOGONAL`).
 
-- **Common Ancestry Discounting**:
-  - The Risk Lens calculates posterior probability by evaluating **Evidence Lineage Domains**, discounting co-derived observables:
+- **Common Ancestry Discounting (Reference Heuristic Formulation)**:
+  > [!NOTE]
+  > **Epistemic Classification: Heuristic Reference Formulation**:
+  > The dependency-discounting equations and thresholds below ($S \ge 75/100$) represent a **parameterized reference scoring heuristic**, not a closed-form theorem of Bayesian correctness. Heterogeneous telemetry streams exhibit non-linear causal couplings that violate simple conditional independence. TIDIR codifies these equations as an initial baseline architecture, subject to empirical calibration and validation under the Attack-to-Containment Benchmark Harness.
+
+  - The Risk Lens estimates composite risk by evaluating **Evidence Lineage Domains**, discounting co-derived observables:
     $$S = f(\text{Adversary TTP Severity}, \text{Asset Criticality}, \text{Identity Privilege}, \text{Orthogonal Evidence Domains})$$
-  - When two signals share identical `source_observation_ids` or upstream `derivation_chain` steps, the secondary signal's likelihood ratio ($LR$) is discounted to its residual information gain:
+  - When two signals share identical `source_observation_ids` or upstream `derivation_chain` steps, the secondary signal's likelihood ratio ($LR$) is discounted to its residual information gain via the reference heuristic:
     $$LR_{\text{adjusted}}(e_2 \mid e_1) = 1 + (LR(e_2) - 1) \cdot (1 - \text{Overlap}(e_1, e_2))$$
+    where $\text{Overlap}(e_1, e_2) \in [0, 1]$ parameterizes shared derivation ancestry and common sensor-family features.
   - *Orthogonal Domain Requirement*: Compound risk elevation ($S \ge 75/100$) requires corroboration across at least two distinct `sensor_domains` (e.g. an endpoint parent-child process relationship *and* an outbound connection to an unclassified Autonomous System Number / ASN) evaluated as `CROSS_DOMAIN_ORTHOGONAL`.
-  - *Evidential vs. Statistical Independence*: In security telemetry, distinct sensor domains (e.g. host process events and network flows) may still be causally linked observations of the same underlying attacker activity. `CROSS_DOMAIN_ORTHOGONAL` does not assert literal statistical independence; it defines **sufficient evidential independence for the scoring model, validated empirically** against production baselines to prevent co-derived finding inflation.
+  - *Evidential vs. Statistical Independence*: In security telemetry, distinct sensor domains (e.g. host process events and network flows) may still be causally linked observations of the same underlying attacker activity. `CROSS_DOMAIN_ORTHOGONAL` does not assert literal statistical independence; it defines **sufficient evidential independence for the scoring heuristic, validated empirically** against production baselines to prevent co-derived finding inflation.
   - Isolated anomalies that fail to accumulate corroborating signals within a configurable time window decay naturally without operator intervention.
 
 ### 3. Deterministic Override Circuit (Preventing Single-Event False Negatives & Guarding Against Operational DoS)
