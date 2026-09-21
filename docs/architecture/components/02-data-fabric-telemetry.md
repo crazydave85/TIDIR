@@ -70,6 +70,11 @@ flowchart TB
      - Partitioned by event timestamp (`dt=YYYY-MM-DD/hh=HH`) and OCSF class.
      - Queryable via distributed SQL execution engines.
 
+4. **Threat-Led Telemetry Validation & Coverage Closure**:
+   - Ingestion priorities are aligned with the empirical technique frequency curve established by Cyber Threat Intelligence (CTI).
+   - Automated collection audits continuously verify that the mandatory OCSF attributes required by the top 20 high-prevalence adversary techniques (e.g. process execution ancestry, memory access permissions, token impersonation, network egress flows) are actively collected across critical asset classes.
+   - Sensor instrumentation deficits that would blind detection of top-prevalence techniques trigger immediate gap notifications, ensuring collection depth where adversary frequency is highest before expending budget on peripheral log sources.
+
 ---
 
 ## 3. Architectural Capability Archetypes & Protocol Standards

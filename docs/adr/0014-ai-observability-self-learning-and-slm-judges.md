@@ -129,3 +129,9 @@ TIDIR establishes automated feedback loops connecting operational incident outco
 
 * Requires provisioning and monitoring dedicated local GPU nodes for the Tier 0 SLM cluster.
 * Demands governance discipline to prevent contaminated or malicious incident resolutions from entering the few-shot knowledge base (mitigated by mandatory human analyst sign-off before harvesting).
+
+### Scientific & Literature Grounding
+
+* **Adversarial Machine Learning & Data Poisoning**: [Carlini et al. (2023)](https://doi.org/10.48550/arXiv.2304.14897), *Poisoning Language Models During Pre-training*; [FND-18](/architecture/foundational-research#fnd-18).
+* **Autonomous Pipeline Integrity & Verification**: [Anthropic (2026)](/architecture/foundational-research#fnd-17), *Claude Mythos System Card & Project Glasswing*; [FND-17](/architecture/foundational-research#fnd-17).
+* **Empirical Grounding in Autonomous Reasoning**: [UK AI Security Institute [AISI] (2026)](/architecture/foundational-research#fnd-17), *Empirical Evaluations of Frontier Autonomous Cyber Capabilities*; [FND-17](/architecture/foundational-research#fnd-17).

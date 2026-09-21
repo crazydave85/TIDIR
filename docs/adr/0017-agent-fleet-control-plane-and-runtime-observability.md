@@ -156,3 +156,9 @@ The tools exposed to agents are treated as production microservices governed by 
 
 * Introduces an additional orchestration component (the Agent Fleet Supervisor) that must be monitored and maintained by the SecOps Platform SRE team.
 * In complex multi-stage attacks, strict tool recursion limits (8 calls) may occasionally require human approval to extend the investigation depth.
+
+### Scientific & Literature Grounding
+
+* **Distributed Stability Patterns & Circuit Breakers**: [Nygard (2007)](https://pragprog.com/titles/mnee2/release-it-second-edition/), *Release It! Design and Deploy Production-Ready Software*; [FND-09](/architecture/foundational-research#fnd-09).
+* **Empirical Limits of Autonomous Agent Loops & Tool Execution**: [UK AI Security Institute [AISI] (2026)](/architecture/foundational-research#fnd-17), *Empirical Evaluations of Frontier Autonomous Cyber Capabilities*; [FND-17](/architecture/foundational-research#fnd-17).
+* **Unconstrained Agent Loops & Credential Harvesting Post-Mortem**: [Hugging Face & Cloud Security Alliance [CSA] (2026)](/architecture/foundational-research#deep-dive-1-ai-risks-adversary-capabilities-the-reality-vs-the-hype), *Incident Post-Mortem: Autonomous Agent Infrastructure Intrusion*; [FND-17](/architecture/foundational-research#fnd-17).

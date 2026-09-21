@@ -14,6 +14,12 @@
           <span class="diagram-modal-hint">(Pinch / Drag / Scroll to zoom & pan)</span>
         </div>
         <div class="diagram-modal-controls">
+          <button class="ctrl-btn action-btn" @click.stop="exportSvg" title="Download standalone SVG">📥 SVG</button>
+          <button class="ctrl-btn action-btn" @click.stop="exportPng" title="Download high-resolution PNG (2x)">🖼️ PNG</button>
+          <button class="ctrl-btn action-btn" @click.stop="copySvg" title="Copy SVG code to clipboard">
+            {{ copied ? "Copied! ✅" : "📋 Copy SVG" }}
+          </button>
+          <div class="divider"></div>
           <button class="ctrl-btn" @click.stop="zoomIn" title="Zoom In (+)">➕</button>
           <button class="ctrl-btn" @click.stop="zoomOut" title="Zoom Out (-)">➖</button>
           <button class="ctrl-btn" @click.stop="resetTransform" title="Reset View">↺ 100%</button>
@@ -54,6 +60,9 @@ const translateX = ref(0);
 const translateY = ref(0);
 const modalRef = ref(null);
 const viewportRef = ref(null);
+const activeSvgElement = ref(null);
+const copied = ref(false);
+let copyTimer = null;
 
 let isDragging = false;
 let startX = 0;
@@ -63,8 +72,130 @@ let startY = 0;
 let initialPinchDistance = null;
 let initialScale = 1;
 
+function getCleanSvgString() {
+  if (!activeSvgElement.value) return "";
+  const clone = activeSvgElement.value.cloneNode(true);
+
+  clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  clone.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+
+  const viewBox = clone.getAttribute("viewBox");
+  let width = 1200;
+  let height = 800;
+
+  if (viewBox) {
+    const parts = viewBox.split(/[\s,]+/).map(Number);
+    if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
+      width = parts[2];
+      height = parts[3];
+    }
+  }
+
+  clone.setAttribute("width", String(width));
+  clone.setAttribute("height", String(height));
+  clone.style.backgroundColor = "#0b0f19";
+
+  // Prepend background rectangle to ensure standalone rendering has dark canvas
+  const bgRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  bgRect.setAttribute("width", "100%");
+  bgRect.setAttribute("height", "100%");
+  bgRect.setAttribute("fill", "#0b0f19");
+  clone.insertBefore(bgRect, clone.firstChild);
+
+  // Embed critical normalisation CSS inside SVG
+  const styleEl = document.createElementNS("http://www.w3.org/2000/svg", "style");
+  styleEl.textContent = `
+    .nodeLabel, .label, foreignObject div, foreignObject span, foreignObject p {
+      line-height: 1.25 !important;
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    foreignObject { overflow: visible !important; }
+  `;
+  clone.insertBefore(styleEl, bgRect);
+
+  const serializer = new XMLSerializer();
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' + serializer.serializeToString(clone);
+}
+
+function exportSvg() {
+  const svgString = getCleanSvgString();
+  if (!svgString) return;
+  const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `tidir-diagram-${Date.now()}.svg`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function exportPng() {
+  const svgString = getCleanSvgString();
+  if (!svgString) return;
+
+  const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+
+  img.onload = () => {
+    const scaleFactor = 2; // High-DPI 2x Retina rendering
+    const canvas = document.createElement("canvas");
+    const baseWidth = img.naturalWidth || 1200;
+    const baseHeight = img.naturalHeight || 800;
+    canvas.width = baseWidth * scaleFactor;
+    canvas.height = baseHeight * scaleFactor;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.fillStyle = "#0b0f19";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob((pngBlob) => {
+      if (!pngBlob) return;
+      const pngUrl = URL.createObjectURL(pngBlob);
+      const a = document.createElement("a");
+      a.href = pngUrl;
+      a.download = `tidir-diagram-${Date.now()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(pngUrl);
+      URL.revokeObjectURL(url);
+    }, "image/png");
+  };
+
+  img.onerror = () => {
+    URL.revokeObjectURL(url);
+  };
+
+  img.src = url;
+}
+
+async function copySvg() {
+  const svgString = getCleanSvgString();
+  if (!svgString) return;
+
+  try {
+    await navigator.clipboard.writeText(svgString);
+    copied.value = true;
+    if (copyTimer) clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => {
+      copied.value = false;
+    }, 2000);
+  } catch (err) {
+    console.error("Failed to copy SVG to clipboard:", err);
+  }
+}
+
 function openModal(svgElement) {
   if (!svgElement) return;
+
+  activeSvgElement.value = svgElement;
 
   // Clone SVG so we don't mutate or move the inline diagram
   const clone = svgElement.cloneNode(true);
@@ -95,6 +226,8 @@ function openModal(svgElement) {
 function closeModal() {
   isOpen.value = false;
   currentSvgHtml.value = "";
+  activeSvgElement.value = null;
+  copied.value = false;
 }
 
 function zoomIn() {
@@ -251,6 +384,7 @@ onUnmounted(() => {
 
 .diagram-modal-controls {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
@@ -264,12 +398,48 @@ onUnmounted(() => {
   cursor: pointer;
   transition: all 0.15s ease;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .ctrl-btn:hover {
   background: #334155;
   border-color: #38bdf8;
   color: #38bdf8;
+}
+
+.action-btn {
+  background: #0b1329;
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #38bdf8;
+}
+
+.action-btn:hover {
+  background: #38bdf8;
+  border-color: #38bdf8;
+  color: #0b0f19;
+}
+
+.divider {
+  width: 1px;
+  height: 22px;
+  background: #334155;
+  margin: 0 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .diagram-modal-controls {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .divider {
+    display: none;
+  }
+  .ctrl-btn {
+    padding: 0.3rem 0.55rem;
+    font-size: 0.75rem;
+  }
 }
 
 .close-btn {
@@ -317,5 +487,22 @@ onUnmounted(() => {
   height: auto !important;
   max-height: 85vh !important;
   filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.6));
+}
+
+:deep(.diagram-canvas-content foreignObject) {
+  overflow: visible !important;
+}
+
+:deep(.diagram-canvas-content .nodeLabel),
+:deep(.diagram-canvas-content .label),
+:deep(.diagram-canvas-content .cluster-label),
+:deep(.diagram-canvas-content .edgeLabel),
+:deep(.diagram-canvas-content foreignObject div),
+:deep(.diagram-canvas-content foreignObject span),
+:deep(.diagram-canvas-content foreignObject p) {
+  line-height: 1.25 !important;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 </style>

@@ -171,3 +171,10 @@ To prevent container churn and dynamic IP recycling from destabilizing the Bipar
 
 * Introduces microVM runtime dependencies (`gVisor` / `runsc` / container runtime configurations) into agent execution nodes.
 * Demands that enterprise Kubernetes clusters emit pod lifecycle and identity metadata to sustain the SPIFFE/UID entity mapping.
+
+### Scientific & Literature Grounding
+
+* **Workload Attestation & Ephemeral Identity**: [CNCF (2020)](https://spiffe.io/), *Secure Production Identity Framework for Everyone (SPIFFE)*; [FND-06](/architecture/foundational-research#fnd-06).
+* **Zero Trust Architecture & Least Privilege**: [NIST SP 800-207 (2020)](https://doi.org/10.6028/NIST.SP.800-207); [Saltzer & Schroeder (1975)](https://doi.org/10.1109/PROC.1975.9939); [FND-02](/architecture/foundational-research#fnd-02), [FND-03](/architecture/foundational-research#fnd-03).
+* **Ambient Cloud Credential Theft & Multi-Stage Agent Traversal**: [Hugging Face & Cloud Security Alliance [CSA] (2026)](/architecture/foundational-research#deep-dive-1-ai-risks-adversary-capabilities-the-reality-vs-the-hype), *Incident Post-Mortem: Autonomous Agent Infrastructure Intrusion*; [FND-17](/architecture/foundational-research#fnd-17).
+* **Autonomous Cyber Capability Isolation & Execution Bounds**: [UK AI Security Institute [AISI] (2026)](/architecture/foundational-research#fnd-17), *Empirical Evaluations of Frontier Autonomous Cyber Capabilities*; [FND-17](/architecture/foundational-research#fnd-17).

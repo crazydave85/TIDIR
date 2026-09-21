@@ -12,7 +12,7 @@ flowchart TB
   subgraph DaCPipeline ["Detection-as-Code (DaC) & Continuous Purple Team"]
     GIT["Polyglot DaC Repository\n(Vendor-Neutral Envelope + Native Dialects)"]
     CI["CI Pipeline: Linting, Unit Testing & Syntax Check"]
-    PURPLE["Automated Purple Team Harness\n(Atomic Adversary Emulation)"]
+    PURPLE["Automated Purple Team Harness\n(Atomic Adversary Emulation & Mutation Testing)"]
     BACKTEST["30-Day Historical Lakehouse Replay"]
     DEPLOY["Automated Rule Deployer"]
   end
@@ -22,10 +22,12 @@ flowchart TB
     BATCH_RULES["Scheduled Batch Analytics Engine\n- Long-window baselining (7-90 days)\n- Complex multi-dataset joins\n- Threshold & outlier detection"]
   end
 
-  subgraph AlertPipeline ["Correlation & Finding Synthesis"]
-    DEDUP["Deduplication & Flapping Suppression"]
-    CORR["Entity Correlation & Scoring Engine"]
-    INCIDENT["Finding Synthesis -> OCSF 2001/2004 Queue"]
+  subgraph DetectionEgress ["Decoupled Multi-Action Egress & Routing"]
+    ROUTER["Detection Egress Router\n(Dispatches by Typed Rule Intent)"]
+    FINDING["Finding Egress\n(Deduplication, Entity Graph & OCSF 2001/2004 Queue)"]
+    RISK["Risk Increment\n(Bayesian Multi-Signal Graph Lens; ADR-0009)"]
+    SIGNAL["Signal / Decoration\n(Lakehouse Telemetry Tagging & Historical Retro-Hunt Index)"]
+    ELEVATE["Telemetry Trigger\n(JIT Ephemeral Sensor Elevation; ADR-0016)"]
   end
 
   GIT --> CI
@@ -35,10 +37,12 @@ flowchart TB
   DEPLOY --> STREAM_RULES
   DEPLOY --> BATCH_RULES
 
-  STREAM_RULES --> DEDUP
-  BATCH_RULES --> DEDUP
-  DEDUP --> CORR
-  CORR --> INCIDENT
+  STREAM_RULES --> ROUTER
+  BATCH_RULES --> ROUTER
+  ROUTER --> FINDING
+  ROUTER --> RISK
+  ROUTER --> SIGNAL
+  ROUTER --> ELEVATE
 ```
 
 ---
@@ -60,14 +64,25 @@ flowchart TB
    - Pre-deployment CI checks:
      - Rule syntax validation against canonical OCSF schema registries.
      - Synthetic unit testing (verifying true positives trigger and benign data passes across all target engine implementations).
-     - **Continuous Automated Purple Teaming**: Executes non-destructive atomic adversary emulation payloads in an isolated staging environment to verify end-to-end detection latency and telemetry capture.
+     - **Continuous Automated Purple Teaming & Mutation Testing**: Executes non-destructive atomic adversary emulation payloads in an isolated staging environment. The test harness applies automated syntactic and procedural mutations (CLI flag permutations, environment indirection, alternate system call bindings) to measure **Evasion Resilience** and empirically distinguish brittle tactical matches from robust functional primitive detections ([ADR-0007](../../adr/0007-continuous-automated-purple-teaming-and-multi-model-consensus.md)).
      - **Historical Lakehouse Backtesting**: Replays candidate rules across 30 days of historical data in pre-prod to calculate Expected Alert Volume (EAV) and reject rules exceeding noise budgets.
    - Immutable version tagging and GitOps rollbacks.
 
-3. **Alert Correlation & Entity Scoring**:
+3. **Decoupled Multi-Action Detection Egress**:
+   - **Matching Decoupled from Alerting**: Rule execution is separated from incident generation. Detections do not assume that every match warrants human paging. Every rule in the Polyglot DaC envelope explicitly declares its operational `intent`:
+     - `finding`: High-confidence, high-impact security observations that route to deduplication, entity graph clustering, and OCSF 2001/2004 Security Finding queues for triage.
+     - `risk_increment`: Evidential observations (such as noisy Living-off-the-Land administrative executions) that increment an entity's risk state in the Bayesian Multi-Signal Risk Lens ([ADR-0009](../../adr/0009-bayesian-multi-signal-risk-scoring.md)) without waking an analyst.
+     - `signal`: Contextual decoration that tags raw events in the streaming bus and lakehouse partitions, accelerating retro-hunting and exploratory graph traversal without affecting risk scores.
+     - `telemetry_elevation_trigger`: Precursor operational indicators that emit a control directive to the telemetry plane, initiating Just-in-Time ephemeral sensor elevation ([ADR-0016](../../adr/0016-just-in-time-telemetry-elevation-and-ephemeral-forensics.md)).
+
+4. **Alert Correlation & Entity Scoring**:
    - Deduplication engine suppressing identical alerts within a configurable quiet window.
    - Entity-centric graph correlation: links alerts sharing an entity ID (e.g., `user_id`, `hostname`, `ip_address`) within an active time window into a single compound finding.
-   - Dynamic Risk Scoring: composite score evaluating alert severity, asset criticality, and threat actor confidence.
+   - Dynamic Risk Scoring: composite score evaluating alert severity, asset criticality, and threat actor confidence. Solves the operational challenge of noisy behavioral analytics by requiring multiple orthogonal signals before escalating to human review.
+
+5. **Threat-Led Backlog Prioritisation**:
+   - Detection engineering backlogs and automated purple team emulation suites are explicitly weighted by the empirical technique frequency curve established by CTI ([`CTI-03`](01-threat-intelligence.md)).
+   - Prioritises achieving layered, mutation-resilient coverage across the top 20 high-prevalence techniques (accounting for over 80% of observed intrusion activity) before investing engineering velocity in peripheral or theoretical edge cases.
 
 ---
 
@@ -78,5 +93,6 @@ flowchart TB
 | **Stream Detection** | Distributed event-driven stream processor with sliding-window state storage and microsecond event-time watermarking. | Declarative stream predicates; in-memory state snapshots. | **D3FEND ACF:** Symbolic Logic<br>[`d3f:ProcessSpawnAnalysis`](https://d3fend.mitre.org/technique/d3f:ProcessSpawnAnalysis/) |
 | **Batch Analytics Engine** | Distributed SQL query engine supporting columnar object storage pruning and vectorized query execution. | SQL:2016 standard queries; columnar open table format manifests. | **D3FEND ACF:** Statistical Analysis<br>[MITRE CAR Analytic Models](https://car.mitre.org/) |
 | **Rule Specification** | Polyglot declarative detection specification (vendor-neutral YAML metadata envelope with target-optimized execution blocks; [ADR-0019](../../adr/0019-polyglot-detection-as-code-and-native-engine-adaptation.md)). | YAML schema mapping to OCSF Class attributes; native KQL, SPL, and SQL query blocks. | [MITRE CAR](https://car.mitre.org/) Data Models & ATT&CK Mappings |
-| **Adversary Emulation Runner** | Automated test harness executing atomic adversary techniques against staging sensors. | MITRE ATT&CK technique IDs; non-destructive atomic execution manifests. | MITRE ATT&CK & [ADR-0007](../../adr/0007-continuous-automated-purple-teaming-and-multi-model-consensus.md) |
+| **Detection Egress Router** | Intent-based event dispatcher routing rule outputs to finding queues, risk accumulators, telemetry tags, or JIT elevation triggers. | OCSF Finding Class 2001/2004; typed egress control messages. | **D3FEND ACF:** Symbolic Logic<br>[`d3f:IdentifierAnalysis`](https://d3fend.mitre.org/technique/d3f:IdentifierAnalysis/) |
+| **Adversary Emulation Runner** | Automated test harness executing atomic adversary techniques and procedural mutations against staging sensors. | MITRE ATT&CK technique IDs; non-destructive atomic execution manifests. | MITRE ATT&CK & [ADR-0007](../../adr/0007-continuous-automated-purple-teaming-and-multi-model-consensus.md) |
 | **Bayesian Multi-Signal Risk Lens** | Dependency-aware evidence compounding mitigating the Base Rate Fallacy across orthogonal telemetry vectors. | Composite probability vector $(P(\text{Breach} \mid E_1, \dots, E_n))$; OCSF finding metadata. | **D3FEND ACF:** Statistical Analysis<br>[`d3f:UserBehaviorAnalysis`](https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/) |

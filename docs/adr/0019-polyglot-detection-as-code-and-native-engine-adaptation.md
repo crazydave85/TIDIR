@@ -97,6 +97,7 @@ threat_intel:
     acf_family: "symbolic_logic" # MITRE D3FEND Analytic Characterization Framework
   mitre_car:
     analytics: ["CAR-2013-05-002"] # MITRE Cyber Analytics Repository
+  evasion_resilience: "functional" # Empirical rating derived from CI mutation testing: tactical | operational | functional
   attack_flow_ref: "af-2026-proc-hollow-v1"
 
 data_requirements:
@@ -108,6 +109,7 @@ data_requirements:
     - "process.parent_process.file.name"
 
 operational:
+  intent: "finding" # Typed egress: finding | risk_increment | signal | telemetry_elevation_trigger
   severity: "high"
   noise_budget_fpr: 0.02
   quiet_window: "15m"
@@ -161,6 +163,12 @@ tests:
           file: { name: "svchost.exe", signature: { is_signed: true } }
           parent_process: { file: { name: "services.exe" } }
 ```
+
+### Typed Detection Egress & Empirical Evasion Resilience
+
+The Polyglot DaC envelope formalises two critical operational properties:
+1. **Typed Egress Intent (`operational.intent`)**: Decouples detection matching from alert generation. Rules explicitly declare whether a match emits an actionable security `finding` (OCSF 2001/2004), increments an entity's `risk_increment` in the Bayesian Multi-Signal Risk Lens ([ADR-0009](0009-bayesian-multi-signal-risk-scoring.md)), tags raw events as an informational `signal` for retro-hunting, or fires a `telemetry_elevation_trigger` commanding Just-in-Time (JIT) ephemeral sensor verbosity ([ADR-0016](0016-just-in-time-telemetry-elevation-and-ephemeral-forensics.md)).
+2. **Empirical Evasion Resilience (`threat_intel.evasion_resilience`)**: Rather than relying on self-declared coverage checklists ("ATT&CK Bingo"), rules undergo automated mutation testing in CI ([ADR-0007](0007-continuous-automated-purple-teaming-and-multi-model-consensus.md)). Detections that withstand syntactic and procedural variations are classified as `functional`, intermediate sequences as `operational`, and brittle syntax matches as `tactical`.
 
 ---
 

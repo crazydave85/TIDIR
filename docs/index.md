@@ -65,7 +65,7 @@ flowchart TB
 
     subgraph DP ["1. TELEMETRY DATA PLANE (Untrusted Input Environment)"]
         direction LR
-        P1_RAW["Raw Endpoint, Cloud & Network Events"] --> P1_NORM["Line-Rate OCSF Normalisation\n(Catch-All unmapped_data)"]
+        P1_RAW["Raw Endpoint, Cloud\n& Network Events"] --> P1_NORM["Line-Rate OCSF Normalisation\n(Catch-All unmapped_data)"]
         P1_NORM --> P1_LAKE["Decoupled Storage Fabric\n(Hot Index + Columnar Lakehouse)"]
     end
 

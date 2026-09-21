@@ -53,3 +53,9 @@ Chosen option: **Continuous Evals-as-Code with Assertion-First Harness and Golde
 
 * Requires ongoing curation and sanitization of production incidents to expand and refresh the golden benchmark corpus.
 * Introduces CI/CD pipeline execution costs and time for running multi-case agent evaluation suites during pull requests.
+
+### Scientific & Literature Grounding
+
+* **Empirical Evaluations of Autonomous Cyber Capabilities**: [UK AI Security Institute [AISI] (2026)](/architecture/foundational-research#fnd-17), *Empirical Evaluations of Frontier Autonomous Cyber Capabilities*; [FND-17](/architecture/foundational-research#fnd-17).
+* **Autonomous Exploit Testing & Benchmark Methodology**: [Fang et al. (2024)](https://arxiv.org/abs/2404.08144), *LLM Agents can Autonomously Exploit One-day Vulnerabilities*; [FND-17](/architecture/foundational-research#fnd-17).
+* **Frontier Reasoning Model Evaluations & Guardrail Failure Modes**: [Anthropic (2026)](/architecture/foundational-research#fnd-17), *Claude Mythos System Card & Project Glasswing*; [FND-17](/architecture/foundational-research#fnd-17).

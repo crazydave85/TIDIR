@@ -66,6 +66,13 @@ flowchart LR
    - **Retroactive Hunting**: Automated triggering of historical lakehouse scans when high-severity zero-day indicators are ingested.
    - **Analyst Investigation Workbench**: GraphQL / REST endpoints for pulling full threat actor profiles, associated campaigns, and MITRE ATT&CK techniques.
 
+5. **Threat-Led Prioritisation & Technique Frequency Weighting**:
+   - **Empirical Power-Law Distribution**: Acknowledges that adversary tradecraft follows a steep empirical power-law curve: a compact core of 15 to 20 MITRE ATT&CK techniques accounts for more than 80% of observed enterprise intrusions (e.g., credential dumping, process masquerading, remote service traversal, and living-off-the-land utilities).
+   - **Prevalence-Weighted Guidance**: Rather than treating framework coverage as a uniform checklist ("ATT&CK Bingo"), the CTI subsystem continuously computes an **Adversary Technique Prevalence Weighting** derived from internal case discoveries, ISAC intelligence, and empirical industry sightings.
+   - **Bi-Directional Driver for Detection & Data Fabrics**:
+     - *Detection Engineering Backlog (`DET-03`)*: Mandates that detection engineers prioritise depth, stateful correlation, and mutation resilience across high-prevalence techniques before addressing hypothetical long-tail attacks.
+     - *Telemetry Collection Audits (`DATA-01`)*: Continuously audits sensor telemetry ingestion to assert that the mandatory OCSF classes required to detect high-frequency techniques are actively collected and preserved before expending ingestion budget on peripheral edge sources.
+
 ---
 
 ## 3. Data Model & Schemas

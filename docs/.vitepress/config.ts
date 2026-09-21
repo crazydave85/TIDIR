@@ -153,7 +153,7 @@ export default withMermaid(
       [
         "style",
         {},
-        "mjx-assistive-mml { display: none !important; position: absolute !important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); user-select: none; white-space: nowrap; overflow: hidden !important; padding: 0 !important; border: 0 !important; height: 1px !important; width: 1px !important; } mjx-container[display='true'] { display: block !important; max-width: 100% !important; overflow-x: auto !important; overflow-y: hidden !important; padding: 0.75rem 0; } mjx-container:not([display='true']) { display: inline-block !important; max-width: 100%; }"
+        "mjx-assistive-mml { display: none !important; position: absolute !important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); user-select: none; white-space: nowrap; overflow: hidden !important; padding: 0 !important; border: 0 !important; height: 1px !important; width: 1px !important; } mjx-container[display='true'] { display: block !important; max-width: 100% !important; overflow-x: auto !important; overflow-y: hidden !important; padding: 0.75rem 0; } mjx-container:not([display='true']) { display: inline-block !important; max-width: 100%; } .mermaid foreignObject { overflow: visible !important; } .mermaid .nodeLabel, .mermaid .label, .mermaid .cluster-label, .mermaid .edgeLabel, .mermaid foreignObject div, .mermaid foreignObject span, .mermaid foreignObject p { line-height: 1.25 !important; font-family: Inter, ui-sans-serif, system-ui, sans-serif !important; margin: 0 !important; padding: 0 !important; }"
       ]
     ],
     themeConfig: {
@@ -343,6 +343,11 @@ export default withMermaid(
         edgeLabelBackground: "#1e293b",
         fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
         fontSize: "13px"
+      },
+      flowchart: {
+        htmlLabels: true,
+        useMaxWidth: true,
+        padding: 12
       }
     }
   })
