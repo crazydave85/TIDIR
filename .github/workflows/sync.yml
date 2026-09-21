@@ -92,6 +92,10 @@ jobs:
     needs: sync
     if: needs.sync.outputs.has_updates == 'true' || inputs.force_assessment == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     steps:
       - name: Checkout maintenance branch (gets your scripts)
         uses: actions/checkout@v7
