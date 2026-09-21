@@ -122,7 +122,7 @@ function parseAssessmentJson(rawText: string): any {
 // 4. Call the Gemini API with a Retry Loop
 let response;
 const maxRetries = 5;
-let delay = 10000; // Start with a 10-second wait
+let delay = 60000; // Start with a 60-second wait
 
 for (let attempt = 1; attempt <= maxRetries; attempt++) {
   // Be sure to use your working model version here (e.g. gemini-1.5-flash or whatever you settled on)
