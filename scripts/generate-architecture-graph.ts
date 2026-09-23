@@ -325,6 +325,26 @@ const model: ArchitecturalModel = {
       target_slo: "100% fail-secure posture; MTTR < 60 min",
       invariants_enforced: ["INV-06", "INV-07", "INV-09"],
       mitre_d3fend: ["D3-SMS", "D3-FE"]
+    },
+    {
+      id: "CAP-RESP-06",
+      name: "Automation-as-Code & Testing Harness",
+      domain: "Automated Response",
+      execution_mode: "Deterministic Engine",
+      description: "Versioned GitOps workflows and CI/CD pipelines testing playbooks against mock APIs and OPA policies.",
+      target_slo: "CI test execution < 60s; 100% schema contract enforcement",
+      invariants_enforced: ["INV-04", "INV-11"],
+      mitre_d3fend: ["D3-DPO"]
+    },
+    {
+      id: "CAP-RESP-07",
+      name: "Bidirectional Systems of Record & Collab Sync",
+      domain: "Automated Response",
+      execution_mode: "Deterministic Engine",
+      description: "Bidirectional synchronization between incident dossiers, enterprise ITSM tickets, CMDB postures, and ChatOps channels.",
+      target_slo: "State sync < 2s; ChatOps incident room hydration < 5s",
+      invariants_enforced: ["INV-02", "INV-10"],
+      mitre_d3fend: ["D3-HCI"]
     }
   ],
   services: [
@@ -432,7 +452,7 @@ const model: ArchitecturalModel = {
       description: "Adversary manipulates defensive playbooks into isolating critical production databases or domain controllers.",
       underpinning_capabilities: ["CAP-RESP-01", "CAP-RESP-02", "CAP-RESP-04", "RESIL-05"],
       mitigated_by_invariants: ["INV-06", "INV-07", "INV-09"],
-      governing_adrs: ["ADR-0005"],
+      governing_adrs: ["ADR-0005", "ADR-0027"],
       mitre_attack: ["T1489", "T1562.001"],
       mitre_atlas: ["AML.T0053"],
       mitre_d3fend: ["D3-SMS", "D3-BRC", "D3-BGO"]

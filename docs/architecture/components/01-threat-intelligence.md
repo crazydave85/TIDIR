@@ -74,7 +74,7 @@ flowchart LR
      - *Telemetry Collection Audits (`DATA-01`)*: Continuously audits sensor telemetry ingestion to assert that the mandatory OCSF classes required to detect high-frequency techniques are actively collected and preserved before expending ingestion budget on peripheral edge sources.
 
 6. **Continuous Threat Exposure Management (CTEM) & Exploit Weaponization Convergence**:
-   - Integrates with the Exposure Intelligence fabric ([ADR-0022](../../adr/0022-exposure-management-and-continuous-threat-exposure-integration.md)) by correlating tactical CTI threat feeds with active vulnerability exposure catalogs.
+   - Integrates with the Exposure Intelligence fabric ([ADR-0022](../../adr/0022-exposure-management-and-continuous-threat-exposure-integration.md)) by correlating tactical CTI threat feeds with active vulnerability exposure catalogs across the 4-tier exposure ingress taxonomy (Unified Exposure Management, Exposure Assessment Platforms, Adversarial Exposure Validation, and Risk-Based Vulnerability Management).
    - Ingests exploitability metrics including CISA Known Exploited Vulnerabilities (KEV), Exploit Prediction Scoring System (EPSS) probabilities, and proof-of-concept (PoC) weaponization chatter.
    - Computes an **Exploit Weaponization Status**: when external CTI detects active in-the-wild exploitation of a CVE present in the enterprise's attack surface graph, the CTI subsystem emits an immediate exposure priority escalation, raising the Bayesian prior probability $P(\text{Breach})$ across matching assets.
 

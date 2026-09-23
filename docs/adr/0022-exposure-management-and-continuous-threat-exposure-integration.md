@@ -49,12 +49,12 @@ $$\text{Exposure} \longleftrightarrow \text{Observe} \longrightarrow \text{Norma
 
 ```mermaid
 flowchart TB
-  subgraph ExposurePlane ["1. Exposure Intelligence & CTEM Fabric"]
+  subgraph ExposurePlane ["1. The 4-Tier Exposure Ingress Taxonomy"]
     direction TB
-    EASM["External Attack Surface Management\n(Internet-Facing Exposures, Domain Recon)"]
-    VULN["Continuous Vulnerability Assessment\n(Known Exploited Vulnerabilities - CISA KEV / EPSS)"]
-    PATH["Identity & Network Attack Path Graphs\n(Lateral Reachability & Choke Points)"]
-    POSTURE["Control Effectiveness & Posture\n(EDR Health, WAF State, Accepted Risk Register)"]
+    UEM["1. Unified Exposure Management (UEM / CTEM)\n(Systemic attack surface posture, asset criticality, business impact)"]
+    EAP["2. Exposure Assessment Platforms (EAP / ASM / CAASM)\n(Outside-in attack surface, shadow cloud assets, orphaned DNS/APIs)"]
+    AEV["3. Adversarial Exposure Validation (AEV / BAS / Auto-PT)\n(Empirical exploitability, breach simulation, verified path traversal)"]
+    RBVM["4. Risk-Based Vulnerability Management (RBVM)\n(Host/container CVE scanning, EPSS, CISA KEV exploitability)"]
   end
 
   subgraph DetectionPlane ["2. Analytical & Detection Engines"]
@@ -86,6 +86,19 @@ flowchart TB
   FB_REALIZED ==>|Immediate Priority Escalation| ExposurePlane
   FB_COMPENSATE ==>|Adjusts Active Perimeter Graph| ExposurePlane
 ```
+
+### The 4-Tier Exposure Ingress Taxonomy
+
+To avoid building redundant asset databases while capturing the full spectrum of exposure telemetry, TIDIR classifies exposure inputs into four distinct functional tiers:
+
+1. **Unified Exposure Management (UEM / CTEM)**:
+   - Aggregates top-level enterprise risk context, integrating business impact weighting, cross-domain asset criticality, and global threat landscape convergence into unified attack path graphs.
+2. **Exposure Assessment Platforms (EAP / ASM / CAASM)**:
+   - Performs continuous outside-in asset discovery, enumerating unmanaged cloud resources, forgotten subdomains, shadow APIs, expired certificates, and open perimeter services.
+3. **Adversarial Exposure Validation (AEV / BAS / Automated Pen-Testing)**:
+   - *Provides empirical validation of theoretical exposure.* Rather than assuming an unpatched CVE represents an active breach path, AEV simulates adversary techniques (e.g. lateral credential dumping, network pivoting) to verify whether current perimeter and endpoint controls actively block or permit path traversal.
+4. **Risk-Based Vulnerability Management (RBVM)**:
+   - Ingests granular host, container, and software package vulnerability scans, contextualized dynamically by the Exploit Prediction Scoring System (EPSS) and CISA Known Exploited Vulnerabilities (KEV) catalogs.
 
 ### Key Architectural Invariants & Mechanisms
 

@@ -91,7 +91,7 @@ flowchart TB
   subgraph L4 ["LAYER 4: INVESTIGATION, CASE MANAGEMENT & AUTOMATED RESPONSE"]
     L4_DOSSIER["Unified Investigation & Case Dossier\n(Entity 360, progressive disclosure UX, sealed timeline)"]:::layer4
     L4_TRIAGE["Hierarchical Agent Mesh & JIT Elevation\n(Lead orchestrator, host/network/cloud specialists, JIT orders)"]:::layer4
-    L4_RESP["Declarative Action Intents & Containment\n(Vendor-neutral intents, forward escalation, break-glass)"]:::layer4
+    L4_RESP["Workflow Orchestration & Containment\n(AaC, polyglot sandboxes, monotonic sagas; ADR-0027)"]:::layer4
   end
 
   %% Closed-Loop Architectural Feedback
@@ -125,7 +125,7 @@ flowchart LR
     E1["Data Engineering\n(Schema Evolution & Contracts)"]:::eng
     E2["Threat Intel Engineering\n(PIRs & Indicator Decay)"]:::eng
     E3["Detection Engineering (DaC)\n(Simulation, Testing & CI/CD)"]:::eng
-    E4["Automation SRE\n(Playbooks-as-Code & Fail-Closed Containment)"]:::eng
+    E4["Workflow Engineering & SRE\n(Automation-as-Code & Monotonic Sagas; ADR-0027)"]:::eng
     E5["AI Agent Harnesses\n(Evals-as-Code & Agent Trust Boundary)"]:::eng
     E6["Green Team Engineering\n(IaC Remediation & Defense-in-Depth)"]:::eng
   end
@@ -270,6 +270,7 @@ To prevent ambiguous claims of correctness, TIDIR enforces a strict three-tier v
 - **Hierarchical Agent Mesh**: Dispatches specialized autonomous subagents (host forensic, identity, network, cloud) coordinated by a Lead Triage Orchestrator behind an isolated **Agent Trust Boundary**, governed by deterministic schema validation and advisory consensus critique.
 - **Tamper-Evident Evidence Dossier**: Records queries, annotations, and artifacts with cryptographic integrity (RFC 3161 timestamps) across the **Incident Decision DAG**.
 - **Monotonic Fail-Closed Containment**: Executes containment as state machines governed by **Security-State Monotonicity** (see [ADR-0005](../adr/0005-saga-pattern-containment-and-break-glass-protocol.md)), separating low-risk actions (Tier 1) from disruptive actions (Tier 2) governed by dual-authorisation consensus and an audited **Break-Glass Emergency Protocol**.
+- **First-Principles Workflow & Automation-as-Code (AaC)**: Replaces monolithic legacy SOAR platforms with code-first, testable workflows decoupled from compute runtimes (FaaS microVMs, containers, isolated VMs), executing under ephemeral SPIFFE SVID identities and dynamic secrets leasing ([ADR-0027](../adr/0027-first-principles-workflow-orchestration-and-automation-as-code.md)). Synchronizes incident state bidirectionally across enterprise ticketing (ITSM) and CMDB systems of record.
 - **Closed-Loop Feedback & Green Team Prevention**: While TIDIR intentionally scopes its core engine to threat intelligence, detection, investigation, and incident response (deliberately avoiding duplicating inline prevention appliances), it completes the closed loop by programmatically recommending and triggering **Green Teams** (infrastructure, platform, and cloud security engineering). Post-incident findings, exploited misconfigurations, and lateral movement paths automatically synthesize Infrastructure-as-Code (IaC) pull requests, identity boundary tightenings, and preventative control improvements to permanently eradicate root causes and deepen enterprise defense-in-depth.
 - See full spec: [Layer 4 Specification](07-layer-4-incident-response.md) and [AI & Agentic Orchestration Plane](components/06-ai-orchestration.md).
 

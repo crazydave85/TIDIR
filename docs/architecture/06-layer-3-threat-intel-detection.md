@@ -352,12 +352,12 @@ Layer 3 culminates in an **Alert-to-Incident Synthesis Engine** that projects a 
 
 ```mermaid
 flowchart TB
-  subgraph IngressFindings ["1. Heterogeneous Findings Ingress"]
+  subgraph IngressFindings ["1. Heterogeneous Findings & Risk Ingress"]
     direction LR
     F_STREAM["Real-Time Streaming Alerts\n(OCSF Class 2004)"]
     F_BATCH["Lakehouse Batch Detections\n(OCSF Class 2004)"]
-    F_SECURITY["Sensor & Tool Findings\n(OCSF Class 2001)"]
-    F_INTEL["CTI Retro-Match Hits\n(STIX Observables)"]
+    F_SECURITY["Sensor & Product Risk Scores\n(EDR/NDR/CNAPP Class 2001)"]
+    F_INTEL["CTI Retro-Match Hits\n(STIX Observables & Decayed Scores)"]
   end
 
   subgraph BipartiteGraphEngine ["2. Bipartite Entity-Finding Graph Engine"]
@@ -374,11 +374,13 @@ flowchart TB
     direction TB
     RL_ASSET["Asset & Tier 0 Criticality\n(Production DB vs. Dev Pod)"]
     RL_CTI["CTI Priority Alignment\n(PIR-tagged threat actor campaigns)"]
+    RL_EXPO["4-Tier Exposure Intelligence\n(UEM, EAP/ASM, AEV, RBVM)"]
     RL_STAGE["ATT&CK Progression Compounding\n(Recon ➔ Cred Access ➔ Exfil)"]
     RL_SCORE["Composite Risk Scoring Algorithm\n(Suppression threshold vs. Promotion)"]
 
     RL_ASSET --> RL_SCORE
     RL_CTI --> RL_SCORE
+    RL_EXPO --> RL_SCORE
     RL_STAGE --> RL_SCORE
   end
 
@@ -402,6 +404,7 @@ TIDIR implements a **Bipartite Entity-Finding Graph Model**:
 - **Entity Substrate (Layer $V_E$)**: Physical and logical actors—such as identities (`actor.user.name`, `iam.role_arn`), host endpoints (`device.hostname`, `device.uid`), processes (`process.entity_id`, `process.parent_process.guid`), and network endpoints (`src_endpoint.ip`, `dst_endpoint.ip`)—form the structural topology linked by causal interaction edges (`AUTHENTICATED_TO`, `SPAWNED`, `CONNECTED_TO`).
 - **Finding Annotations (Layer $V_F$)**: Detection findings and alerts attach to one or more entity vertices via bipartite assignment edges ($e = (f, v)$ where $f \in V_F, v \in V_E$), serving as contextual risk annotations rather than primary graph nodes.
 - **External Multi-Tool Finding Attachment (XDR, CNAPP, CSPM)**: Pre-computed findings emitted by external commercial tools (e.g. CrowdStrike/Defender EDR detections, Wiz/Orca cloud posture misconfigurations, Cloudflare WAF blocks) attach directly to their corresponding entity vertices (`host.id`, `iam.role_arn`, `ip.address`). This eliminates disconnected vendor console silos: an external CNAPP alert and an internal kernel eBPF detection automatically coalesce into a single unified attack graph.
+- **Multi-Source Signal Ingress & Invariant 3 Co-Derivation Discounting**: Inbound risk evaluations derive from diverse internal and external sources—including raw telemetry threshold anomalies (`DET-01`), decayed CTI indicator matches (`CTI-02`), product-native risk scores (EDR, NDR, CNAPP), and external third-party benchmarks ([ADR-0009](/adr/0009-bayesian-multi-signal-risk-scoring)). Invariant 3 dictates that product-native scores serve as *upstream probabilistic evidence*, not unquestioned truth. When an upstream commercial EDR alert and a custom streaming SQL rule fire on the identical underlying OS process event (`source_observation_ids`), the engine evaluates their derivation lineage and discounts the secondary signal to its residual marginal gain, preventing co-derived signals from artificially compounding into an erroneous Sev-1 emergency.
 - **Community Detection**: Weakly connected components and modularity-based community detection algorithms (such as Louvain or label propagation) cluster densely connected subgraphs across sliding temporal windows ($\Delta t = 15\text{m} \dots 2\text{h}$) into cohesive incident candidates.
 
 #### Mathematical Supernode Centrality Dampening
@@ -426,7 +429,7 @@ Where $t_{1/2}$ represents the configured half-life (e.g. $t_{1/2} = 45\text{ mi
 ### 2. The Composite Risk Lens Algorithm
 Static alert severities (e.g., standard "Medium" or "High" labels) are fundamentally inadequate for prioritisation. Layer 3 evaluates each clustered graph through a composite mathematical risk function:
 
-$$\text{Cluster Risk} = \left[ \sum_{i \in \text{Findings}} \Big( C_i \times (1 - \text{FPR}_{30d, i})^\beta \times \Phi(\text{Technique}_i) \Big) \right] \times \Psi_{\text{progression}} \times M_{\text{asset}} \times P_{\text{PIR}}$$
+$$\text{Cluster Risk} = \left[ \sum_{i \in \text{Findings}} \Big( C_i \times (1 - \text{FPR}_{30d, i})^\beta \times \Phi(\text{Technique}_i) \Big) \right] \times \Psi_{\text{progression}} \times M_{\text{asset}} \times P_{\text{PIR}} \times P_{\text{expo}}$$
 
 Where:
 - $C_i$: Base confidence score ($0.0 \dots 1.0$) of finding $i$.
@@ -435,6 +438,12 @@ Where:
 - $\Psi_{\text{progression}}$: Compounding ATT&CK Progression Multiplier ($\Psi = 1.0 + 0.5 \cdot (k_{\text{tactics}} - 1)^{1.2}$), exponentially rewarding findings that advance across sequential kill-chain phases (Initial Access $\to$ Credential Access $\to$ Exfiltration).
 - $M_{\text{asset}}$: Asset Criticality Multiplier ($1.0 \dots 5.0$) extracted from Layer 1 CMDB posture (Domain Controllers, production databases, executive credentials).
 - $P_{\text{PIR}}$: Priority Intelligence Requirement Priority Factor ($1.0 \dots 2.5$) for active threat actor campaigns targeting the organisation's specific sector.
+- $P_{\text{expo}}$: Exposure Prior Multiplier ($1.0 \dots 3.0$), parameterized dynamically by the 4-tier exposure ingress taxonomy ([ADR-0022](/adr/0022-exposure-management-and-continuous-threat-exposure-integration)):
+  - *Unified Exposure Management (UEM)*: Systemic attack path centrality and crown-jewel reachability.
+  - *Exposure Assessment Platforms (EAP / ASM / CAASM)*: External perimeter exposure, open ports/services, and unmanaged shadow IT discovery.
+  - *Adversarial Exposure Validation (AEV / BAS)*: Empirically validated exploitability paths and defense bypass evidence.
+  - *Risk-Based Vulnerability Management (RBVM)*: CVE severity calibrated by CISA Known Exploited Vulnerabilities (KEV) and EPSS exploit probability scores.
+  - *Non-Zero Exposure Floor*: Evaluated with $P(\text{Breach}) \ge \epsilon \gt 0$ to prevent novel zero-day attacks against air-gapped or unmapped assets from being silenced by missing exposure records.
 
 ### 3. Noise Suppression, Intelligent De-duplication & Deterministic Overrides
 - **Volumetric Consolidation**: Hundreds of individual endpoint or network flow events triggered during a port sweep, password spray, or port scan are collapsed into a single multi-event finding cluster.

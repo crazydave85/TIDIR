@@ -56,7 +56,7 @@ For full-text ingestion across all core specifications in a single file, see: ht
 - [Telemetry & Data Fabric](https://tidir.harrymclaren.co.uk/architecture/components/02-data-fabric-telemetry): Line-rate OCSF normalisation, event streaming buses (Kafka/Redpanda), and tiered retention economics.
 - [Detection Engine](https://tidir.harrymclaren.co.uk/architecture/components/03-detection-engine): Streaming pattern detection, lakehouse SQL analytics, and Alert Noise Error Budget enforcement.
 - [Investigation & Cases](https://tidir.harrymclaren.co.uk/architecture/components/04-investigation-cases): Entity resolution, bipartite graphs, supernode pruning, and tamper-evident evidence lockers.
-- [Response & Automation](https://tidir.harrymclaren.co.uk/architecture/components/05-response-automation): Blast-radius risk tiers, monotonic forward compensation, circuit breakers, and break-glass overrides.
+- [Workflow Automation & Containment](https://tidir.harrymclaren.co.uk/architecture/components/05-response-automation): Automation-as-Code (AaC), polyglot sandboxed compute (MicroVMs/FaaS, containers), blast-radius risk tiers, monotonic forward compensation, and systems of record sync.
 - [AI & Agent Orchestration](https://tidir.harrymclaren.co.uk/architecture/components/06-ai-orchestration): Agent Trust Boundaries (dual-plane data isolation), sandboxed tools, ephemeral SPIFFE identities, and deterministic invariant validation.
 
 ## Key Architectural Decision Records (ADRs)
@@ -69,3 +69,4 @@ For full-text ingestion across all core specifications in a single file, see: ht
 - [ADR-0015: Sandboxed Agent Execution & OTLP Convergence](https://tidir.harrymclaren.co.uk/adr/0015-sandboxed-agent-execution-otlp-convergence-and-ephemeral-identity): MicroVM agent sandboxing, ephemeral SPIFFE SVIDs, and unified OpenTelemetry tracing.
 - [ADR-0019: Polyglot Detection-as-Code & Native Engine Adaptation](https://tidir.harrymclaren.co.uk/adr/0019-polyglot-detection-as-code-and-native-engine-adaptation): Vendor-neutral metadata envelopes with target-optimized native query blocks.
 - [ADR-0021: Graceful Degradation & Plan B Continuity](https://tidir.harrymclaren.co.uk/adr/0021-graceful-degradation-automated-fallback-and-continuity-plan-b): First-class failure modes, active canary probes, and deterministic fallbacks.
+- [ADR-0027: First-Principles Workflow Orchestration & Automation-as-Code](https://tidir.harrymclaren.co.uk/adr/0027-first-principles-workflow-orchestration-and-automation-as-code): Decoupling workflow orchestration from polyglot sandboxed execution, ephemeral SPIFFE identities, and bidirectional systems of record synchronization.

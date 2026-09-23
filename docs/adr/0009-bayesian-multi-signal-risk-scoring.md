@@ -99,6 +99,22 @@ independence_class: "SAME_OBSERVATION_DERIVATION" # SAME_OBSERVATION_DERIVATION,
   - *Token-Bucket Rate Limiter*: The deterministic bypass path enforces a strict token-bucket rate limiter constrained by identity context, asset class, and network subnet ($\beta_{\text{override}} \le N_{\max}/\Delta t$, e.g. max 5 override triggers per subnet/hour).
   - *Graceful Downgrade*: If the frequency of deterministic overrides exceeds the threshold for a given scope, the engine automatically downgrades subsequent triggers to high-priority Bayesian queueing ($S = 85$) with immediate notification to the lead detection engineer, preventing denial-of-service against the control plane while preserving alert visibility.
 
+### 4. Composite Multi-Source Risk Ingress & Calibration
+
+Real-world enterprise environments generate risk signals from heterogeneous internal and third-party engines. Rather than treating risk scoring as an opaque vendor black box, TIDIR standardizes a multi-source risk ingress and calibration pipeline:
+
+1. **Multi-Source Signal Ingress Taxonomy**:
+   - *Raw Telemetry Anomalies*: Statistical outliers and sliding-window threshold violations emitted by stateful stream engines (`DET-01`).
+   - *Decayed Threat Intelligence Signals*: Dynamic indicator match confidence adjusted by half-life temporal decay curves (`CTI-02`).
+   - *Product-Native Risk Scores*: Native severity and risk evaluations emitted by endpoint (EDR), network (NDR), and cloud security (CNAPP) appliances (e.g. Microsoft Defender, CrowdStrike Falcon, AWS GuardDuty). These are ingested as upstream probabilistic evidence rather than unquestioned ground truth.
+   - *Third-Party & Comparative Risk Models*: External threat ratings, supply chain risk scores, and comparative industry benchmarks.
+   - *Bespoke Enterprise Heuristics*: Custom business logic tailored to specific mission-critical assets, sensitive data enclaves, and regulatory boundaries.
+2. **Shared Ancestry Calibration & Co-Derivation Discounting (Invariant 3)**:
+   - When an upstream commercial EDR alert and a custom streaming SQL rule fire on the same underlying operating system event, both derivations trace to identical raw observations (`source_observation_ids`).
+   - The Bayesian engine evaluates their `derivation_chain` lineage and discounts the secondary signal to its residual marginal information gain, permanently preventing co-derived signals from artificially compounding into an erroneous Sev-1 emergency.
+3. **OCSF Finding Contract Normalization**:
+   - Regardless of source, all risk evaluations are normalized into canonical OCSF Class 2001 (Security Finding) and Class 2004 (Detection Finding) envelopes with bounded 0–100 integer risk scores, ensuring uniform mathematical aggregation across the Bipartite Entity-Finding Graph ([ADR-0011](0011-bipartite-entity-finding-graph-consolidation.md)).
+
 ### Positive Consequences
 
 * Suppresses the Base Rate Fallacy through dependency-aware multi-signal correlation; target engineering property: triage queue load reduction of $\gt 75\%$ relative to single-event alerting.

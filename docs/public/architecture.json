@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
-  "architecture_version": "1.16.0",
-  "generated_at": "2026-09-23T09:01:08.601Z",
+  "architecture_version": "1.17.0",
+  "generated_at": "2026-09-23T20:53:20.316Z",
   "canonical_source": "https://tidir.harrymclaren.co.uk",
   "title": "TIDIR Reference Architecture Graph",
   "description": "Machine-readable graph representation of TIDIR invariants, capabilities, services, threats, and governance contracts.",
@@ -344,6 +344,36 @@
         "D3-SMS",
         "D3-FE"
       ]
+    },
+    {
+      "id": "CAP-RESP-06",
+      "name": "Automation-as-Code & Testing Harness",
+      "domain": "Automated Response",
+      "execution_mode": "Deterministic Engine",
+      "description": "Versioned GitOps workflows and CI/CD pipelines testing playbooks against mock APIs and OPA policies.",
+      "target_slo": "CI test execution < 60s; 100% schema contract enforcement",
+      "invariants_enforced": [
+        "INV-04",
+        "INV-11"
+      ],
+      "mitre_d3fend": [
+        "D3-DPO"
+      ]
+    },
+    {
+      "id": "CAP-RESP-07",
+      "name": "Bidirectional Systems of Record & Collab Sync",
+      "domain": "Automated Response",
+      "execution_mode": "Deterministic Engine",
+      "description": "Bidirectional synchronization between incident dossiers, enterprise ITSM tickets, CMDB postures, and ChatOps channels.",
+      "target_slo": "State sync < 2s; ChatOps incident room hydration < 5s",
+      "invariants_enforced": [
+        "INV-02",
+        "INV-10"
+      ],
+      "mitre_d3fend": [
+        "D3-HCI"
+      ]
     }
   ],
   "services": [
@@ -569,7 +599,8 @@
         "INV-09"
       ],
       "governing_adrs": [
-        "ADR-0005"
+        "ADR-0005",
+        "ADR-0027"
       ],
       "mitre_attack": [
         "T1489",

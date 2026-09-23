@@ -38,7 +38,7 @@ flowchart TB
     TIER0["Tier 0: Read-Only Enrichment\n(Autonomous Execution)"]
     TIER1["Tier 1: Targeted Low-Disruption\n(Policy-Gated Automation)"]
     TIER2["Tier 2: Potentially Disruptive\n(Mandatory Human Authorisation)"]
-    CONNECTOR["Perimeter, Identity & Endpoint Connectors\n(Declarative Playbook Runtimes)"]
+    CONNECTOR["Durable Orchestrator & Polyglot Workers\n(AaC, FaaS/Containers/VMs, Systems of Record)"]
 
     ROUTER -->|Read-Only| TIER0
     ROUTER -->|Low Blast Radius| TIER1
@@ -228,6 +228,26 @@ To govern distributed containment workflows, Layer 4 establishes **Security-Stat
 - **Action Monotonicity vs. Security-State Monotonicity**: We distinguish between reversing individual API actions and regressing the security perimeter. Automated compensation is permitted exclusively for *forward-security actions* (e.g. restoring benign services, routing traffic through isolated inspection enclaves) but is strictly prohibited from dismantling established security barriers ($T_1 \dots T_{k-1}$) without explicit, authenticated human attestation.
 - **Fail-Secure Boundary Freezes**: On partial failure or API timeouts, the orchestrator freezes the existing perimeter in place and executes forward escalation (e.g. applying upstream network-tier isolation) rather than reopening endpoints.
 - **Lease-Gated Deadlock Prevention**: As codified in [ADR-0005](../adr/0005-saga-pattern-containment-and-break-glass-protocol.md), partial containment locks are bound to ephemeral isolation leases with bounded TTLs (e.g. 45 minutes), ensuring that network partitions or stalled workflows fail safely to higher-order supervisory alerts without distributed deadlock.
+
+### Automation-as-Code (AaC), Polyglot Execution & Systems of Record Sync
+
+To prevent brittle graphical playbooks and monolithic execution vulnerabilities, Layer 4 decouples workflow authoring, durable state management, sandboxed execution, and secrets leasing ([ADR-0027](../adr/0027-first-principles-workflow-orchestration-and-automation-as-code.md)):
+
+1. **Automation-as-Code (AaC) & CI/CD Verification**:
+   - Workflows are defined as version-controlled code (TypeScript, Python, Go) or typed declarative directed acyclic graphs (DAGs).
+   - Every playbook change undergoes continuous integration testing: unit tests evaluate logic against simulated API mocks, while static policy engines verify that destructive actions require dual-operator consensus gating.
+2. **Polyglot Sandboxed Compute**:
+   - The central orchestrator manages state transitions and timers but delegates execution to ephemeral workers across Function-as-a-Service (FaaS) microVMs (e.g. Firecracker, WebAssembly), containerized jobs, or isolated virtual machines.
+   - Workers share zero persistent memory or ambient network routes, mitigating lateral movement risks if an enrichment script handles untrusted payload data.
+3. **Task-Scoped Identity & Dynamic Secret Leasing**:
+   - Execution workers utilize ephemeral SPIFFE/SPIRE X.509 certificates with short lifetimes ($\text{TTL} \le 15\text{m}$).
+   - Dynamic secret brokers issue credentials restricted exclusively to the authorized task (e.g. read-only CMDB tokens for asset enrichment), preventing broad credential compromise.
+4. **Bidirectional Systems of Record Synchronization**:
+   - Workflows automatically synchronize incident state between the operator workbench, enterprise IT service management (ITSM; ServiceNow, Jira Service Management), and Configuration Management Databases (CMDB).
+   - Automated ChatOps pipelines hydrate dedicated incident response channels (Slack, Microsoft Teams) during high-severity incidents, streaming milestone summaries and containment cards to cross-functional teams.
+5. **Continuous Access Evaluation (CAEP) & Identity Risk Sharing (RISC)**:
+   - Outbound identity containment actions (`REVOKE_SESSION`, `RESTRICT_ROLE`) emit OpenID Shared Signals and Events (SSE) using IETF Security Event Tokens (SETs; RFC 8417).
+   - CAEP and RISC events trigger instant session termination and token revocation across federated Identity Providers and participating SaaS applications without waiting for periodic access token expiration.
 
 ### Operator Skill Retention & Incident Replay Flight Deck
 

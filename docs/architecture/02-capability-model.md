@@ -11,7 +11,7 @@ This document specifies the functional capability taxonomy required across the T
 
 ## 1. Capability Taxonomy Matrix
 
-The TIDIR capability model defines **thirty-two operational capabilities** organized across six functional domains, underpinned by **seven cross-cutting AI Governance and Verification capabilities** and **five Operational Continuity & Resilience capabilities** (44 capabilities in total), spanning from proactive exposure management and raw sensory ingestion to closed-loop response automation:
+The TIDIR capability model defines **thirty-four operational capabilities** organized across six functional domains, underpinned by **seven cross-cutting AI Governance and Verification capabilities** and **five Operational Continuity & Resilience capabilities** (46 capabilities in total), spanning from proactive exposure management and raw sensory ingestion to closed-loop response automation:
 
 ```mermaid
 flowchart TB
@@ -34,7 +34,7 @@ flowchart TB
 
   D4["<b>Domain 4: Investigation & Case Management (INV)</b><br/>• INV-01: Unified Entity Resolution 360<br/>• INV-02: Chronological Multi-Source Timeline<br/>• INV-03: Relational Execution & Process Graph<br/>• INV-04: Sealed Evidence Locker & RFC 3161<br/>• INV-05: Hierarchical Agent Mesh & Agent Trust Boundary<br/>• INV-06: Progressive Disclosure Analyst Workbench<br/>• INV-07: Just-in-Time (JIT) Telemetry Elevation"]:::inv
 
-  D5["<b>Domain 5: Automated Response & Containment (RESP)</b><br/>• RESP-01: Declarative Playbook Orchestration<br/>• RESP-02: Monotonic Containment & Forward Escalation<br/>• RESP-03: Autonomous Tier 1 Containment<br/>• RESP-04: Dual-Auth Consensus & Break-Glass Override<br/>• RESP-05: Closed-Loop & Green Team Triggers"]:::resp
+  D5["<b>Domain 5: Automated Response & Containment (RESP)</b><br/>• RESP-01: Declarative Playbook Orchestration<br/>• RESP-02: Monotonic Containment & Forward Escalation<br/>• RESP-03: Autonomous Tier 1 Containment<br/>• RESP-04: Dual-Auth Consensus & Break-Glass Override<br/>• RESP-05: Closed-Loop & Green Team Triggers<br/>• RESP-06: Automation-as-Code & Testing Harness<br/>• RESP-07: Systems of Record & Collab Sync"]:::resp
 
   GOV["<b>Cross-Cutting: AI Governance & Verification (AIGOV)</b><br/>• AIGOV-01: Continuous Evals-as-Code & Grounding<br/>• AIGOV-02: Dual-Plane Data/Control Isolation<br/>• AIGOV-03: Cost & Latency Performance Budgets<br/>• AIGOV-04: Agent Fleet Lifecycle & Preemption<br/>• AIGOV-05: MCP Tool Observability & Loop Breakers<br/>• AIGOV-06: Ephemeral Attestation & SVIDs<br/>• AIGOV-07: Non-Human Identity (NHI) Profiling"]:::aigov
 
@@ -128,6 +128,8 @@ flowchart TB
 | **RESP-03** | Autonomous Rapid Containment | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-HI`](https://d3fend.mitre.org/technique/d3f:NetworkIsolation/)<br>[`D3-CR`](https://d3fend.mitre.org/technique/d3f:CredentialRevocation/)<br>[`D3-BRC`](https://d3fend.mitre.org/technique/d3f:NetworkIsolation/)<br>[CIS v8 Control 17.7](https://www.cisecurity.org/controls/v8) | Execute instantaneous containment for low-blast-radius actions (e.g. host isolation in sandbox, token invalidation). | Time-to-contain (MTTC) < 15 seconds |
 | **RESP-04** | Dual-Auth & Break-Glass Protocols | `[Human-in-the-Loop]`<br>*(ACF: Symbolic Logic)* | [`D3-BGO`](https://d3fend.mitre.org/technique/d3f:AccessPolicyAdministration/)<br>[`D3-MAC`](https://d3fend.mitre.org/technique/d3f:AccessPolicyAdministration/)<br>[CIS v8 Control 17.8](https://www.cisecurity.org/controls/v8) | Enforce multi-signature consensus for high-impact actions with authenticated single-commander break-glass overrides. | MTTC < 5 min; break-glass audit broadcast < 5 sec |
 | **RESP-05** | Closed-Loop & Green Team Triggers | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-CIR`](https://d3fend.mitre.org/technique/d3f:ApplicationHardening/)<br>[`D3-IaC`](https://d3fend.mitre.org/technique/d3f:ApplicationHardening/)<br>[CIS v8 Control 17.9](https://www.cisecurity.org/controls/v8) | Extract confirmed indicators for CTI, calibrate DaC rules, and synthesize IaC hardening pull requests for Green Teams to improve defense-in-depth. | Closed-loop & hardening dispatch automated on case closure |
+| **RESP-06** | Automation-as-Code & Testing Harness | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-DPO`](https://d3fend.mitre.org/technique/d3f:ProcessTermination/)<br>[CIS v8 Control 17.1](https://www.cisecurity.org/controls/v8) | Versioned GitOps workflows and CI/CD pipelines testing playbooks against mock APIs and OPA blast-radius policies before production deployment. | CI test execution < 60s; 100% schema contract enforcement |
+| **RESP-07** | Bidirectional Systems of Record & Collab Sync | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-HCI`](https://d3fend.mitre.org/technique/d3f:HardwareComponentInventory/)<br>[CIS v8 Control 1.1, 17.2](https://www.cisecurity.org/controls/v8) | Bidirectional synchronization between incident dossiers, enterprise ITSM tickets (ServiceNow, Jira), CMDB asset postures, and ChatOps incident channels. | State sync < 2s; ChatOps incident room hydration < 5s |
 
 ---
 
@@ -167,7 +169,7 @@ The [MITRE D3FEND ACF](https://d3fend.mitre.org/) categorizes how defensive coun
 
 1. **Symbolic Logic (`[Deterministic Engine]` / `[Human-in-the-Loop]`):**
    - *Mechanisms:* AST validation, finite state machines, schema validation, cryptographic hash checks, string pattern matches, and relational graph traversals.
-   - *Capabilities:* `DATA-01` through `DATA-05`, `DET-01`, `DET-04`, `DET-06`, `DET-07`, `INV-01` through `INV-04`, `INV-06`, `INV-07`, `RESP-01` through `RESP-05`, `AIGOV-02` through `AIGOV-06`, and `RESIL-01` through `RESIL-05`.
+   - *Capabilities:* `DATA-01` through `DATA-05`, `DET-01`, `DET-04`, `DET-06`, `DET-07`, `INV-01` through `INV-04`, `INV-06`, `INV-07`, `RESP-01` through `RESP-07`, `AIGOV-02` through `AIGOV-06`, and `RESIL-01` through `RESIL-05`.
    - *Architectural Role:* Primary authorization and containment plane. Deterministic components enforce all invariants.
 
 2. **Statistical Methods (`[Deterministic Engine]` / `[Statistical Analysis]`):**
