@@ -72,7 +72,7 @@ flowchart TB
    - Completely decoupled from task compute; the orchestrator never executes untrusted customer or community code within its core memory space.
 3. **Ephemeral Identity & Dynamic Secrets Broker**:
    - Eliminates the static "SOAR credential vault" anti-pattern.
-   - Leverages **SPIFFE/SPIRE** ([AIGOV-06](file:///Users/harrymclaren/Projects/TIDIR/docs/architecture/02-capability-model.md#L143)) to issue task-scoped, short-lived X.509 certificates ($\text{TTL} \le 15\text{m}$).
+   - Leverages **SPIFFE/SPIRE** ([AIGOV-06](/architecture/02-capability-model)) to issue task-scoped, short-lived X.509 certificates ($\text{TTL} \le 15\text{m}$).
    - Dynamically leases task-specific credentials Just-in-Time (JIT). An enrichment task querying an IP reputation API receives only read-only network tokens; it never sees host containment or administrative keys.
 4. **Polyglot Sandboxed Execution Plane**:
    - Compute substrates are dynamically matched to activity performance and isolation requirements:
