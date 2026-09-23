@@ -23,7 +23,7 @@ All stories adhere to the canonical structure:
 
 ### Story H1: Contextual Graph Triage without Pivot Fatigue
 * **As a** Senior Triage Analyst (Layer 4),
-* **I want** incoming high-priority cases to arrive with pre-correlated entity graphs, chronological timelines, and affected crown-jewel assets already resolved,
+* **I want** incoming high-priority cases to arrive with pre-correlated entity graphs, chronological timelines, and affected mission-critical assets already resolved,
 * **So that** I can assess the complete blast radius of an active intrusion in under 60 seconds without manually pivoting across multiple query terminals.
 
 #### Acceptance Criteria
@@ -187,7 +187,7 @@ All stories adhere to the canonical structure:
 #### Acceptance Criteria
 1. Threat intelligence products are exported in structured machine-readable formats defining sequential attacker steps, prerequisite conditions, and forensic observables.
 2. Each attack flow step explicitly maps to MITRE ATT&CK technique IDs and target OCSF data classes.
-3. New attack flows automatically update the Detection Opportunity Backlog, scoring implementation priority by multiplying threat prevalence, crown-jewel exposure, and sensor visibility feasibility.
+3. New attack flows automatically update the Detection Opportunity Backlog, scoring implementation priority by multiplying threat prevalence, Tier 0 asset exposure, and sensor visibility feasibility.
 
 ---
 

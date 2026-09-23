@@ -76,6 +76,34 @@ const warningRules = [
   {
     regex: /\brevolutionary\b/gi,
     message: "Marketing fluff 'revolutionary'"
+  },
+  {
+    regex: /\b(delve|delving|tapestry|testament|seamlessly|plethora|myriad|paramount|supercharge|supercharging|unleash|unleashing)\b/gi,
+    message: "High-probability AI writing cliché / marker"
+  },
+  {
+    regex: /\b(leverage|leveraging|leveraged|leverages)\b/gi,
+    message: "Corporate buzzword 'leverage' (prefer: 'use', 'apply', or 'exploit')"
+  },
+  {
+    regex: /\b(utilize|utilizing|utilized|utilizes)\b/gi,
+    message: "Stilted word 'utilize' (prefer: 'use')"
+  },
+  {
+    regex: /\bcrown\s+jewels?\b/gi,
+    message: "Corporate metaphor 'crown jewel(s)' (prefer: 'Tier 0 mission-critical assets' or 'critical infrastructure')"
+  },
+  {
+    regex: /\b(furthermore|moreover)\b/gi,
+    message: "Stilted essay connective (prefer direct sentence flow)"
+  },
+  {
+    regex: /\b(paves?\s+the\s+way|vital\s+role|at\s+the\s+forefront\s+of|serves?\s+as\s+a\s+reminder)\b/gi,
+    message: "Vacuous rhetorical cliché"
+  },
+  {
+    regex: /\b(not\s+only\b.+\bbut\s+also|in\s+today['’]s\b|at\s+the\s+end\s+of\s+the\s+day\b|when\s+all\s+is\s+said\s+and\s+done\b)\b/gi,
+    message: "Rhetorical connective / cliché (prefer direct factual exposition)"
   }
 ];
 
@@ -167,10 +195,17 @@ for (const file of targetFiles) {
 
   // Track heading numbers within parent scope
   const sectionNumbersByLevel = new Map<number, number[]>();
+  let inCodeBlock = false;
 
   for (let i = 0; i < lines.length; i++) {
     const lineNum = i + 1;
     const line = lines[i];
+
+    if (line.trim().startsWith("```")) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) continue;
 
     // Check heading numbering sequence
     const headingMatch = line.match(/^(#{2,4})\s+(\d+)\.\s+(.*)$/);
@@ -201,6 +236,30 @@ for (const file of targetFiles) {
       }
     }
 
+    // 0. Check formatting and punctuation AI markers
+    if (/^#{1,6}\s+.*[🚀💡🔍⚡🔥✨🎉🎯📌🤖🧠📈🛡️]/u.test(line)) {
+      warnings.push(`⚠️ [Formatting / AI Marker] ${file}:${lineNum} — Decorative emoji in markdown heading (prefer clean technical headings)`);
+    }
+
+    if (/^#{1,6}\s+(Conclusion|Summary|In Summary|Key Takeaways?|Wrapping Up)\b/i.test(line)) {
+      warnings.push(`⚠️ [Formatting / AI Marker] ${file}:${lineNum} — Formulaic closing heading (prefer descriptive technical headings)`);
+    }
+
+    if (/^[*-]\s+.*;\s*(and|or)?\s*$/i.test(line)) {
+      warnings.push(`⚠️ [Formatting / AI Marker] ${file}:${lineNum} — Semicolon-terminated bullet point (prefer clean sentences or comma lists)`);
+    }
+
+    if (!line.includes("|") && !line.includes("classDef") && !line.includes("http")) {
+      const emCount = (line.match(/—/g) || []).length;
+      if (emCount >= 3) {
+        warnings.push(`⚠️ [Punctuation / AI Marker] ${file}:${lineNum} — Excessive em-dashes (≥ 3) on a single line`);
+      }
+    }
+
+    if (/[«»‹›]/.test(line)) {
+      warnings.push(`⚠️ [Punctuation / AI Marker] ${file}:${lineNum} — Non-standard guillemet quotation mark (prefer standard English quotes or markdown italics)`);
+    }
+
     if (!isInvariantDoc) {
       // 1. Check claims discipline (Hard Errors)
       for (const rule of absoluteErrorRules) {
@@ -227,14 +286,33 @@ for (const file of targetFiles) {
 
     // 4. Check hyphen stacks (clean line of markdown links, URLs, and code)
     if (!line.trim().startsWith("```") && !line.includes("classDef") && !line.includes("http")) {
+      const allowedHyphenStacks = new Set([
+        "state-of-record",
+        "zero-data-egress",
+        "end-to-end",
+        "human-in-the-loop",
+        "software-as-a-service",
+        "living-off-the-land",
+        "llm-as-a-judge",
+        "model-as-a-judge",
+        "out-of-the-box",
+        "write-once-read-many",
+        "mean-time-to-detect",
+        "architecture-at-a-glance",
+        "needle-in-a-haystack",
+        "out-of-the-loop"
+      ]);
+
       const cleanLine = line
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // strip markdown links to just their label
+        .replace(/<[^>]+>/g, "")                  // strip HTML tags
+        .replace(/\([^)]+\)/g, "")                 // strip link URLs and parenthetical paths
+        .replace(/\[[^\]]+\]/g, "")                // strip markdown link labels
         .replace(/`[^`]+`/g, "");                 // strip inline code
 
       const matches = cleanLine.match(hyphenStackRegex);
       if (matches) {
         for (const m of matches) {
-          if (!m.includes("state-of-record") && !m.includes("zero-data-egress") && !m.includes("end-to-end") && !m.includes("Human-in-the-Loop") && !m.includes("human-in-the-loop")) {
+          if (!allowedHyphenStacks.has(m.toLowerCase())) {
             warnings.push(`⚠️ [Hyphen Stack] ${file}:${lineNum} — High hyphen stack '${m}' in prose`);
           }
         }

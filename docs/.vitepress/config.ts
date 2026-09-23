@@ -179,6 +179,8 @@ export default withMermaid(
             items: [
               { text: "What is TIDIR?", link: "/guide/what-is-tidir" },
               { text: "15-Minute Golden Path", link: "/guide/golden-path" },
+              { text: "Adoption Roadmap & Maturity", link: "/guide/adoption-roadmap" },
+              { text: "Persona-Driven Journeys", link: "/guide/persona-journeys" },
               { text: "Foundational Research & Literature", link: "/architecture/foundational-research" },
               { text: "Assurance Case Map", link: "/architecture/assurance-map" }
             ]
@@ -210,6 +212,7 @@ export default withMermaid(
               { text: "Architectural Invariants", link: "/architecture/00-architectural-invariants" },
               { text: "Foundational Research & Literature", link: "/architecture/foundational-research" },
               { text: "System Overview & 4-Plane Model", link: "/architecture/01-system-overview" },
+              { text: "Reference Stacks", link: "/architecture/reference-stacks" },
               { text: "ADR Registry", link: "/adr/" }
             ]
           }
@@ -220,6 +223,9 @@ export default withMermaid(
             items: [
               { text: "Architectural Invariants & Constitution", link: "/architecture/00-architectural-invariants" },
               { text: "System Overview & 4-Plane Model", link: "/architecture/01-system-overview" },
+              { text: "Distributed Detection & Finding Bus", link: "/architecture/distributed-detection-and-the-finding-bus" },
+              { text: "Concrete Reference Stacks", link: "/architecture/reference-stacks" },
+              { text: "Failure Modes & Tradeoffs", link: "/architecture/failure-modes-and-tradeoffs" },
               { text: "Foundational Research & Literature", link: "/architecture/foundational-research" },
               { text: "Glossary & Concept Taxonomy", link: "/architecture/glossary" },
               { text: "Target Threat Model", link: "/architecture/09-threat-model" },
@@ -266,7 +272,8 @@ export default withMermaid(
               { text: "0001 - Record Architecture Decisions", link: "/adr/0001-record-architecture-decisions" },
               { text: "0010 - SABSA Alignment & Attribute Profiling", link: "/adr/0010-sabsa-business-architecture-and-attribute-profiling" },
               { text: "0008 - SecOps Error Budgets & Chaos SRE", link: "/adr/0008-secops-error-budgets-and-chaos-security-engineering" },
-              { text: "0021 - Graceful Degradation & Plan B", link: "/adr/0021-graceful-degradation-automated-fallback-and-continuity-plan-b" }
+              { text: "0021 - Graceful Degradation & Plan B", link: "/adr/0021-graceful-degradation-automated-fallback-and-continuity-plan-b" },
+              { text: "0026 - End-to-End Coverage Assurance", link: "/adr/0026-end-to-end-coverage-assurance-and-degradation-circuit-breakers" }
             ]
           },
           {
@@ -275,7 +282,8 @@ export default withMermaid(
             items: [
               { text: "0002 - Preserve Unmapped OCSF Telemetry", link: "/adr/0002-preserve-unmapped-telemetry-in-ocsf" },
               { text: "0015 - Sandboxed Agents & OTLP Convergence", link: "/adr/0015-sandboxed-agent-execution-otlp-convergence-and-ephemeral-identity" },
-              { text: "0016 - JIT Telemetry Elevation & Forensics", link: "/adr/0016-just-in-time-telemetry-elevation-and-ephemeral-forensics" }
+              { text: "0016 - JIT Telemetry Elevation & Forensics", link: "/adr/0016-just-in-time-telemetry-elevation-and-ephemeral-forensics" },
+              { text: "0025 - Pre-Detection Telemetry Lineage", link: "/adr/0025-pre-detection-telemetry-provenance-and-ingestion-lineage" }
             ]
           },
           {
@@ -286,7 +294,10 @@ export default withMermaid(
               { text: "0009 - Bayesian Multi-Signal Risk Scoring", link: "/adr/0009-bayesian-multi-signal-risk-scoring" },
               { text: "0011 - Bipartite Entity-Finding Graph", link: "/adr/0011-bipartite-entity-finding-graph-consolidation" },
               { text: "0013 - Ambient Deception & Canary Anchors", link: "/adr/0013-ambient-deception-fabric-and-canary-anchors" },
-              { text: "0019 - Polyglot DaC & Native Engine Adaptation", link: "/adr/0019-polyglot-detection-as-code-and-native-engine-adaptation" }
+              { text: "0019 - Polyglot DaC & Native Engine Adaptation", link: "/adr/0019-polyglot-detection-as-code-and-native-engine-adaptation" },
+              { text: "0022 - Exposure Management & CTEM Integration", link: "/adr/0022-exposure-management-and-continuous-threat-exposure-integration" },
+              { text: "0023 - Distributed Detection & Edge Correlation", link: "/adr/0023-distributed-detection-and-edge-to-center-correlation" },
+              { text: "0024 - Finding Bus Architecture & Contract", link: "/adr/0024-finding-bus-architecture-lineage-and-finding-contract" }
             ]
           },
           {

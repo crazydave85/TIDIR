@@ -79,7 +79,13 @@ flowchart TB
    - Downstream integration connectors enforce strict rate limits, exponential backoff, and stateful circuit breakers.
    - If a third-party control plane experiences elevated error rates ($\gt 5\%$ 5xx responses or timeouts), the connector trips open, diverting automated actions to an operator escalation queue rather than stalling the pipeline.
 
-4. **Closed-Loop Intelligence, DaC Tuning & Green Team Prevention**:
+4. **Declarative Action Intent Abstraction Layer**:
+   - To preserve operational portability and prevent vendor lock-in, the Policy Kernel and the Incident Decision DAG decouple response intent from concrete vendor APIs:
+     - **Canonical Action Intents**: Workflows emit standardized, vendor-neutral intent declarations: `ISOLATE_HOST`, `REVOKE_SESSION`, `BLOCK_INDICATOR`, `QUARANTINE_WORKLOAD`, and `RESTRICT_ROLE`.
+     - **Actuation Adapters**: Domain-specific adapters translate canonical intents into native execution commands (e.g. mapping `ISOLATE_HOST` to Microsoft Defender for Endpoint `POST /api/machines/{id}/isolate`, CrowdStrike Falcon `POST /devices/entities/devices-actions/v2`, AWS VPC Security Group shunts, or Kubernetes NetworkPolicy quarantine labels).
+     - **Intent-Level Lineage**: The Incident Decision DAG records the authorized *intent* and its safety constraints rather than proprietary API parameters, ensuring evidence and audit trails remain valid across infrastructure migrations.
+
+5. **Closed-Loop Intelligence, DaC Tuning & Green Team Prevention**:
    - While TIDIR intentionally focuses on Threat Intelligence, Detection, Investigation & Response (and deliberately avoids duplicating inline prevention appliances), it completes the closed loop by programmatically bridging into **Green Teams** (platform, infrastructure, and cloud security engineering):
      - **Attributed Threat Feedback**: Verified indicators (hashes, C2 domains) and campaign flows are immediately exported back into the Layer 1/3 Threat Intelligence fabric for retroactive sweeps and edge cache matching.
      - **DaC Quality & Noise Tuning**: Case classifications automatically trigger rule calibration pull requests in the Detection-as-Code repository, pruning false-positive noise or adjusting sensitivity thresholds.

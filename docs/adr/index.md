@@ -9,7 +9,7 @@ This directory serves as the immutable registry of **Architectural Decision Reco
 All decisions are recorded as version-controlled markdown documents alongside the architecture specifications. Visual state machines and topologies within ADRs are authored in declarative Mermaid syntax and validated programmatically in CI/CD.
 
 ```
-Total Decisions: 21 | Accepted: 21 | Deprecated: 0 | Superseded: 0
+Total Decisions: 26 | Accepted: 26 | Deprecated: 0 | Superseded: 0
 ```
 
 ---
@@ -22,6 +22,7 @@ Total Decisions: 21 | Accepted: 21 | Deprecated: 0 | Superseded: 0
 | [**0008**](0008-secops-error-budgets-and-chaos-security-engineering.md) | **SecOps Error Budgets & Chaos Engineering** | `accepted` | SecOps / SRE Team | Adopts SRE Alert Noise Error Budgets (false-positive rate $\le 5\%$) with automated CI/CD deployment freezes on budget exhaustion. |
 | [**0010**](0010-sabsa-business-architecture-and-attribute-profiling.md) | **SABSA Alignment & Attribute Profiling** | `accepted` | Enterprise Architecture | Maps all TIDIR capabilities to the SABSA 6x6 matrix and operational security attribute profiles. |
 | [**0021**](0021-graceful-degradation-automated-fallback-and-continuity-plan-b.md) | **Graceful Degradation & Continuity Plan B** | `accepted` | Architecture / SecOps / SRE | Codifies a 4-tier capabilities-driven degradation model, failure detection probes, and automated Plan B fallbacks across all layers. |
+| [**0026**](0026-end-to-end-coverage-assurance-and-degradation-circuit-breakers.md) | **End-to-End Coverage Assurance & Circuit Breakers** | `accepted` | Architecture / Detection Leads / Harry | Establishes a 10-step verification chain, active purple-team emulation canaries, and automated confidence-capping circuit breakers. |
 
 ---
 
@@ -32,6 +33,7 @@ Total Decisions: 21 | Accepted: 21 | Deprecated: 0 | Superseded: 0
 | [**0002**](0002-preserve-unmapped-telemetry-in-ocsf.md) | **Preserve Unmapped OCSF Telemetry** | `accepted` | Data Engineering | Mandates preserving non-standard raw fields inside an `unmapped_data` JSON object to prevent telemetry loss. |
 | [**0015**](0015-sandboxed-agent-execution-otlp-convergence-and-ephemeral-identity.md) | **Sandboxed Agent Execution & OTLP Convergence** | `accepted` | SecOps / AI Platform | Runs specialist agents in gVisor/Firecracker microVMs emitting standard OTLP spans, unified with enterprise APM. |
 | [**0016**](0016-just-in-time-telemetry-elevation-and-ephemeral-forensics.md) | **JIT Telemetry Elevation & Ephemeral Forensics** | `accepted` | SecOps / Detection Leads | Implements dynamic agent-driven sensor elevation (eBPF, PCAP, memory) with strict TTLs ($\le 30\,\text{min}$) and auto-eviction. |
+| [**0025**](0025-pre-detection-telemetry-provenance-and-ingestion-lineage.md) | **Pre-Detection Telemetry Provenance & Lineage** | `accepted` | Architecture / Data Engineering / Harry | Extends the Evidence DAG upstream using W3C Trace Context and micro-batch transform hashes to eliminate pipeline blind spots. |
 
 ---
 
@@ -44,6 +46,9 @@ Total Decisions: 21 | Accepted: 21 | Deprecated: 0 | Superseded: 0
 | [**0011**](0011-bipartite-entity-finding-graph-consolidation.md) | **Bipartite Entity-Finding Graph Consolidation** | `accepted` | Detection & Graph Leads | Structures detection correlation as a bipartite graph of Entities and Findings with community detection clustering. |
 | [**0013**](0013-ambient-deception-fabric-and-canary-anchors.md) | **Ambient Deception Fabric & Canary Anchors** | `accepted` | SecOps / Red Team | Deploys low-overhead honeytokens and canary assets emitting zero-noise high-confidence alerts with instant triage priority. |
 | [**0019**](0019-polyglot-detection-as-code-and-native-engine-adaptation.md) | **Polyglot Detection-as-Code & Native Engines** | `accepted` | Architecture / Detection Leads | Pairs vendor-neutral YAML metadata envelopes with target-optimized query blocks (KQL, SPL, SQL) and AI-driven parity testing. |
+| [**0022**](0022-exposure-management-and-continuous-threat-exposure-integration.md) | **Exposure Management & CTEM Integration** | `accepted` | Architecture / Threat Intel / Detection | Integrates Exposure Intelligence as bidirectional prior probabilities and closed-loop realized risk feedback. |
+| [**0023**](0023-distributed-detection-and-edge-to-center-correlation.md) | **Distributed Detection & Edge Correlation** | `accepted` | Architecture / Detection Leads | Establishes local native detection, central cross-domain correlation, and on-demand contextual telemetry retrieval. |
+| [**0024**](0024-finding-bus-architecture-lineage-and-finding-contract.md) | **Finding Bus Architecture & OCSF Finding Contract** | `accepted` | Architecture / Detection Leads / Harry | Establishes an open publish-subscribe boundary for distributed detections in OCSF Class 2001/2004 with explicit parent lineage. |
 
 ---
 

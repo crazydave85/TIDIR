@@ -8,7 +8,7 @@ Technical Story: [Deception & Canary Architecture]
 
 ## Context and Problem Statement
 
-A central failure mode of enterprise detection engineering is the **Base Rate Fallacy**: in an environment processing billions of benign events daily, even detection rules with high statistical specificity (e.g. 99.9%) inevitably generate overwhelming volumes of false-positive alerts. Furthermore, fear of false positives cripples response automation; security leadership hesitates to authorize autonomous host isolation or session revocation when an alert might stem from a legitimate administrative script or developer utility.
+A central failure mode of enterprise detection engineering is the **Base Rate Fallacy**: in an environment processing billions of benign events daily, even detection rules with high statistical specificity (e.g. 99.9%) inevitably generate overwhelming volumes of false-positive alerts. Fear of false positives also cripples response automation; security leadership hesitates to authorize autonomous host isolation or session revocation when an alert might stem from a legitimate administrative script or developer utility.
 
 Traditional deception solutions attempted to solve this by deploying complex, high-maintenance honeynet subnets or dedicated virtual appliances. These systems suffer from heavy operational overhead, distinct network footprints easily fingerprinted and bypassed by sophisticated adversaries, and poor integration into mainstream SecOps pipelines.
 
@@ -81,12 +81,12 @@ In the Layer 3 Risk Lens (ADR 0009) and Bipartite Entity-Finding Graph (ADR 0011
 
 ---
 
-### 3. Unlocking Autonomous Tier 1 Containment with Crown-Jewel Anti-Inversion Safeguards
+### 3. Unlocking Autonomous Tier 1 Containment with Critical Infrastructure Anti-Inversion Safeguards
 
 The operational bottleneck to automated response is the fear of isolating a legitimate production server. Canary triggers eliminate this ambiguity, but introduce an acute adversarial hazard: **Canary Inversion Attacks**, where adversaries deliberately plant or induce canaries via core servers to trigger automated self-DoS.
 
 - **Zero-Hesitation Autonomous Containment (Standard Workloads):** Interaction with a high-fidelity canary immediately licenses automated Tier 1 containment playbooks (host network isolation, credential revocation, firewall IP blocking) for standard endpoints and non-critical workloads.
-- **The Crown-Jewel Canary Exemption Matrix (Anti-Inversion Filter):** 
+- **The Tier 0 Canary Exemption Matrix (Anti-Inversion Filter):** 
   - If the entity interacting with a canary primitive carries a **Critical Asset Tier** (Tier 0 infrastructure in CMDB/posture: Domain Controllers, identity federation servers, root certificate authorities, production database clusters, or core Kubernetes control planes), **zero-hesitation autonomous isolation is strictly prohibited**.
   - Instead, the event is routed to an **Immediate Escalation Lane** that triggers an instantaneous high-priority page to the on-duty Incident Commander with a mandatory $\lt 60$-second confirmation SLA. The system executes a non-destructive session freeze rather than hard network decapitation.
 - **Adversary Entanglement:** For sophisticated multi-stage intrusions, the orchestrator can transparently redirect the adversary's network sessions into a sandboxed deception environment, allowing AI agent harnesses to observe tradecraft, log novel TTPs, and extract CTI in real time.

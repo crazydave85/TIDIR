@@ -10,7 +10,7 @@ Technical Story: [SABSA Alignment & Business Attribute Profiling]
 
 Enterprise Architecture Review Boards (EARBs), chief risk officers, and regulatory compliance authorities require rigorous traceability proving that security technical investments directly satisfy enterprise business requirements and manage articulated operational risks. In contrast, technical security architectures frequently focus exclusively on engineering mechanics—such as event streaming throughput, query performance, and detection rules—without formalising bi-directional traceability to business goals.
 
-Furthermore, as autonomous agentic triage and automated containment become central to modern security operations, traditional governance frameworks struggle to assess automated risk thresholds and trust boundaries.
+As autonomous agentic triage and automated containment become central to modern security operations, traditional governance frameworks struggle to assess automated risk thresholds and trust boundaries.
 
 How should TIDIR bridge the gap between business risk appetite and deep technical engineering, establishing formal, bi-directional traceability without degenerating into bureaucratic shelfware?
 
@@ -31,7 +31,7 @@ How should TIDIR bridge the gap between business risk appetite and deep technica
 
 Chosen option: **Pragmatic SABSA Overlay with Business Attribute Profiling (BAP)**, because:
 * It establishes formal bi-directional vertical traceability from contextual business goals down to component-level data schemas and operational SRE budgets.
-* It leverages SABSA's most powerful instrument—the **Business Attributes Profile (BAP)**—to translate engineering metrics (such as MTTD, MTTC, and false positive rates) into executive-level risk language.
+* It applies SABSA's most powerful instrument—the **Business Attributes Profile (BAP)**—to translate engineering metrics (such as MTTD, MTTC, and false positive rates) into executive-level risk language.
 * It strictly avoids bureaucratic paralysis by keeping the mapping concise, living, and directly linked to automated verification suites and ADRs.
 
 ---

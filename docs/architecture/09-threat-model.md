@@ -7,11 +7,11 @@
 
 Security platforms are themselves high-value attack surfaces. If an adversary can blind telemetry, poison threat intelligence, inject malicious instructions into autonomous triage agents, subvert non-human machine identities, or manipulate automated response playbooks, they neutralise enterprise defence at the root.
 
-This document provides a comprehensive threat model of the TIDIR target architecture. It maps the attack surface across all functional subsystems, articulates concrete attack vectors ($\text{T}_1$ to $\text{T}_9$), defines five explicit trust boundaries, provides a dedicated AI threat model aligned with **MITRE ATLAS** and the **OWASP Top 10 for LLMs**, and establishes a **Tri-Framework Mapping Matrix** spanning **MITRE ATT&CK**, **MITRE ATLAS**, and **MITRE D3FEND**.
+This document maps the threat model of the TIDIR target architecture. It articulates the attack surface across all functional subsystems, details concrete attack vectors ($\text{T}_1$ to $\text{T}_9$), defines five explicit trust boundaries, provides a dedicated AI threat model aligned with **MITRE ATLAS** and the **OWASP Top 10 for LLMs**, and establishes a **Tri-Framework Mapping Matrix** spanning **MITRE ATT&CK**, **MITRE ATLAS**, and **MITRE D3FEND**.
 
 ---
 
-## 1. System Threat Landscape & Attack Surface Diagram
+## 1. System Attack Surface & Threat Boundary Diagram
 
 The diagram below maps the primary attack vectors ($\text{T}_1$ to $\text{T}_9$) across TIDIR's trust boundaries and illustrates the defence-in-depth controls enforced at each tier:
 
@@ -280,7 +280,7 @@ While isolated threat vectors ($\text{T}_1$ to $\text{T}_9$) model discrete atta
 The three benchmark compound campaigns below illustrate how TIDIR maintains safety when adversaries chain multi-stage attacks across the system:
 
 ### Campaign C1: Sensor Spoofing to Containment Sabotage & Break-Glass Hijacking
-* **Adversary Strategy**: The adversary breaches an edge sensor network or compromises an external threat feed ($\text{T}_1, \text{T}_2$). They inject crafted beacon events mimicking high-velocity ransomware activity to provoke automated containment. When automated playbooks isolate a network switch, enterprise operations are disrupted. The adversary leverages the ensuing crisis to socially engineer or force invocation of an unauthenticated Break-Glass protocol ($\text{T}_6, \text{T}_7$) to hijack privileged execution tokens.
+* **Adversary Strategy**: The adversary breaches an edge sensor network or compromises an external threat feed ($\text{T}_1, \text{T}_2$). They inject crafted beacon events mimicking high-velocity ransomware activity to provoke automated containment. When automated playbooks isolate a network switch, enterprise operations are disrupted. The adversary exploits the ensuing crisis to socially engineer or force invocation of an unauthenticated Break-Glass protocol ($\text{T}_6, \text{T}_7$) to hijack privileged execution tokens.
 * **TIDIR Compositional Defence**:
   1. *Evidential Cross-Validation*: The Risk Lens requires corroboration across orthogonal sensor domains (`sensor_domains` $\ge 2$). Ingested single-stream beacon floods are throttled by token-bucket rate limiters ($\beta_{\text{override}} \le N_{\max}/\Delta t$).
   2. *Pre-Execution Blast-Radius Boundary*: Invariant 6 (Bounded Autonomy) and Critical Asset Immunity enforce deterministic blocks on core routing switches, refusing disruptive automated isolation regardless of composite score.
@@ -306,7 +306,7 @@ The three benchmark compound campaigns below illustrate how TIDIR maintains safe
 
 Modern SecOps architectures increasingly integrate Large Language Models (LLMs) and Small Language Models (SLMs) for advisory parsing, query compilation, and triage summarisation. TIDIR treats AI components not as trusted reasoning oracles, but as probabilistic workers operating in a Zero Trust environment governed by the **TIDIR Trust Doctrine Maxim**:
 
-$$\text{“Probabilistic components may propose. Deterministic components authorize.”}$$
+> *"Probabilistic components may propose. Deterministic components authorise."*
 
 ### AI Threat Taxonomy Alignment (MITRE ATLAS & OWASP Top 10 for LLMs)
 

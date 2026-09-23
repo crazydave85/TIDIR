@@ -151,7 +151,7 @@ The authoritative operational baseline against which anomalies and threat severi
 
 - **Asset Inventory & Compute Registry**: Physical machines, virtual instances, container clusters, and serverless functions; static/DHCP IP history; operating system builds; and environment tiering (Production vs. Staging vs. Dev sandbox).
 - **Identity Directory & Role Hierarchy**: Authoritative corporate directory metadata (job function, reporting line, executive status, baseline location, working hours) and privileged access groupings (Domain Admins, Cloud Owners).
-- **Business Process & Service Mapping**: Relational mapping connecting technical infrastructure components to revenue-generating workflows, customer data stores, and regulatory boundaries (crown jewel scoring).
+- **Business Process & Service Mapping**: Relational mapping connecting technical infrastructure components to revenue-generating workflows, customer data stores, and regulatory boundaries (Tier 0 asset criticality scoring).
 
 ---
 
@@ -225,7 +225,7 @@ flowchart TB
 
 ### Deterministic Shedding & Ring Buffer Drop Policies
 1. **Ring Buffer Watermarks**: eBPF and ETW kernel buffer pollers trigger user-space backpressure signals when consumer lag crosses 75%.
-2. **Shedding Accounting & Drop Metrics**: Whenever Tier 2 or Tier 3 events are sampled or shed, the collector emits an immutable `TelemetryDropCount` metric specifying the exact timestamp window, shedded class, and dropped record volume. Downstream detection engines (Layer 3) leverage this signal to compute visibility uncertainty bounds.
+2. **Shedding Accounting & Drop Metrics**: Whenever Tier 2 or Tier 3 events are sampled or shed, the collector emits an immutable `TelemetryDropCount` metric specifying the exact timestamp window, shedded class, and dropped record volume. Downstream detection engines (Layer 3) use this signal to compute visibility uncertainty bounds.
 3. **Local Spool Bounding**: On-disk edge spools are capped at a hard disk budget (e.g. 2GB or 5% free disk). When disk budgets exhaust, FIFO eviction applies strictly across Tier 3 first, then Tier 2. Tier 1 events are never evicted without an operator-audited emergency alarm.
 
 ---
@@ -235,23 +235,23 @@ flowchart TB
 To defend against advanced adversaries attempting to truncate, wipe, or tamper with event logs prior to egress:
 
 - **RFC 3161 Cryptographic Timestamp Tokens**: Critical audit trails obtain trusted time-stamping authority tokens at the collection boundary.
-- **Hardware-Backed Origin Identity**: Collectors leverage TPM 2.0 or secure enclave certificates for mTLS client authentication, ensuring rogue machines cannot spoof legitimate sensor identifiers.
+- **Hardware-Backed Origin Identity**: Collectors use TPM 2.0 or secure enclave certificates for mTLS client authentication, ensuring rogue machines cannot spoof legitimate sensor identifiers.
 - **Local Tamper-Evident Append-Only Ring**: Pre-egress spool files are structured as cryptographic hash chains (each log block incorporates the HMAC-SHA256 of the preceding block). Any tampering or excision of un-egressed logs breaks the chain and alerts Layer 2 upon reconnection.
 
 ---
 
-## 8. Autonomous AI & Ingestion Leverage
+## 8. Autonomous AI Roles & Ingestion Capabilities
 
-While the data plane transport remains strictly deterministic and high-performance, autonomous AI harnesses provide two high-leverage capabilities in the Layer 1 engineering lifecycle:
+While the data plane transport remains strictly deterministic and high-performance, autonomous AI harnesses provide two distinct capabilities in the Layer 1 engineering lifecycle:
 
 1. **Automated Log Parser Synthesis (OCSF CodeGen)**:
    - *Problem*: Integrating proprietary enterprise applications or legacy network appliances often stalls for weeks while data engineers manually write regex grok patterns or extraction scripts.
-   - *AI Leverage*: Tier 0/1 language models consume raw, unstructured sample logs alongside target OCSF JSON schemas to automatically synthesize high-performance parser definitions (e.g. Vector VRL expressions or Logstash configs).
+   - *AI Role*: Tier 0/1 language models consume raw, unstructured sample logs alongside target OCSF JSON schemas to automatically synthesize high-performance parser definitions (e.g. Vector VRL expressions or Logstash configs).
    - *Deterministic Safety Gate*: Synthesized parsers must compile without warnings and pass automated unit test suites against golden log corpora before merging into the Schema Registry.
    
 2. **Synthetic Adversarial Telemetry Generation**:
    - *Problem*: Testing detection coverage for catastrophic techniques (e.g. ransomware volume shadow copy deletion or DCShadow attacks) on live production systems is hazardous and rarely permitted.
-   - *AI Leverage*: Generative agent harnesses synthesize high-fidelity, schema-valid synthetic OCSF telemetry representing multi-stage intrusions.
+   - *AI Role*: Generative agent harnesses synthesize high-fidelity, schema-valid synthetic OCSF telemetry representing multi-stage intrusions.
    - *Deterministic Safety Gate*: Synthetic telemetry is tagged with `is_synthetic: true` and routed exclusively to `test` and `dev` pipeline topics, completely isolated from production alerting queues.
 
 

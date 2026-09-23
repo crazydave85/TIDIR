@@ -6,7 +6,7 @@
 
 ## Context and Problem Statement
 
-As autonomous AI agents assume responsibility for higher-leverage cognitive workflows in the security operations lifecycle—such as natural language telemetry exploration, autonomous 30-day lakehouse baseline scoping, adversary hypothesis formulation, and threat flow codification—the risk of model hallucination, stochastic drift, and regression increases.
+As autonomous AI agents assume responsibility for consequential cognitive workflows in the security operations lifecycle—such as natural language telemetry exploration, autonomous 30-day lakehouse baseline scoping, adversary hypothesis formulation, and threat flow codification—the risk of model hallucination, stochastic drift, and regression increases.
 
 While Detection-as-Code (DaC) enforces strict unit testing, schema linting, and 30-day historical replay for declarative detection rules, generative agent workflows lack equivalent continuous integration verification. If an underlying model is updated, or if an agent prompt/tool definition changes, the quality of investigative dossiers, entity resolutions, and blast-radius estimations can silently degrade.
 

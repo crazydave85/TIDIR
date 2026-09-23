@@ -105,7 +105,7 @@ All architectural layers, components, and Architectural Decision Records (ADRs) 
 - **Concrete Example**: An organization receives millions of DNS query logs. Because no current detection query monitors uncommon record types, legacy systems drop them at the collector to save ingestion costs. When an advanced adversary campaign exploiting that exact DNS technique is disclosed six months later, the organization is blind. Under TIDIR, those logs are preserved in open storage, enabling retroactive hunting.
 - **Invariant Property**: Ingested telemetry must survive and remain queryable in an open, vendor-neutral, schema-agnostic representation. Telemetry is never dropped at the edge merely because no active detection rule currently queries it.
 - **Information Governance & Legal Boundaries**: Forensic preservation is bounded by explicit, governed policy: statutory data minimization mandates (e.g. GDPR Article 5(1)(c)), legally compelled deletion schedules, legal privilege redactions, automated credential and secret scrubbing, and governed forensic compaction that provably preserves evidentiary reconstructability. Unregulated destruction or vendor-cost dropping is strictly prohibited.
-- **Reference Pattern**: Line-rate stream ingestion into open columnar lakehouses (`L2_STORAGE`) backed by object storage (e.g. Apache Iceberg / Parquet) with structured redaction pipelines.
+- **Reference Pattern**: Line-rate stream ingestion into open columnar lakehouses (`L2_STORAGE`) backed by object storage (e.g. Apache Iceberg / Parquet) with structured redaction pipelines. Under the Distributed Detection model ([ADR-0023](/adr/0023-distributed-detection-and-edge-to-center-correlation)), local and native detections emit finding metadata while raw contextual telemetry is retained in cost-effective lakehouses or edge ring buffers, preserved and retrievable on-demand rather than discarded.
 - **Foundational Research & Standards**: [FND-04: OCSF Telemetry Schema (Linux Foundation 2023)](/architecture/foundational-research#fnd-04), [FND-16: Open Columnar Table Formats (Apache Iceberg 2021)](/architecture/foundational-research#fnd-16).
 
 ### I2 — Evidence Provenance & Traceability
@@ -122,7 +122,7 @@ All architectural layers, components, and Architectural Decision Records (ADRs) 
 - **Plain-English Meaning**: Two alerts are not independent proof of an attack if they both came from the same underlying event. TIDIR tracks that shared ancestry so the same evidence is not counted twice.
 - **Concrete Example**: An adversary executes an encoded command on an endpoint (Event $E_1$). This single event triggers an alert from the endpoint sensor ($A_1$), an alert from the security analytics tool ($A_2$), and an alert from the system log parser ($A_3$). Because all three alerts share a single parent observation, the system treats them as one piece of evidence with three representations, preventing false confidence inflation.
 - **Invariant Property**: Correlated derivations sharing common ancestry cannot masquerade as independent evidence. Evidence aggregation across orthogonal sensor domains must discount co-derived signals to their residual information gain.
-- **Reference Pattern**: Dependency-aware probabilistic risk compounding (such as Bayesian graph compounding or factor graphs) explicitly penalising shared parent nodes in the entity-finding graph.
+- **Reference Pattern**: Dependency-aware probabilistic risk compounding (such as Bayesian graph compounding or factor graphs) explicitly penalising shared parent nodes in the entity-finding graph. In Exposure Intelligence integration ([ADR-0022](/adr/0022-exposure-management-and-continuous-threat-exposure-integration)), exposure context sets the prior probability $P(\text{Breach})$ rather than acting as a redundant corroborating signal, preventing artificial compounding between vulnerabilities and their exploit detections. To prevent base-rate blindness on unmapped or zero-day attack vectors, the architecture enforces a minimum prior probability bound—the **Exposure Floor** ($P(\text{Breach}) \ge \epsilon \gt 0$, adapting standard Laplace prior smoothing to prevent zero-frequency suppression). Deterministic invariant violations (canary tokens, kernel driver tampering) bypass prior weighting entirely.
 - **Foundational Research & Standards**: [FND-01: Base-Rate Fallacy in Intrusion Detection (Axelsson 2000)](/architecture/foundational-research#fnd-01), [FND-07: MITRE ATT&CK Grounded Evidence (MITRE 2018)](/architecture/foundational-research#fnd-07).
 
 ### I4 — Authority Separation (Trust Doctrine Maxim)
@@ -250,18 +250,19 @@ Source: docs/architecture/01-system-overview.md
 
 ---
 
-This document defines the target component architecture for **TIDIR** (Threat Intelligence, Detection, Investigation & Response). TIDIR is architected as a closed-loop **Cyber Defence Control System** that governs the operational progression:
+This document defines the target component architecture for **TIDIR** (Threat Intelligence, Detection, Investigation & Response). TIDIR is architected as a closed-loop **Cyber Defence Control System** that governs the bidirectional operational progression:
 
-$$\text{Observe} \longrightarrow \text{Normalise} \longrightarrow \text{Infer} \longrightarrow \text{Investigate} \longrightarrow \text{Decide} \longrightarrow \text{Actuate} \longrightarrow \text{Learn}$$
+$$\text{Exposure} \longleftrightarrow \text{Observe} \longrightarrow \text{Normalise} \longrightarrow \text{Infer} \longrightarrow \text{Investigate} \longrightarrow \text{Decide} \longrightarrow \text{Actuate} \longrightarrow \text{Learn} \longleftrightarrow \text{Exposure}$$
 
 with deterministic controls wrapped around all probabilistic stages:
-* **Observation**: Telemetry & Data Fabric (Layer 1 & 2) collecting raw environmental events.
+* **Exposure Intelligence**: Continuous Threat Exposure Management (CTEM) integration, asset criticality scoring, and attack path mapping providing dynamic Bayesian priors, updated continuously by incident reality.
+* **Observation**: Telemetry & Data Fabric (Layer 1 & 2) collecting raw environmental events and native edge security findings.
 * **Normalisation**: Open Cybersecurity Schema Framework (OCSF) validation and schema registry mapping.
-* **Inference & Threat Estimation**: Stateful streaming detection and dependency-aware Bayesian risk compounding (Layer 3).
-* **Investigation**: Bounded hierarchical agent mesh with evidence grounding across entity-finding graphs (Layer 4).
+* **Inference & Threat Estimation**: Distributed detection model pairing native edge detections (EDR, NDR, CNAPP, IdP) with central cross-domain correlation and dependency-aware Bayesian risk compounding (Layer 3).
+* **Investigation**: Bounded hierarchical agent mesh with evidence grounding across entity-finding graphs (Layer 4), retrieving contextual telemetry on-demand.
 * **Decision**: Universal Incident Decision Directed Acyclic Graph (DAG) recording causal provenance.
 * **Actuation & Control**: Monotonic fail-closed containment state machines governed by reachability invariants.
-* **Feedback & Learning**: Continuous Red, Blue, and Green Team prevention calibration loops.
+* **Feedback & Learning**: Continuous Red, Blue, Green Team, and Exposure Management calibration loops.
 * **Resilience**: Four-tier graceful degradation, local NVMe spooling, and air-gapped continuity modes.
 
 ---
@@ -309,16 +310,17 @@ flowchart TB
   classDef layer4 fill:#06372b,stroke:#34d399,stroke-width:2px,color:#f8fafc;
 
   %% Layer 1: Data Sources & Environmental Inputs
-  subgraph L1 ["LAYER 1: DATA SOURCES & CONTEXTUAL INGESTION"]
+  subgraph L1 ["LAYER 1: DATA SOURCES, EXPOSURE & EDGE FINDINGS"]
     L1_LOGS["Machine-Readable Logs & OS Events\n(Syslog RFC 5424, JSON/NDJSON, Windows EVTX, journald, cloud audit)"]:::layer1
     L1_TELEM["Runtime Operational Telemetry\n(Kernel hooks, eBPF, audit trails, network flows & identity)"]:::layer1
-    L1_CTX["Enterprise Posture & Asset Context\n(CMDB hierarchy, attack surface exposure, control status)"]:::layer1
+    L1_EDGE["Distributed Edge Findings\n(Native EDR, NDR, CNAPP, IdP OCSF Findings; ADR-0023)"]:::layer1
+    L1_EXPO["Exposure Intelligence Fabric\n(CTEM attack paths, KEV exploitability, asset criticality; ADR-0022)"]:::layer1
     L1_CTI["Cyber Threat Intelligence (CTI)\n(STIX 2.1 tactical feeds, CVE weaponization, threat actors)"]:::layer1
   end
 
   %% Layer 2: Pipeline, Storage & Query Fabric
   subgraph L2 ["LAYER 2: PIPELINE, STORAGE & QUERY FABRIC"]
-    L2_INGEST["Line-Rate Ingestion & OCSF Normalization\n(Schema registry, unmapped data catch-all & DLQ)"]:::layer2
+    L2_INGEST["Line-Rate Ingestion & OCSF Normalization\n(Schema registry, W3C trace lineage & DLQ; ADR-0025)"]:::layer2
     L2_ROUTER["Value-Based Tiering & Stream Router\n(Tier A hot stream, Tier B lakehouse, Tier C filter)"]:::layer2
     L2_STORAGE["Multi-Paradigm Storage & Query Core\n(Hot index, columnar lakehouse, two-tier sketch state Δt)"]:::layer2
   end
@@ -326,20 +328,21 @@ flowchart TB
   %% Layer 3: Threat Intelligence & Detection Engineering
   subgraph L3 ["LAYER 3: THREAT INTEL & DETECTION ENGINEERING"]
     L3_FLOW["Machine-Readable Threat Models\n(Adversary attack flows, PIRs, graph mapping)"]:::layer3
-    L3_DAC["Dual-Lane DaC Engine\n(Fast-lane emergency zero-day + standard 30d lakehouse)"]:::layer3
-    L3_RISK["Risk Lens & Finding Synthesis\n(Supernode-dampened graph clustering, OCSF 2001/2004)"]:::layer3
+    L3_DAC["Dual-Lane DaC Engine\n(Inverted dependencies & coverage assurance; ADR-0019/0026)"]:::layer3
+    L3_RISK["Exposure-Aware Risk Lens\n(Dynamic priors, supernode graph clustering, OCSF 2001/2004)"]:::layer3
   end
 
   %% Layer 4: Incident Response & Automation
   subgraph L4 ["LAYER 4: INVESTIGATION, CASE MANAGEMENT & AUTOMATED RESPONSE"]
     L4_DOSSIER["Unified Investigation & Case Dossier\n(Entity 360, progressive disclosure UX, sealed timeline)"]:::layer4
     L4_TRIAGE["Hierarchical Agent Mesh & JIT Elevation\n(Lead orchestrator, host/network/cloud specialists, JIT orders)"]:::layer4
-    L4_RESP["Asymmetric Fail-Secure Containment\n(Forward escalation, dual-auth gates, break-glass override)"]:::layer4
+    L4_RESP["Declarative Action Intents & Containment\n(Vendor-neutral intents, forward escalation, break-glass)"]:::layer4
   end
 
   %% Closed-Loop Architectural Feedback
   subgraph FB ["CLOSED-LOOP CONTINUOUS CALIBRATION"]
     FB_INTEL["Attributed Threat Flows & IOCs\n(Re-ingested into L1 CTI & L3 Detection Backlog)"]
+    FB_EXPO["Realized Risk Elevation\n(Converts theoretical exposure to active threat in CTEM)"]
     FB_GAPS["Telemetry Blindspot Analysis\n(Re-tunes L1 Sensor Filters & Collection Audits)"]
     FB_JIT["JIT Telemetry Elevation Orders\n(Dynamically re-instruments L1 edge sensors for 15-30m)"]
     FB_RESP["Playbook Execution Efficacy\n(Refines L4 Blast-Radius & Forward Models)"]
@@ -349,7 +352,7 @@ flowchart TB
   %% Operational Progression (Strict Top-to-Bottom DAG)
   L1 ==>|1. Transport Envelopes & Raw Ingestion| L2
   L2 ==>|2. Normalized Telemetry & Low-Latency State Δt| L3
-  L3 ==>|3. Correlated Security & Detection Findings| L4
+  L3 ==>|3. The Finding Bus: OCSF 2001/2004 Findings - ADR-0024| L4
   L4 ==>|4. Incident Dossiers & Post-Mortem Outcomes| FB
 ```
 
@@ -488,17 +491,19 @@ To prevent ambiguous claims of correctness, TIDIR enforces a strict three-tier v
 
 ### Layer 1: Data Sources & Environmental Inputs
 - **Generation, Collection & Transport**: Emits raw facts at the point of origin across standard machine-readable logs (Syslog RFC 5424, JSON/NDJSON, Windows EVTX, journald, cloud audit trails), kernel hooks (eBPF, ETW), control plane APIs, and wire taps, buffering at the edge and transporting across network boundaries via secure, compressed streams.
-- **Multidimensional Inputs**: Unifies standard machine-readable logs and runtime operational telemetry with external cyber threat intelligence (CTI), organizational context (asset CMDB, directory hierarchies), attack surface exposure (EASM), and security control posture.
+- **Multidimensional Ingress & Distributed Findings**: Unifies raw telemetry with native edge findings emitted directly by domain security controls (EDR, NDR, CNAPP, IdP OCSF Classes 2001/2004; [ADR-0023](../adr/0023-distributed-detection-and-edge-to-center-correlation.md)).
+- **Exposure Intelligence & CTEM Fabric**: Ingests continuous asset criticality, network reachability, identity attack path graphs, and vulnerability exploitability metrics (CISA KEV, EPSS), establishing the baseline context for detection prioritization ([ADR-0022](../adr/0022-exposure-management-and-continuous-threat-exposure-integration.md)).
 - See full spec: [Layer 1 Specification](03-layer-1-data-sources.md).
 
 ### Layer 2: Pipeline, Storage & Query Fabric
-- **Line-Rate Normalization**: Standardises raw payloads into Open Cybersecurity Schema Framework (OCSF) objects via an authoritative Schema Registry.
+- **Line-Rate Normalization**: Standardises raw payloads and native edge findings into Open Cybersecurity Schema Framework (OCSF) objects via an authoritative Schema Registry.
 - **Value-Based Routing**: Diverts high-value security events to hot indexing and stream engines while streaming bulk forensic telemetry into low-cost columnar lakehouse storage.
-- **Multi-Paradigm Querying**: Provides four specialized engines: Real-Time Streaming ($\lt 5\text{s}$), Scheduled Batch SQL (7–90 day baselines), Federated Query-in-Place, and ML Feature Stores.
+- **Multi-Paradigm & Federated Querying**: Provides four specialized engines: Real-Time Streaming ($\lt 5\text{s}$), Scheduled Batch SQL (7–90 day baselines), Federated Query-in-Place (for on-demand edge/VPC context retrieval), and ML Feature Stores.
 - See full spec: [Layer 2 Specification](04-layer-2-pipeline-storage-query.md).
 
 ### Layer 3: Threat Intelligence & Detection Engineering
-- **Dual-Lane Detection Ingress**: Balances a probabilistic, dependency-aware Bayesian compounding lane for correlated weak signals with a deterministic fast-path that immediately elevates zero-tolerance invariants (canary tokens, BYOVD kernel tampering) without graph delay.
+- **Distributed & Cross-Domain Detection**: Adheres to the principle *"detect as close to the signal as practical; correlate as centrally as necessary."* Offloads commodity single-source detections to native edge controls, reserving central stream and batch engines for cross-domain correlations and bespoke enterprise logic ([ADR-0023](../adr/0023-distributed-detection-and-edge-to-center-correlation.md)).
+- **Exposure-Aware Bayesian Risk Lens**: Dynamically injects asset criticality and exposure posture as prior probabilities $P(\text{Breach})$ into the Bayesian Multi-Signal Risk Lens ([ADR-0009](../adr/0009-bayesian-multi-signal-risk-scoring.md)), mitigating the Base Rate Fallacy by aggressively elevating weak anomalies on exposed choke points while dampening benign activity on isolated assets ([ADR-0022](../adr/0022-exposure-management-and-continuous-threat-exposure-integration.md)).
 - **Machine-Readable Attack Flows**: Codifies multi-stage adversary behaviours into structured graphs, prioritising detection engineering backlogs via threat likelihood and asset exposure.
 - **Detection-as-Code (DaC)**: All rules are authored as declarative code using a Polyglot DaC pattern (vendor-neutral YAML metadata envelopes coupled with target-optimized query blocks, see [ADR-0019](../adr/0019-polyglot-detection-as-code-and-native-engine-adaptation.md)), versioned in Git.
 - **Empirical Test Harness**: Validates rules through controlled adversary simulation, synthetic unit tests, and 30-day historical lakehouse backtesting.
@@ -515,16 +520,24 @@ To prevent ambiguous claims of correctness, TIDIR enforces a strict three-tier v
 
 ---
 
-## 5. Data Contracts Across the Architecture
+## 5. Interface Types & Boundary Contracts
+
+Rather than indiscriminately shipping all raw data into a centralized repository, TIDIR establishes three first-class interface types grounded in OCSF:
+
+1. **Telemetry (Observations)**: Raw factual records emitted by endpoints, networks, cloud providers, and applications. Mapped to **OCSF Categories 1, 3, 4, and 6** (e.g. `1007: Process Activity`, `3001: Authentication`, `4001: Network Connection`). Telemetry is retained in tiered columnar lakehouses or edge ring buffers, queried on demand, with upstream lineage tracked via W3C Trace Context ([ADR-0025](../adr/0025-pre-detection-telemetry-provenance-and-ingestion-lineage.md)).
+2. **Findings (Evaluative Intelligence)**: Evaluative conclusions produced by specialized detection engines and controls. Mapped strictly to **OCSF Category 2 (Class 2001: Security Finding and Class 2004: Detection Finding)**. Native domain controls (EDR, NDR, CNAPP, IdP) detect locally and publish findings to the **Finding Bus** at line rate ([ADR-0023](../adr/0023-distributed-detection-and-edge-to-center-correlation.md), [ADR-0024](../adr/0024-finding-bus-architecture-lineage-and-finding-contract.md), and the [Strategic Position Paper](distributed-detection-and-the-finding-bus.md)).
+3. **Context (Security Knowledge)**: Ground-truth reference state used to interpret observations and findings. Mapped to **OCSF Standard Objects** (`Device`, `User`, `Account`, `Process`, `Cloud`) and structured into the **Bipartite Entity-Finding Graph ([ADR-0011](../adr/0011-bipartite-entity-finding-graph-consolidation.md))**. Context tracks identity resolution, asset criticality tiers, exposure paths, and governing controls across four epistemic tiers (Authoritative, Observed, Derived, Inferred).
+
+### Canonical Boundary Contracts
 
 | Boundary | Schema Contract | Purpose |
 | :--- | :--- | :--- |
-| **L1 ➔ L2 Ingress** | Native / Schema Registry Envelope | Bounded transport batch carrying origin metadata and raw event facts. |
+| **L1 ➔ L2 Ingress** | Schema Registry Envelope & Ingestion Lineage ([ADR-0025](../adr/0025-pre-detection-telemetry-provenance-and-ingestion-lineage.md)) | Bounded transport batch carrying origin metadata, W3C trace context, and raw event facts. |
 | **L2 Normalization** | OCSF (Open Cybersecurity Schema Framework) | Canonical schema across system, identity, network, cloud, and application domains. |
-| **L3 Detection Target** | OCSF Classes (1001, 1007, 3002, 4001, etc.) & Target Dialects | Vendor-neutral governance metadata envelope with target-optimized query blocks (KQL, SPL, SQL). |
-| **L3 ➔ L4 Handoff** | OCSF Class 2001 & Class 2004 Findings with Evidence Lineage | Standardised security and detection findings carrying evidence lineage, ATT&CK tags, and dependency-discounted risk scores. |
+| **L3 Detection Target** | OCSF Classes, Inverted Dependencies ([ADR-0019](../adr/0019-polyglot-detection-as-code-and-native-engine-adaptation.md)) & Coverage Assurance ([ADR-0026](../adr/0026-end-to-end-coverage-assurance-and-degradation-circuit-breakers.md)) | Rules declare required/optional telemetry streams, executing on native engines with automated degradation circuit breakers. |
+| **L3 ➔ L4 Handoff** | The Finding Bus: OCSF Class 2001 & Class 2004 Findings ([ADR-0024](../adr/0024-finding-bus-architecture-lineage-and-finding-contract.md)) | Standardised security and detection findings carrying evidence lineage, ATT&CK tags, and dependency-discounted risk scores. |
 | **L4 Agent Tool Contract** | Model Context Protocol (MCP) & Typed JSON Schema | Parameters for read-only forensic queries; strictly isolates prompts from unformatted raw telemetry. |
-| **L4 Monotonic Containment** | Asymmetric Action Specifications | Parameterized forward action ($T_i$) and forward escalation payloads; strictly fail-closed with reachability-bounded forward compensation ($R(s_{\text{post}}) \subseteq R(s_{\text{pre}})$: post-action reachability remains a subset of pre-action reachability). |
+| **L4 Monotonic Containment** | Declarative Action Intents & Asymmetric State Machine | Standardized action intents (`ISOLATE_HOST`, `REVOKE_SESSION`, `BLOCK_INDICATOR`) decoupled from vendor APIs; strictly fail-closed with reachability-bounded forward compensation ($R(s_{\text{post}}) \subseteq R(s_{\text{pre}})$). |
 
 ---
 
@@ -594,11 +607,11 @@ Source: docs/architecture/09-threat-model.md
 
 Security platforms are themselves high-value attack surfaces. If an adversary can blind telemetry, poison threat intelligence, inject malicious instructions into autonomous triage agents, subvert non-human machine identities, or manipulate automated response playbooks, they neutralise enterprise defence at the root.
 
-This document provides a comprehensive threat model of the TIDIR target architecture. It maps the attack surface across all functional subsystems, articulates concrete attack vectors ($\text{T}_1$ to $\text{T}_9$), defines five explicit trust boundaries, provides a dedicated AI threat model aligned with **MITRE ATLAS** and the **OWASP Top 10 for LLMs**, and establishes a **Tri-Framework Mapping Matrix** spanning **MITRE ATT&CK**, **MITRE ATLAS**, and **MITRE D3FEND**.
+This document maps the threat model of the TIDIR target architecture. It articulates the attack surface across all functional subsystems, details concrete attack vectors ($\text{T}_1$ to $\text{T}_9$), defines five explicit trust boundaries, provides a dedicated AI threat model aligned with **MITRE ATLAS** and the **OWASP Top 10 for LLMs**, and establishes a **Tri-Framework Mapping Matrix** spanning **MITRE ATT&CK**, **MITRE ATLAS**, and **MITRE D3FEND**.
 
 ---
 
-## 1. System Threat Landscape & Attack Surface Diagram
+## 1. System Attack Surface & Threat Boundary Diagram
 
 The diagram below maps the primary attack vectors ($\text{T}_1$ to $\text{T}_9$) across TIDIR's trust boundaries and illustrates the defence-in-depth controls enforced at each tier:
 
@@ -867,7 +880,7 @@ While isolated threat vectors ($\text{T}_1$ to $\text{T}_9$) model discrete atta
 The three benchmark compound campaigns below illustrate how TIDIR maintains safety when adversaries chain multi-stage attacks across the system:
 
 ### Campaign C1: Sensor Spoofing to Containment Sabotage & Break-Glass Hijacking
-* **Adversary Strategy**: The adversary breaches an edge sensor network or compromises an external threat feed ($\text{T}_1, \text{T}_2$). They inject crafted beacon events mimicking high-velocity ransomware activity to provoke automated containment. When automated playbooks isolate a network switch, enterprise operations are disrupted. The adversary leverages the ensuing crisis to socially engineer or force invocation of an unauthenticated Break-Glass protocol ($\text{T}_6, \text{T}_7$) to hijack privileged execution tokens.
+* **Adversary Strategy**: The adversary breaches an edge sensor network or compromises an external threat feed ($\text{T}_1, \text{T}_2$). They inject crafted beacon events mimicking high-velocity ransomware activity to provoke automated containment. When automated playbooks isolate a network switch, enterprise operations are disrupted. The adversary exploits the ensuing crisis to socially engineer or force invocation of an unauthenticated Break-Glass protocol ($\text{T}_6, \text{T}_7$) to hijack privileged execution tokens.
 * **TIDIR Compositional Defence**:
   1. *Evidential Cross-Validation*: The Risk Lens requires corroboration across orthogonal sensor domains (`sensor_domains` $\ge 2$). Ingested single-stream beacon floods are throttled by token-bucket rate limiters ($\beta_{\text{override}} \le N_{\max}/\Delta t$).
   2. *Pre-Execution Blast-Radius Boundary*: Invariant 6 (Bounded Autonomy) and Critical Asset Immunity enforce deterministic blocks on core routing switches, refusing disruptive automated isolation regardless of composite score.
@@ -893,7 +906,7 @@ The three benchmark compound campaigns below illustrate how TIDIR maintains safe
 
 Modern SecOps architectures increasingly integrate Large Language Models (LLMs) and Small Language Models (SLMs) for advisory parsing, query compilation, and triage summarisation. TIDIR treats AI components not as trusted reasoning oracles, but as probabilistic workers operating in a Zero Trust environment governed by the **TIDIR Trust Doctrine Maxim**:
 
-$$\text{“Probabilistic components may propose. Deterministic components authorize.”}$$
+> *"Probabilistic components may propose. Deterministic components authorise."*
 
 ### AI Threat Taxonomy Alignment (MITRE ATLAS & OWASP Top 10 for LLMs)
 
@@ -1008,11 +1021,12 @@ This document specifies the functional capability taxonomy required across the T
 
 ## 1. Capability Taxonomy Matrix
 
-The TIDIR capability model defines **twenty-nine operational capabilities** organized across five functional domains, underpinned by **seven cross-cutting AI Governance and Verification capabilities** and **five Operational Continuity & Resilience capabilities** (41 capabilities in total), spanning from raw sensory ingestion to closed-loop response automation:
+The TIDIR capability model defines **thirty-two operational capabilities** organized across six functional domains, underpinned by **seven cross-cutting AI Governance and Verification capabilities** and **five Operational Continuity & Resilience capabilities** (44 capabilities in total), spanning from proactive exposure management and raw sensory ingestion to closed-loop response automation:
 
 ```mermaid
 flowchart TB
   %% Class Definitions for High Contrast & Visual Clarity
+  classDef expo fill:#14291f,stroke:#10b981,stroke-width:2px,color:#f8fafc;
   classDef cti fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc;
   classDef data fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
   classDef det fill:#2e1065,stroke:#c084fc,stroke-width:2px,color:#f8fafc;
@@ -1020,11 +1034,13 @@ flowchart TB
   classDef resp fill:#4c0519,stroke:#fb7185,stroke-width:2px,color:#f8fafc;
   classDef aigov fill:#1e293b,stroke:#f472b6,stroke-width:2px,color:#f8fafc;
 
+  D0["<b>Domain 0: Exposure Intelligence & CTEM (EXPO)</b><br/>• EXPO-01: Asset Exposure & Attack Path Graph<br/>• EXPO-02: Realized Risk & Threat Feed Convergence"]:::expo
+
   D1["<b>Domain 1: Cyber Threat Intelligence (CTI)</b><br/>• CTI-01: Feed Aggregation & STIX/TAXII Ingestion<br/>• CTI-02: Indicator Deduplication & Half-Life Decay<br/>• CTI-03: Attack Flow & Adversary TTP Mapping<br/>• CTI-04: Line-Rate IOC Dissemination to Edge<br/>• CTI-05: Retroactive Lakehouse Threat Sweeps"]:::cti
 
   D2["<b>Domain 2: Telemetry & Data Fabric (DATA)</b><br/>• DATA-01: Multi-Source Kernel & Cloud Ingress<br/>• DATA-02: Line-Rate OCSF Normalization & DLQ<br/>• DATA-03: Distributed Partitioned Streaming Log<br/>• DATA-04: Hot Analytical Search Index (15–30d)<br/>• DATA-05: Columnar Security Lakehouse (365d+)"]:::data
 
-  D3["<b>Domain 3: Detection Engineering (DET)</b><br/>• DET-01: Stateful Sliding-Window Streaming<br/>• DET-02: Scheduled Batch Lakehouse SQL<br/>• DET-03: Detection-as-Code (DaC) & CI Testing<br/>• DET-04: Supernode-Dampened Graph Clustering<br/>• DET-05: Multi-Factor Composite Risk Lens<br/>• DET-06: SecOps Alert Noise Error Budgets<br/>• DET-07: Ambient Deception & Canary Fabric"]:::det
+  D3["<b>Domain 3: Detection Engineering (DET)</b><br/>• DET-01: Stateful Sliding-Window Streaming<br/>• DET-02: Scheduled Batch Lakehouse SQL<br/>• DET-03: Detection-as-Code (DaC) & CI Testing<br/>• DET-04: Supernode-Dampened Graph Clustering<br/>• DET-05: Multi-Factor Composite Risk Lens<br/>• DET-06: SecOps Alert Noise Error Budgets<br/>• DET-07: Ambient Deception & Canary Fabric<br/>• DET-08: Distributed Edge Finding Federation"]:::det
 
   D4["<b>Domain 4: Investigation & Case Management (INV)</b><br/>• INV-01: Unified Entity Resolution 360<br/>• INV-02: Chronological Multi-Source Timeline<br/>• INV-03: Relational Execution & Process Graph<br/>• INV-04: Sealed Evidence Locker & RFC 3161<br/>• INV-05: Hierarchical Agent Mesh & Agent Trust Boundary<br/>• INV-06: Progressive Disclosure Analyst Workbench<br/>• INV-07: Just-in-Time (JIT) Telemetry Elevation"]:::inv
 
@@ -1032,11 +1048,13 @@ flowchart TB
 
   GOV["<b>Cross-Cutting: AI Governance & Verification (AIGOV)</b><br/>• AIGOV-01: Continuous Evals-as-Code & Grounding<br/>• AIGOV-02: Dual-Plane Data/Control Isolation<br/>• AIGOV-03: Cost & Latency Performance Budgets<br/>• AIGOV-04: Agent Fleet Lifecycle & Preemption<br/>• AIGOV-05: MCP Tool Observability & Loop Breakers<br/>• AIGOV-06: Ephemeral Attestation & SVIDs<br/>• AIGOV-07: Non-Human Identity (NHI) Profiling"]:::aigov
 
+  D0 ==>|Dynamic Prior Probabilities P_Breach| D3
   D1 ==>|Operational Threat Feeds & PIR Flows| D2
   D2 ==>|Normalized Telemetry & Low-Latency State Δt| D3
   D3 ==>|Elevated Risk-Scored Incident Dossiers| D4
   D4 ==>|Validated Remediation & Containment Tasks| D5
   D5 -.->|Attributed Intel & Blindspot Calibration| D1
+  D5 -.->|Realized Incident Exposure Feedback| D0
   GOV -.-|Enforces Evals & Agent Trust Boundary Across| D4
   GOV -.-|Enforces Blast-Radius & Attestation Across| D5
 ```
@@ -1048,6 +1066,15 @@ flowchart TB
 > [!NOTE]
 > **Multi-Framework Alignment & Reference Target SLOs**:
 > Each capability is formally mapped to its primary defensive countermeasure in [MITRE D3FEND](https://d3fend.mitre.org/), characterized under the [MITRE D3FEND Analytic Characterization Framework (ACF)](https://d3fend.mitre.org/) (*Symbolic Logic*, *Statistical Analysis*, *Machine Learning*), and aligned with enterprise benchmarks including [CIS Controls v8](https://www.cisecurity.org/controls/v8), [MITRE ENGAGE](https://engage.mitre.org/), and the [OWASP API Security Top 10](https://owasp.org/API-Security/). Operational latencies, throughput figures, and comprehension metrics listed below are designated as **Reference Target Service Level Objectives (SLOs)** based on representative enterprise workloads (e.g. 100 TB reference lakehouse tiers).
+
+### Domain 0: Exposure Intelligence & CTEM (EXPO)
+
+| Capability ID | Name | Execution Mode & D3FEND ACF | MITRE D3FEND & Frameworks | Description | Reference Target SLO |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **EXPO-01** | Asset Exposure & Attack Path Graph | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-EFA`](https://d3fend.mitre.org/technique/d3f:IdentifierAnalysis/)<br>[`D3-HPA`](https://d3fend.mitre.org/technique/d3f:HardwareComponentInventory/) | Map internet-facing attack surfaces, unpatched exploitability (CISA KEV, EPSS), and identity reachability graphs to supply dynamic Bayesian priors $P(\text{Breach})$. | Attack path recalculation < 15 min; sub-second prior lookup |
+| **EXPO-02** | Realized Risk & Threat Convergence | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-CIR`](https://d3fend.mitre.org/technique/d3f:ApplicationHardening/)<br>[`D3-TIE`](https://d3fend.mitre.org/technique/d3f:InboundTrafficFiltering/) | Ingest confirmed intrusion discoveries and active exploit paths from Layer 4 investigations, elevating theoretical vulnerabilities to realized risk in CTEM platforms. | CTEM exposure priority escalation < 30 sec |
+
+---
 
 ### Domain 1: Cyber Threat Intelligence (CTI)
 
@@ -1084,6 +1111,7 @@ flowchart TB
 | **DET-05** | Bayesian Multi-Signal Risk Lens | `[Deterministic Engine]`<br>*(ACF: Statistical Analysis)* | [`D3-BCA`](https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/)<br>[`D3-EIC`](https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/) | Mitigate the operational consequences of the Base Rate Fallacy by compounding orthogonal evidence vectors (asset, identity, network) before elevation. | Dynamic composite score (0–100); false alarms < 5% |
 | **DET-06** | SecOps Error Budgets | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-ARA`](https://d3fend.mitre.org/technique/d3f:AuthorizationEventThresholding/)<br>[`D3-SRE`](https://d3fend.mitre.org/technique/d3f:AuthorizationEventThresholding/) | Enforce false-positive Noise Budgets per detection class with automated deployment freeze on budget burn. | Pre-deploy CI gate: peak FPR < 1%; Production SLO: rolling 30-day FPR <= 5% |
 | **DET-07** | Deception & Canary Surface Fabric | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-DN`](https://d3fend.mitre.org/technique/d3f:DecoyEnvironment/)<br>[`D3-HT`](https://d3fend.mitre.org/technique/d3f:DecoyUserCredential/)<br>[`ENGAGE: EAC-1/2`](https://engage.mitre.org/) | Embed lightweight honeytokens, Kerberos SPN decoys, and file lures emitting OCSF canary events for zero-noise detection. | False Positive Rate = 0.00%; MTTD < 1 second |
+| **DET-08** | Distributed Edge Finding Federation | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-EFA`](https://d3fend.mitre.org/technique/d3f:IdentifierAnalysis/)<br>[`D3-IDA`](https://d3fend.mitre.org/technique/d3f:IdentifierAnalysis/) | Ingest line-rate standardized OCSF findings from native domain security controls (EDR, NDR, CNAPP, IdP) for central cross-domain graph correlation. | Ingestion latency < 2 seconds from edge emission |
 
 ---
 
@@ -1909,7 +1937,7 @@ This directory serves as the immutable registry of **Architectural Decision Reco
 All decisions are recorded as version-controlled markdown documents alongside the architecture specifications. Visual state machines and topologies within ADRs are authored in declarative Mermaid syntax and validated programmatically in CI/CD.
 
 ```
-Total Decisions: 21 | Accepted: 21 | Deprecated: 0 | Superseded: 0
+Total Decisions: 26 | Accepted: 26 | Deprecated: 0 | Superseded: 0
 ```
 
 ---
@@ -1922,6 +1950,7 @@ Total Decisions: 21 | Accepted: 21 | Deprecated: 0 | Superseded: 0
 | [**0008**](0008-secops-error-budgets-and-chaos-security-engineering.md) | **SecOps Error Budgets & Chaos Engineering** | `accepted` | SecOps / SRE Team | Adopts SRE Alert Noise Error Budgets (false-positive rate $\le 5\%$) with automated CI/CD deployment freezes on budget exhaustion. |
 | [**0010**](0010-sabsa-business-architecture-and-attribute-profiling.md) | **SABSA Alignment & Attribute Profiling** | `accepted` | Enterprise Architecture | Maps all TIDIR capabilities to the SABSA 6x6 matrix and operational security attribute profiles. |
 | [**0021**](0021-graceful-degradation-automated-fallback-and-continuity-plan-b.md) | **Graceful Degradation & Continuity Plan B** | `accepted` | Architecture / SecOps / SRE | Codifies a 4-tier capabilities-driven degradation model, failure detection probes, and automated Plan B fallbacks across all layers. |
+| [**0026**](0026-end-to-end-coverage-assurance-and-degradation-circuit-breakers.md) | **End-to-End Coverage Assurance & Circuit Breakers** | `accepted` | Architecture / Detection Leads / Harry | Establishes a 10-step verification chain, active purple-team emulation canaries, and automated confidence-capping circuit breakers. |
 
 ---
 
@@ -1932,6 +1961,7 @@ Total Decisions: 21 | Accepted: 21 | Deprecated: 0 | Superseded: 0
 | [**0002**](0002-preserve-unmapped-telemetry-in-ocsf.md) | **Preserve Unmapped OCSF Telemetry** | `accepted` | Data Engineering | Mandates preserving non-standard raw fields inside an `unmapped_data` JSON object to prevent telemetry loss. |
 | [**0015**](0015-sandboxed-agent-execution-otlp-convergence-and-ephemeral-identity.md) | **Sandboxed Agent Execution & OTLP Convergence** | `accepted` | SecOps / AI Platform | Runs specialist agents in gVisor/Firecracker microVMs emitting standard OTLP spans, unified with enterprise APM. |
 | [**0016**](0016-just-in-time-telemetry-elevation-and-ephemeral-forensics.md) | **JIT Telemetry Elevation & Ephemeral Forensics** | `accepted` | SecOps / Detection Leads | Implements dynamic agent-driven sensor elevation (eBPF, PCAP, memory) with strict TTLs ($\le 30\,\text{min}$) and auto-eviction. |
+| [**0025**](0025-pre-detection-telemetry-provenance-and-ingestion-lineage.md) | **Pre-Detection Telemetry Provenance & Lineage** | `accepted` | Architecture / Data Engineering / Harry | Extends the Evidence DAG upstream using W3C Trace Context and micro-batch transform hashes to eliminate pipeline blind spots. |
 
 ---
 
@@ -1944,6 +1974,9 @@ Total Decisions: 21 | Accepted: 21 | Deprecated: 0 | Superseded: 0
 | [**0011**](0011-bipartite-entity-finding-graph-consolidation.md) | **Bipartite Entity-Finding Graph Consolidation** | `accepted` | Detection & Graph Leads | Structures detection correlation as a bipartite graph of Entities and Findings with community detection clustering. |
 | [**0013**](0013-ambient-deception-fabric-and-canary-anchors.md) | **Ambient Deception Fabric & Canary Anchors** | `accepted` | SecOps / Red Team | Deploys low-overhead honeytokens and canary assets emitting zero-noise high-confidence alerts with instant triage priority. |
 | [**0019**](0019-polyglot-detection-as-code-and-native-engine-adaptation.md) | **Polyglot Detection-as-Code & Native Engines** | `accepted` | Architecture / Detection Leads | Pairs vendor-neutral YAML metadata envelopes with target-optimized query blocks (KQL, SPL, SQL) and AI-driven parity testing. |
+| [**0022**](0022-exposure-management-and-continuous-threat-exposure-integration.md) | **Exposure Management & CTEM Integration** | `accepted` | Architecture / Threat Intel / Detection | Integrates Exposure Intelligence as bidirectional prior probabilities and closed-loop realized risk feedback. |
+| [**0023**](0023-distributed-detection-and-edge-to-center-correlation.md) | **Distributed Detection & Edge Correlation** | `accepted` | Architecture / Detection Leads | Establishes local native detection, central cross-domain correlation, and on-demand contextual telemetry retrieval. |
+| [**0024**](0024-finding-bus-architecture-lineage-and-finding-contract.md) | **Finding Bus Architecture & OCSF Finding Contract** | `accepted` | Architecture / Detection Leads / Harry | Establishes an open publish-subscribe boundary for distributed detections in OCSF Class 2001/2004 with explicit parent lineage. |
 
 ---
 

@@ -8,7 +8,7 @@
 
 In high-throughput security operations, the relationship between detection engineering velocity and front-line analyst cognitive sustainability is often unmanaged. Detection engineers deploy rules that appear functional in isolation but generate excessive false-positive volume under live operational conditions, externalising the cost of noisy logic onto tier-1 analysts and driving severe alert fatigue.
 
-Furthermore, automated response playbooks and distributed containment workflows interact with complex distributed APIs (endpoint control planes, cloud identity providers, perimeter firewalls). Under real-world intrusion conditions, these APIs experience network latency, throttling ($429$), and partial downtime. If automated containment workflows are only tested under ideal laboratory conditions, their resilience under catastrophic attack conditions remains unverified.
+Automated response playbooks and distributed containment workflows interact with complex distributed APIs (endpoint control planes, cloud identity providers, perimeter firewalls). Under real-world intrusion conditions, these APIs experience network latency, throttling ($429$), and partial downtime. If automated containment workflows are only tested under ideal laboratory conditions, their resilience under catastrophic attack conditions remains unverified.
 
 How does the architecture balance detection deployment velocity with analyst cognitive sustainability, while ensuring that automated containment workflows withstand distributed network faults?
 

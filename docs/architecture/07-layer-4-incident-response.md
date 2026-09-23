@@ -237,7 +237,7 @@ To permanently eliminate cognitive and forensic atrophy induced by autonomous ag
    - Responders maintain an active forensic currency profile requiring a monthly quota of unassisted manual investigations across system execution, cloud IAM, and identity domains.
    - When an operator's currency metric decays, the allocation engine throttles autonomous delegation, routing eligible medium-severity live findings or synthetic canary alerts directly to the **Manual Flight Deck** (with agent copilots placed in passive observation mode).
 2. **The Incident Replay Simulator**:
-   - Leverages Layer 2 lakehouse time-travel partition snapshots to hydrate exact historical incident telemetry into an ephemeral sandbox workbench.
+   - Uses Layer 2 lakehouse time-travel partition snapshots to hydrate exact historical incident telemetry into an ephemeral sandbox workbench.
    - Operators execute blind investigations against historical outbreaks and purple-team attack simulations without knowing whether the scenario is live or synthetic until the dossier is sealed.
 3. **Dual-Blind Mutual Calibration**:
    - The autonomous agent mesh executes concurrently in a shadow runtime against the same incident.

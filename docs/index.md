@@ -32,13 +32,13 @@ hero:
 features:
   - icon: 🛡️
     title: The Operating Maxim
-    details: "«Probabilistic components propose. Deterministic components authorise.» Generative models and neural embeddings analyze; deterministic policy kernels govern execution."
+    details: "'Probabilistic components propose. Deterministic components authorise.' Generative models and neural embeddings analyse; deterministic policy kernels govern execution."
   - icon: 🌊
     title: Telemetry & Data Fabric
     details: Line-rate OCSF normalisation, decoupled streaming, and dual-tier storage (hot search vs open columnar lakehouse) preserving forensic evidence independent of current detection value.
   - icon: 🎯
     title: Continuous Detection Engineering
-    details: Stateful streaming rules, scheduled lakehouse SQL, and GitOps Detection-as-Code (DaC) tested continuously against atomic adversary simulations in CI/CD.
+    details: Distributed detection placement across edge controls, streaming, and lakehouse SQL, with inverted telemetry dependencies tested continuously in CI/CD.
   - icon: 🧠
     title: Agent Trust Boundary
     details: Specialised triage agents operate behind the Agent Trust Boundary. Untrusted evidence is kept separate from control instructions, and agents receive only short-lived, task-scoped credentials.
@@ -63,15 +63,17 @@ flowchart TB
     classDef kernel fill:#1e1b4b,stroke:#a855f7,stroke-width:2px,color:#f8fafc;
     classDef feedback fill:#064e3b,stroke:#34d399,stroke-width:1.5px,color:#f8fafc;
 
-    subgraph DP ["1. TELEMETRY DATA PLANE (Untrusted Input Environment)"]
+    subgraph DP ["1. TELEMETRY & FINDINGS DATA PLANE (Untrusted Input Environment)"]
         direction LR
-        P1_RAW["Raw Endpoint, Cloud\n& Network Events"] --> P1_NORM["Line-Rate OCSF Normalisation\n(Catch-All unmapped_data)"]
+        P1_RAW["Raw Endpoint, Cloud\n& Network Telemetry"] --> P1_NORM["Line-Rate OCSF Normalisation\n(Catch-All unmapped_data)"]
+        P1_FIND["Native Edge Findings\n(EDR, NDR, CNAPP, IdP)"] --> P1_NORM
         P1_NORM --> P1_LAKE["Decoupled Storage Fabric\n(Hot Index + Columnar Lakehouse)"]
     end
 
     subgraph AP ["2. ANALYTICAL & REASONING PLANE (Advisory Proposals)"]
         direction LR
-        P2_DET["Streaming & Batch DaC Engines\n(SRE Alert Noise Budgets)"] --> P2_BAYES["Dependency-Aware Risk Lens\n(Anti-Shared Ancestry Compounding)"]
+        P2_EXPO["Exposure Intelligence\n(CTEM Priors: Asset Criticality & Attack Paths)"] --> P2_BAYES
+        P2_DET["Streaming & Batch DaC Engines\n(Cross-Domain & SRE Noise Budgets)"] --> P2_BAYES["Exposure-Aware Risk Lens\n(Dependency-Aware Compounding)"]
         P2_BAYES --> P2_AGENT["Hierarchical Agent Mesh\n(Agent Trust Boundary / Dual-Plane)"]
     end
 
@@ -88,10 +90,10 @@ flowchart TB
 
     subgraph FB ["5. CLOSED-LOOP CONTINUOUS CALIBRATION"]
         direction LR
-        FB_FEED["Attributed CTI Re-Cache\n(Re-injected into Layer 1/2)"] --- FB_EVAL["Evals-as-Code CI/CD\n(Continuous Regression Testing)"] --- FB_GREEN["Green Team Preventative IaC PRs\n(Infrastructure Hardening)"]
+        FB_EXPO["Realized Risk Elevation\n(Converts Exposure to Active Threat in CTEM)"] --- FB_FEED["Attributed CTI Re-Cache\n(Re-injected into Layer 1/2)"] --- FB_GREEN["Green Team Preventative IaC PRs\n(Infrastructure Hardening)"]
     end
 
-    DP ==>|1. Normalized Telemetry| AP
+    DP ==>|1. Normalized Telemetry & Edge Findings| AP
     AP ==>|2. Investigative Findings & Hypotheses| DCP
     DCP ==>|3. Authorized Execution Bounds| ACT
     ACT ==>|4. Environmental Outcomes & DAG Nodes| FB
@@ -101,7 +103,7 @@ flowchart TB
     class FB feedback;
 ```
 
-*The closed loop is completed as operational outcomes and incident graph nodes from Actuation (4) enter Continuous Calibration (5), which continuously re-keys threat caches, tunes detection noise budgets, and issues automated hardening pull requests back into the Telemetry Data Plane (1).*
+*The closed loop is completed as operational outcomes and incident graph nodes from Actuation (4) enter Continuous Calibration (5), which continuously re-keys threat caches, converts theoretical exposure into realized risk in CTEM platforms, and issues automated hardening pull requests back into the Telemetry Data Plane (1).*
 
 ---
 
@@ -182,15 +184,16 @@ TIDIR synthesizes defensive strategy, analytic taxonomy, API safety, and operati
 
 ## 7. Explore by Role & Architectural Intent
 
-Select an entry point tailored to your focus:
+Select an entry point tailored to your focus, or view the complete [Role-Based Persona Journeys](/guide/persona-journeys):
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1.5rem;">
 
 <div style="border: 1px solid #334155; border-radius: 8px; padding: 1.25rem; background: #0b0f19;">
 <h3 style="margin-top: 0; color: #38bdf8;">👔 Security Leaders (CISO / SecOps Heads)</h3>
-<p style="font-size: 0.95rem; color: #94a3b8;">Understand the strategic business defensibility, operational cost reduction, and executive risk governance of TIDIR.</p>
+<p style="font-size: 0.95rem; color: #94a3b8;">Understand strategic business defensibility, compliance guarantees, and the phased enterprise adoption path.</p>
 <ul style="padding-left: 1.25rem; font-size: 0.9rem;">
   <li><a href="/guide/what-is-tidir">What is TIDIR? (Executive Summary)</a></li>
+  <li><a href="/guide/adoption-roadmap">Enterprise Adoption Roadmap</a></li>
   <li><a href="/architecture/10-macro-capabilities-and-services">Enterprise Service Delivery Model</a></li>
   <li><a href="/architecture/00-architectural-invariants">The Architectural Constitution</a></li>
 </ul>
@@ -198,11 +201,12 @@ Select an entry point tailored to your focus:
 
 <div style="border: 1px solid #334155; border-radius: 8px; padding: 1.25rem; background: #0b0f19;">
 <h3 style="margin-top: 0; color: #a855f7;">📐 Enterprise Security Architects</h3>
-<p style="font-size: 0.95rem; color: #94a3b8;">Examine the 4-plane control model, trusted computing base boundaries, and vendor-neutral open standards.</p>
+<p style="font-size: 0.95rem; color: #94a3b8;">Examine the 4-plane control model, concrete technology stacks, trust boundaries, and failure tradeoffs.</p>
 <ul style="padding-left: 1.25rem; font-size: 0.9rem;">
   <li><a href="/architecture/01-system-overview">System Overview & 4-Plane Model</a></li>
+  <li><a href="/architecture/reference-stacks">Concrete Reference Stacks (CNCF, AWS, Azure)</a></li>
+  <li><a href="/architecture/failure-modes-and-tradeoffs">Failure Modes & Engineering Tradeoffs</a></li>
   <li><a href="/architecture/assurance-map">The Assurance Case Map</a></li>
-  <li><a href="/architecture/09-threat-model">Target Architecture Threat Model</a></li>
 </ul>
 </div>
 
@@ -213,6 +217,7 @@ Select an entry point tailored to your focus:
   <li><a href="/architecture/02-capability-model">Capability Taxonomy</a></li>
   <li><a href="/architecture/components/03-detection-engine">Detection Engine Architecture</a></li>
   <li><a href="/adr/0019-polyglot-detection-as-code-and-native-engine-adaptation">ADR-0019: Polyglot Detection-as-Code</a></li>
+  <li><a href="/adr/0023-distributed-detection-and-edge-to-center-correlation">ADR-0023: Distributed Detection & Edge Correlation</a></li>
 </ul>
 </div>
 
@@ -223,6 +228,7 @@ Select an entry point tailored to your focus:
   <li><a href="/architecture/components/06-ai-orchestration">AI & Agent Orchestration Plane</a></li>
   <li><a href="/adr/0004-defensive-ai-runtime-and-prompt-injection-firewall">ADR-0004: Agent Trust Boundary</a></li>
   <li><a href="/adr/0015-sandboxed-agent-execution-otlp-convergence-and-ephemeral-identity">ADR-0015: Sandboxed Agent Execution</a></li>
+  <li><a href="/adr/0018-non-human-identity-lifecycle-and-machine-attestation">ADR-0018: Ephemeral Workload Attestation</a></li>
 </ul>
 </div>
 

@@ -34,7 +34,7 @@ Chosen option: **Bipartite Entity-Finding Graph with Community Detection**, beca
 ### 1. Rejection of the Alert-to-Alert Anti-Pattern
 Alerts are sparse epiphenomena—secondary observations that occur only when an adversary triggers a specific detection rule. Adversaries spend the vast majority of their dwell time executing actions that generate zero alerts (living off the land, passive reconnaissance, sleep intervals). 
 
-In an Alert-to-Alert graph, missing a single detection breaks the graph into disconnected components. Furthermore, drawing direct edges between disparate alerts (e.g. connecting a port scan to an account modification two hours later) introduces fragile, subjective heuristics.
+In an Alert-to-Alert graph, missing a single detection breaks the graph into disconnected components. Drawing direct edges between disparate alerts (e.g. connecting a port scan to an account modification two hours later) introduces fragile, subjective heuristics.
 
 ### 2. The Entity-Finding Architectural Model
 Instead of linking alerts to alerts, the architecture establishes a two-layer bipartite model:
@@ -55,7 +55,7 @@ flowchart TB
         E_USER["User: j.smith<br><i>(Identity Entity)</i>"]
         E_HOST1["Host: ws-finance-02<br><i>(Endpoint Entity)</i>"]
         E_PROC["Process: powershell.exe<br><i>(Execution Entity)</i>"]
-        E_HOST2["Host: srv-sql-prod<br><i>(Crown Jewel Entity)</i>"]
+        E_HOST2["Host: srv-sql-prod<br><i>(Tier 0 Critical Entity)</i>"]
         E_EXT["IP: 198.51.100.42<br><i>(Network Entity)</i>"]
 
         E_USER -->|"Logged into"| E_HOST1

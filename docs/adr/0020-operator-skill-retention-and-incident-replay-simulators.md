@@ -15,7 +15,7 @@ As security operations transition toward autonomous agent meshes capable of line
 > *The more automated a system becomes, the more crucial the human contribution is when that automation encounters edge cases—yet because the automation handles all routine operations, the human operator is deprived of the practice needed to maintain essential skills.*
 
 In modern autonomous SecOps, if specialist agents autonomously resolve 95%+ of operational findings, human analysts suffer catastrophic **cognitive and forensic atrophy**:
-1. **Loss of Investigative Intuition**: Analysts lose the visceral, hands-on muscle memory required to navigate raw event logs, reconstruct process execution lineages, trace network pivots, and query columnar lakehouse archives under high stress.
+1. **Loss of Investigative Intuition**: Analysts lose the visceral, hands-on muscle memory required to inspect raw event logs, reconstruct process execution lineages, trace network pivots, and query columnar lakehouse archives under high stress.
 2. **The Automation Dependency Paradox**: When an out-of-distribution attack, adversarial prompt injection, or model poisoning bypasses the AI plane, the incident escalates to a human operator who has spent months acting merely as an approval stamper. Expecting an unpracticed operator to instantly decipher complex novel attacks guarantees operational paralysis.
 3. **Model Evaluation Echo Chambers**: If AI agents generate forensic timelines and SLM judges evaluate those agents against synthetic evals alone, the system creates an ungrounded feedback loop vulnerable to undetected model drift.
 
@@ -96,7 +96,7 @@ flowchart TB
 - **The Manual Flight Deck**: In this mode, AI agent copilots are placed in passive observation mode. The analyst directly formulates queries against Layer 2 lakehouse partitions, inspects raw telemetry, performs entity resolution, and constructs the timeline dossier manually.
 
 #### 2. Incident Replay Simulator ("The SecOps Flight Simulator")
-- **Lakehouse Time-Travel Hydration**: Leveraging Layer 2 open table format snapshots (Delta/Iceberg/Hudi), the simulator can capture the complete 72-hour telemetry state surrounding historical incidents and hydrate it into an isolated, ephemeral staging sandbox.
+- **Lakehouse Time-Travel Hydration**: Using Layer 2 open table format snapshots (Delta/Iceberg/Hudi), the simulator can capture the complete 72-hour telemetry state surrounding historical incidents and hydrate it into an isolated, ephemeral staging sandbox.
 - **Controlled Adversary Injects**: Replays are synthesized by the Layer 3 continuous purple-teaming engine (ADR-0007), embedding real-world attacker techniques into historical baseline telemetry.
 - **Blind Simulation Execution**: Simulations are presented to operators identically to live production findings. The operator does not know whether they are investigating a live outbreak or a high-fidelity synthetic replay until the investigation dossier is cryptographically sealed.
 

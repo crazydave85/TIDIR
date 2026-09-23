@@ -8,7 +8,7 @@
 
 Modern detection engineering requires empirical validation to prevent false-positive alert fatigue and ensure resilience against evolving adversary techniques. While synthetic unit tests and historical data replay provide static verification, they cannot validate the end-to-end operational pipeline under live adversary conditions (e.g. sensor emit latency, in-flight stream parsing, and agentic dossier assembly).
 
-Furthermore, as autonomous AI agents synthesize complex multi-vector findings into investigative dossiers, single-model reasoning paths risk confirmation bias or stochastic hallucinations. If an autonomous agent prematurely closes a finding as benign or recommends disruptive containment based on flawed hypothesis framing, defensive integrity is compromised.
+As autonomous AI agents synthesize complex multi-vector findings into investigative dossiers, single-model reasoning paths risk confirmation bias or stochastic hallucinations. If an autonomous agent prematurely closes a finding as benign or recommends disruptive containment based on flawed hypothesis framing, defensive integrity is compromised.
 
 Finally, industry trends often propose an "output-driven ingestion" model—ingesting telemetry only when tied to an active, pre-existing detection rule. While intended to control SIEM licensing costs, this approach cripples retrospective hunting (`CTI-05`) and blinds the enterprise when novel zero-day exploits emerge.
 

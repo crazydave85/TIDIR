@@ -26,7 +26,7 @@ TIDIR requires an architectural standard that governs how AI models interact wit
 
 1. **Monolithic Vendor-Embedded Copilots:** Rely exclusively on proprietary SIEM/XDR embedded assistants.
 2. **Ad-Hoc Scripted Point Prompts:** Write custom Python/TypeScript scripts wrapping LLM APIs with hardcoded prompt strings and bespoke tool wrappers.
-3. **Dedicated AI Orchestration Plane with MCP, Tiered Routing, and the Utility-Trust-Cost Governance Triad (Selected):** Establish an open, vendor-neutral orchestration runtime utilizing MCP for tool contracts, tiered model gateways, stateful DAG/blackboard runtimes, and continuous evaluation across the Utility-Trust-Cost triad.
+3. **Dedicated AI Orchestration Plane with MCP, Tiered Routing, and the Utility-Trust-Cost Governance Triad (Selected):** Establish an open, vendor-neutral orchestration runtime using MCP for tool contracts, tiered model gateways, stateful DAG/blackboard runtimes, and continuous evaluation across the Utility-Trust-Cost triad.
 
 ## Decision Outcome
 

@@ -123,7 +123,7 @@ flowchart TB
 * **Continuity Plan B (Hierarchical Model Graceful Degradation & Rule-Based Non-AI Mode)**:
   1. *Local SLM Fallback*: The AI orchestration gateway automatically shifts inference workloads from cloud frontier models to locally hosted or VPC-contained Small Language Models (SLMs, e.g. on-premise 8B parameter models).
   2. *Deterministic Rule-Based Non-AI Mode*: If local SLMs are also offline, the system drops AI summarization entirely. The analyst workbench renders structured, deterministic dossiers: raw bipartite entity relationships, tabular chronological timelines, and rule-based blast-radius preview cards.
-  3. *Manual Flight Deck Activation*: Human operators trained under [ADR-0020](0020-operator-skill-retention-and-incident-replay-simulators.md) assume manual investigative control, leveraging existing muscle memory to query the lakehouse directly.
+  3. *Manual Flight Deck Activation*: Human operators trained under [ADR-0020](0020-operator-skill-retention-and-incident-replay-simulators.md) assume manual investigative control, applying established procedural practice to query the lakehouse directly.
 
 #### 4. Response Automation & State Machines (Layer 4)
 * **Failure Mode**: Downstream host EDR or IAM directory APIs become unresponsive; forward-recovery state machines freeze in partial containment, risking distributed deadlocks.
@@ -131,8 +131,8 @@ flowchart TB
   * Containment action dispatch attempts exceed retry ceilings ($\gt 3$ attempts with exponential backoff).
   * State machines held in forward-recovery approach their 45-minute Idempotent Isolation Lease TTL.
   * Enterprise-wide containment velocity exceeds the runaway safety threshold (e.g. $\gt 10$ hosts isolated per minute).
-* **Continuity Plan B (Master E-Stop & Out-of-Band Boundary Containment)**:
-  1. *Autonomous Master E-Stop (Kill-Switch)*: An authenticated cryptographic kill-switch in the SecOps console instantly revokes automated execution permissions across all response workers, downgrading all active and pending playbooks to advisory-only mode.
+* **Continuity Plan B (Master Emergency Stop & Out-of-Band Boundary Containment)**:
+  1. *Autonomous Master Emergency Stop*: An authenticated cryptographic emergency stop in the SecOps console instantly revokes automated execution permissions across all response workers, downgrading all active and pending playbooks to advisory-only mode.
   2. *Isolation Lease Auto-Fallback*: Stalled isolation leases that hit their 45-minute TTL without operator resolution deterministically trigger an automated safe-fallback: elevating to an out-of-band boundary network quarantine (upstream VPC route shunt or firewall ACL) and paging the Incident Commander.
   3. *Air-Gapped Signed Runbooks*: For catastrophic control-plane collapse, operators deploy cryptographically signed, air-gapped CLI containment scripts directly against network and cloud infrastructure outside the TIDIR runtime.
 

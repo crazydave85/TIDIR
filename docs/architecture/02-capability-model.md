@@ -11,11 +11,12 @@ This document specifies the functional capability taxonomy required across the T
 
 ## 1. Capability Taxonomy Matrix
 
-The TIDIR capability model defines **twenty-nine operational capabilities** organized across five functional domains, underpinned by **seven cross-cutting AI Governance and Verification capabilities** and **five Operational Continuity & Resilience capabilities** (41 capabilities in total), spanning from raw sensory ingestion to closed-loop response automation:
+The TIDIR capability model defines **thirty-two operational capabilities** organized across six functional domains, underpinned by **seven cross-cutting AI Governance and Verification capabilities** and **five Operational Continuity & Resilience capabilities** (44 capabilities in total), spanning from proactive exposure management and raw sensory ingestion to closed-loop response automation:
 
 ```mermaid
 flowchart TB
   %% Class Definitions for High Contrast & Visual Clarity
+  classDef expo fill:#14291f,stroke:#10b981,stroke-width:2px,color:#f8fafc;
   classDef cti fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc;
   classDef data fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
   classDef det fill:#2e1065,stroke:#c084fc,stroke-width:2px,color:#f8fafc;
@@ -23,11 +24,13 @@ flowchart TB
   classDef resp fill:#4c0519,stroke:#fb7185,stroke-width:2px,color:#f8fafc;
   classDef aigov fill:#1e293b,stroke:#f472b6,stroke-width:2px,color:#f8fafc;
 
+  D0["<b>Domain 0: Exposure Intelligence & CTEM (EXPO)</b><br/>• EXPO-01: Asset Exposure & Attack Path Graph<br/>• EXPO-02: Realized Risk & Threat Feed Convergence"]:::expo
+
   D1["<b>Domain 1: Cyber Threat Intelligence (CTI)</b><br/>• CTI-01: Feed Aggregation & STIX/TAXII Ingestion<br/>• CTI-02: Indicator Deduplication & Half-Life Decay<br/>• CTI-03: Attack Flow & Adversary TTP Mapping<br/>• CTI-04: Line-Rate IOC Dissemination to Edge<br/>• CTI-05: Retroactive Lakehouse Threat Sweeps"]:::cti
 
   D2["<b>Domain 2: Telemetry & Data Fabric (DATA)</b><br/>• DATA-01: Multi-Source Kernel & Cloud Ingress<br/>• DATA-02: Line-Rate OCSF Normalization & DLQ<br/>• DATA-03: Distributed Partitioned Streaming Log<br/>• DATA-04: Hot Analytical Search Index (15–30d)<br/>• DATA-05: Columnar Security Lakehouse (365d+)"]:::data
 
-  D3["<b>Domain 3: Detection Engineering (DET)</b><br/>• DET-01: Stateful Sliding-Window Streaming<br/>• DET-02: Scheduled Batch Lakehouse SQL<br/>• DET-03: Detection-as-Code (DaC) & CI Testing<br/>• DET-04: Supernode-Dampened Graph Clustering<br/>• DET-05: Multi-Factor Composite Risk Lens<br/>• DET-06: SecOps Alert Noise Error Budgets<br/>• DET-07: Ambient Deception & Canary Fabric"]:::det
+  D3["<b>Domain 3: Detection Engineering (DET)</b><br/>• DET-01: Stateful Sliding-Window Streaming<br/>• DET-02: Scheduled Batch Lakehouse SQL<br/>• DET-03: Detection-as-Code (DaC) & CI Testing<br/>• DET-04: Supernode-Dampened Graph Clustering<br/>• DET-05: Multi-Factor Composite Risk Lens<br/>• DET-06: SecOps Alert Noise Error Budgets<br/>• DET-07: Ambient Deception & Canary Fabric<br/>• DET-08: Distributed Edge Finding Federation"]:::det
 
   D4["<b>Domain 4: Investigation & Case Management (INV)</b><br/>• INV-01: Unified Entity Resolution 360<br/>• INV-02: Chronological Multi-Source Timeline<br/>• INV-03: Relational Execution & Process Graph<br/>• INV-04: Sealed Evidence Locker & RFC 3161<br/>• INV-05: Hierarchical Agent Mesh & Agent Trust Boundary<br/>• INV-06: Progressive Disclosure Analyst Workbench<br/>• INV-07: Just-in-Time (JIT) Telemetry Elevation"]:::inv
 
@@ -35,11 +38,13 @@ flowchart TB
 
   GOV["<b>Cross-Cutting: AI Governance & Verification (AIGOV)</b><br/>• AIGOV-01: Continuous Evals-as-Code & Grounding<br/>• AIGOV-02: Dual-Plane Data/Control Isolation<br/>• AIGOV-03: Cost & Latency Performance Budgets<br/>• AIGOV-04: Agent Fleet Lifecycle & Preemption<br/>• AIGOV-05: MCP Tool Observability & Loop Breakers<br/>• AIGOV-06: Ephemeral Attestation & SVIDs<br/>• AIGOV-07: Non-Human Identity (NHI) Profiling"]:::aigov
 
+  D0 ==>|Dynamic Prior Probabilities P_Breach| D3
   D1 ==>|Operational Threat Feeds & PIR Flows| D2
   D2 ==>|Normalized Telemetry & Low-Latency State Δt| D3
   D3 ==>|Elevated Risk-Scored Incident Dossiers| D4
   D4 ==>|Validated Remediation & Containment Tasks| D5
   D5 -.->|Attributed Intel & Blindspot Calibration| D1
+  D5 -.->|Realized Incident Exposure Feedback| D0
   GOV -.-|Enforces Evals & Agent Trust Boundary Across| D4
   GOV -.-|Enforces Blast-Radius & Attestation Across| D5
 ```
@@ -51,6 +56,15 @@ flowchart TB
 > [!NOTE]
 > **Multi-Framework Alignment & Reference Target SLOs**:
 > Each capability is formally mapped to its primary defensive countermeasure in [MITRE D3FEND](https://d3fend.mitre.org/), characterized under the [MITRE D3FEND Analytic Characterization Framework (ACF)](https://d3fend.mitre.org/) (*Symbolic Logic*, *Statistical Analysis*, *Machine Learning*), and aligned with enterprise benchmarks including [CIS Controls v8](https://www.cisecurity.org/controls/v8), [MITRE ENGAGE](https://engage.mitre.org/), and the [OWASP API Security Top 10](https://owasp.org/API-Security/). Operational latencies, throughput figures, and comprehension metrics listed below are designated as **Reference Target Service Level Objectives (SLOs)** based on representative enterprise workloads (e.g. 100 TB reference lakehouse tiers).
+
+### Domain 0: Exposure Intelligence & CTEM (EXPO)
+
+| Capability ID | Name | Execution Mode & D3FEND ACF | MITRE D3FEND & Frameworks | Description | Reference Target SLO |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **EXPO-01** | Asset Exposure & Attack Path Graph | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-EFA`](https://d3fend.mitre.org/technique/d3f:IdentifierAnalysis/)<br>[`D3-HPA`](https://d3fend.mitre.org/technique/d3f:HardwareComponentInventory/) | Map internet-facing attack surfaces, unpatched exploitability (CISA KEV, EPSS), and identity reachability graphs to supply dynamic Bayesian priors $P(\text{Breach})$. | Attack path recalculation < 15 min; sub-second prior lookup |
+| **EXPO-02** | Realized Risk & Threat Convergence | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-CIR`](https://d3fend.mitre.org/technique/d3f:ApplicationHardening/)<br>[`D3-TIE`](https://d3fend.mitre.org/technique/d3f:InboundTrafficFiltering/) | Ingest confirmed intrusion discoveries and active exploit paths from Layer 4 investigations, elevating theoretical vulnerabilities to realized risk in CTEM platforms. | CTEM exposure priority escalation < 30 sec |
+
+---
 
 ### Domain 1: Cyber Threat Intelligence (CTI)
 
@@ -87,6 +101,7 @@ flowchart TB
 | **DET-05** | Bayesian Multi-Signal Risk Lens | `[Deterministic Engine]`<br>*(ACF: Statistical Analysis)* | [`D3-BCA`](https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/)<br>[`D3-EIC`](https://d3fend.mitre.org/technique/d3f:UserBehaviorAnalysis/) | Mitigate the operational consequences of the Base Rate Fallacy by compounding orthogonal evidence vectors (asset, identity, network) before elevation. | Dynamic composite score (0–100); false alarms < 5% |
 | **DET-06** | SecOps Error Budgets | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-ARA`](https://d3fend.mitre.org/technique/d3f:AuthorizationEventThresholding/)<br>[`D3-SRE`](https://d3fend.mitre.org/technique/d3f:AuthorizationEventThresholding/) | Enforce false-positive Noise Budgets per detection class with automated deployment freeze on budget burn. | Pre-deploy CI gate: peak FPR < 1%; Production SLO: rolling 30-day FPR <= 5% |
 | **DET-07** | Deception & Canary Surface Fabric | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-DN`](https://d3fend.mitre.org/technique/d3f:DecoyEnvironment/)<br>[`D3-HT`](https://d3fend.mitre.org/technique/d3f:DecoyUserCredential/)<br>[`ENGAGE: EAC-1/2`](https://engage.mitre.org/) | Embed lightweight honeytokens, Kerberos SPN decoys, and file lures emitting OCSF canary events for zero-noise detection. | False Positive Rate = 0.00%; MTTD < 1 second |
+| **DET-08** | Distributed Edge Finding Federation | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-EFA`](https://d3fend.mitre.org/technique/d3f:IdentifierAnalysis/)<br>[`D3-IDA`](https://d3fend.mitre.org/technique/d3f:IdentifierAnalysis/) | Ingest line-rate standardized OCSF findings from native domain security controls (EDR, NDR, CNAPP, IdP) for central cross-domain graph correlation. | Ingestion latency < 2 seconds from edge emission |
 
 ---
 

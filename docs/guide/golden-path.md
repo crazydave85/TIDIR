@@ -17,7 +17,9 @@ next:
 TIDIR is designed to be understood at multiple depths:
 * **The 60-Second View**: Available on the [Homepage](/) (Problem ➔ Operating Maxim ➔ Architecture-at-a-Glance ➔ 3 Tiers).
 * **The 15-Minute Orientation (This Guide)**: A curated 5-step walkthrough establishing core architectural doctrine and system topology.
-* **The Deep Reference & Interrogation**: Direct exploration of the [11 Invariants](/architecture/00-architectural-invariants), [4-Plane System Model](/architecture/01-system-overview), [Capability Model](/architecture/02-capability-model), [Foundational Research & Literature](/architecture/foundational-research), [Assurance Map](/architecture/assurance-map), and [21 ADRs](/adr/).
+* **Role-Based Pathways**: Curated reading priorities for CISOs, Detection Engineers, Responders, and Architects in [Persona-Driven Journeys](/guide/persona-journeys).
+* **Pragmatic Implementation**: A 4-phase brownfield migration strategy in the [Enterprise Adoption Roadmap](/guide/adoption-roadmap).
+* **The Deep Reference & Interrogation**: Direct exploration of the [11 Invariants](/architecture/00-architectural-invariants), [4-Plane System Model](/architecture/01-system-overview), [Capability Model](/architecture/02-capability-model), [Foundational Research & Literature](/architecture/foundational-research), [Assurance Map](/architecture/assurance-map), and [23 ADRs](/adr/).
 
 ---
 

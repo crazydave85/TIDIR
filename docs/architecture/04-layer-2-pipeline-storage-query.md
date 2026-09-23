@@ -307,22 +307,22 @@ Industry commentary frequently advocates for an **"Output-Driven SIEM Model"**, 
 TIDIR resolves the underlying economic driver of the output-driven model without starving the enterprise of visibility:
 - **Broad Lakehouse Ingestion**: All normalized security telemetry flows at line rate into open columnar lakehouse storage (Parquet/Iceberg on commodity object storage), where storage costs are sub-linear and orders of magnitude lower than traditional hot analytics engines.
 - **Value-Based Selective Hot Indexing**: Only high-value operational streams and high-fidelity detection candidates are routed into the expensive 15–30 day hot analytical search index.
-- **Result**: Comprehensive 365+ day retrospective visibility and robust historical backtesting with zero SIEM licensing penalties.
+- **Result**: Full-year retrospective visibility and historical backtesting with zero SIEM licensing penalties.
 
 ---
 
-## 9. Autonomous AI & Query Fabric Leverage
+## 9. Autonomous AI Roles & Query Fabric Capabilities
 
 Layer 2 provides the foundational data substrate consumed by AI models and agentic workflows. To democratize data access while preventing compute exhaustion and hallucinated queries:
 
 1. **Natural Language to OCSF SQL/Streaming Translation**:
    - *Problem*: Tier-1 SOC analysts and incident commanders often lack deep SQL/streaming query syntax expertise across complex, nested OCSF schemas.
-   - *AI Leverage*: Tier 1 cloud models translate conversational investigator prompts (e.g. *"Show all SMB sessions from ws-finance-02 to production databases in the last 4 hours"*) into optimized, partition-pruned SQL queries targeting the lakehouse.
+   - *AI Role*: Tier 1 cloud models translate conversational investigator prompts (e.g. *"Show all SMB sessions from ws-finance-02 to production databases in the last 4 hours"*) into optimized, partition-pruned SQL queries targeting the lakehouse.
    - *Deterministic Safety Gate*: Synthesized queries must pass a deterministic Abstract Syntax Tree (AST) validator. The validator rejects any query containing mutating keywords (`DROP`, `DELETE`, `UPDATE`, `INSERT`), mandates temporal bounds (`event_time >= NOW() - INTERVAL`), and enforces tenant boundary predicates before execution.
 
 2. **Semantic & Vector Embeddings on Threat Artifacts**:
    - *Problem*: Traditional lexical search (keyword matching) misses subtle variations in command-line obfuscation, novel script block patterns, and semantic campaign parallels.
-   - *AI Leverage*: Embedding models compute dense vector representations for PowerShell script blocks, process execution arguments, and STIX threat actor reports, storing embeddings alongside columnar Parquet files.
-   - *Deterministic Safety Gate*: Vector distance similarity scores are utilized strictly as enrichment features and contextual hints, never as sole triggers for automated disruption.
+   - *AI Role*: Embedding models compute dense vector representations for PowerShell script blocks, process execution arguments, and STIX threat actor reports, storing embeddings alongside columnar Parquet files.
+   - *Deterministic Safety Gate*: Vector distance similarity scores are used strictly as enrichment features and contextual hints, never as sole triggers for automated disruption.
 
 

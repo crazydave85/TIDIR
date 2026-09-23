@@ -19,7 +19,7 @@ How does TIDIR provide secure, isolated execution environments for autonomous co
 ## Decision Drivers
 
 * **Execution Containment & Zero-Trust Agent Sandboxing:** Ensuring that autonomous agent scripts, parsers, and code fixes execute within mathematically bounded, hardware-isolated sandboxes with zero host access and default-deny network egress.
-* **Unified Telemetry Ingress:** Ingesting native OpenTelemetry Protocol (OTLP over gRPC/HTTP) streams seamlessly alongside syslog and eBPF, mapping OTel semantic attributes directly into OCSF classes at the collector edge.
+* **Unified Telemetry Ingress:** Ingesting native OpenTelemetry Protocol (OTLP over gRPC/HTTP) streams directly alongside syslog and eBPF, mapping OTel semantic attributes directly into OCSF classes at the collector edge.
 * **Cryptographic Identity Grounding:** Eliminating graph fragmentation and attribution collisions caused by ephemeral IP recycling in containerized environments.
 * **Performance & Low Latency:** Sub-millisecond schema mapping at ingress and sub-second container sandbox spin-up.
 

@@ -72,7 +72,7 @@ flowchart LR
 ```
 
 ### The Six Operational Intelligence Phases
-1. **Direction & Planning**: Establishes Priority Intelligence Requirements (PIRs) aligned with business risks, executive threat models, and crown jewel assets.
+1. **Direction & Planning**: Establishes Priority Intelligence Requirements (PIRs) aligned with business risks, executive threat models, and Tier 0 mission-critical assets.
 2. **Collection**: Ingests raw threat data from Layer 1 (technical observables, vulnerability advisories, community disclosures, internal case discoveries).
 3. **Processing & Normalization**: Deduplicates overlapping claims, extracts technical observables into structured entities, applies mathematical decay curves, and resolves multi-source contradictions.
 4. **Analysis**: Correlates technical observables with tactical adversary behaviours, campaign waves, and threat actor profiles.
@@ -95,7 +95,7 @@ Rather than authoring rules reactively or attempting exhaustive coverage of hund
 flowchart TB
   subgraph Inputs ["Prioritisation Inputs"]
     FLOWS["Machine-Readable Attack Flows"]
-    ASSETS["Asset & Crown Jewel Criticality (L1 Context)"]
+    ASSETS["Asset & System Criticality (L1 Context)"]
     POSTURE["Control & Patch Posture (L1 Posture)"]
     TELEMETRY["Telemetry Availability (L1 Coverage)"]
   end
@@ -372,7 +372,7 @@ flowchart TB
 
   subgraph RiskLens ["3. The Multi-Dimensional Risk Lens"]
     direction TB
-    RL_ASSET["Asset & Crown Jewel Criticality\n(Production DB vs. Dev Pod)"]
+    RL_ASSET["Asset & Tier 0 Criticality\n(Production DB vs. Dev Pod)"]
     RL_CTI["CTI Priority Alignment\n(PIR-tagged threat actor campaigns)"]
     RL_STAGE["ATT&CK Progression Compounding\n(Recon ➔ Cred Access ➔ Exfil)"]
     RL_SCORE["Composite Risk Scoring Algorithm\n(Suppression threshold vs. Promotion)"]
@@ -453,16 +453,16 @@ When a cluster crosses the critical composite risk threshold—or when a Determi
 
 ---
 
-## 8. Autonomous AI & Detection Engineering Leverage
+## 8. Autonomous AI Roles & Detection Engineering Capabilities
 
 In Layer 3, autonomous AI and agentic harnesses transform how threat intelligence is ingested and how detection logic is tested and validated:
 
 1. **Threat Advisory to Machine-Readable ATT&CK Flow Synthesis**:
    - *Problem*: Vulnerability disclosures, CISA alerts, and commercial threat bulletins are published in unstructured prose, requiring hours of manual analyst decomposition to extract actionable indicators and behavioral logic.
-   - *AI Leverage*: Tier 1/2 reasoning models ingest unstructured advisories, identify prerequisite attack sequences, and output machine-readable ATT&CK DAG flows specifying exact OCSF schema classes (`1007: Process Activity`, `3002: Authentication`).
+   - *AI Role*: Tier 1/2 reasoning models ingest unstructured advisories, identify prerequisite attack sequences, and output machine-readable ATT&CK DAG flows specifying exact OCSF schema classes (`1007: Process Activity`, `3002: Authentication`).
    - *Deterministic Safety Gate*: Extracted attack flows must undergo human CTI analyst peer review and schema compiler validation before triggering detection engineering backlogs.
 
 2. **Continuous Evals-as-Code & DaC Quality Judges**:
    - *Problem*: Brittle detection rules written without broad test coverage cause alert fatigue or severe performance degradation on production streaming buses.
-   - *AI Leverage*: Multi-model agent judges audit Detection-as-Code (DaC) pull requests, scoring candidate Sigma/SQL rules for schema deprecation, logic ambiguities, and triage documentation completeness.
+   - *AI Role*: Multi-model agent judges audit Detection-as-Code (DaC) pull requests, scoring candidate Sigma/SQL rules for schema deprecation, logic ambiguities, and triage documentation completeness.
    - *Deterministic Safety Gate*: Rules cannot deploy to production without passing automated 30-day historical lakehouse backtests and synthetic unit test suites in CI/CD, guaranteeing zero syntax errors and meeting the pre-deployment CI hard gate of peak $\text{FPR} \lt 1\%$ (against historical replay corpus), before being governed by the operational rolling 30-day production error budget ($\text{FPR} \le 5\%$).

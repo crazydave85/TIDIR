@@ -73,11 +73,16 @@ flowchart LR
      - *Detection Engineering Backlog (`DET-03`)*: Mandates that detection engineers prioritise depth, stateful correlation, and mutation resilience across high-prevalence techniques before addressing hypothetical long-tail attacks.
      - *Telemetry Collection Audits (`DATA-01`)*: Continuously audits sensor telemetry ingestion to assert that the mandatory OCSF classes required to detect high-frequency techniques are actively collected and preserved before expending ingestion budget on peripheral edge sources.
 
+6. **Continuous Threat Exposure Management (CTEM) & Exploit Weaponization Convergence**:
+   - Integrates with the Exposure Intelligence fabric ([ADR-0022](../../adr/0022-exposure-management-and-continuous-threat-exposure-integration.md)) by correlating tactical CTI threat feeds with active vulnerability exposure catalogs.
+   - Ingests exploitability metrics including CISA Known Exploited Vulnerabilities (KEV), Exploit Prediction Scoring System (EPSS) probabilities, and proof-of-concept (PoC) weaponization chatter.
+   - Computes an **Exploit Weaponization Status**: when external CTI detects active in-the-wild exploitation of a CVE present in the enterprise's attack surface graph, the CTI subsystem emits an immediate exposure priority escalation, raising the Bayesian prior probability $P(\text{Breach})$ across matching assets.
+
 ---
 
 ## 3. Data Model & Schemas
 
-The CTI subsystem leverages the **STIX 2.1** standard:
+The CTI subsystem uses the **STIX 2.1** standard:
 - **Indicator**: Patterns representing observable artefacts (IPs, hashes, domains, file paths).
 - **Threat Actor**: Profiles of organised cybercrime groups or state-sponsored advanced persistent threats.
 - **Attack Pattern**: MITRE ATT&CK techniques associated with actor behaviour.

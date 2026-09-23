@@ -58,7 +58,7 @@ flowchart TB
 
 2. **Progressive Disclosure Analyst Workbench**:
    - Designed to eliminate cognitive fatigue and enable sub-60-second operational triage through three structured visual layers:
-     - **Tier 1 (Situation Briefing)**: A concise, plain-language executive and technical summary describing what occurred, the verified root cause, affected crown jewels, and current blast radius.
+     - **Tier 1 (Situation Briefing)**: A concise, plain-language executive and technical summary describing what occurred, the verified root cause, affected mission-critical assets, and current blast radius.
      - **Tier 2 (Cryptographic Evidence Ledger)**: Tabular presentation of verified OCSF facts (exact process GUIDs, SHA-256 hashes, network sockets, microsecond UTC timestamps) with deterministic verification links.
      - **Tier 3 (On-Demand Interactive Graph & Timeline)**: Collapsed by default; dynamically renders process execution trees and identity bipartite graphs with supernode dampening and multi-source chronological event alignment when requested by the investigator.
 

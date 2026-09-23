@@ -14,7 +14,7 @@ Early Detection-as-Code (DaC) proposals advocated for a "100% vendor-neutral dec
 
 In enterprise production environments, this abstraction introduces the **Lowest Common Denominator Trap**:
 1. **Expressive Asymmetry**: Advanced detection relies on engine-native capabilities—such as KQL timeseries decomposition (`make-series`, `series_decompose_anomalies()`), Splunk streaming statistics (`streamstats`, `transaction`), Lakehouse SQL window partitions (`QUALIFY`, `PARTITION BY`), or Flink stateful event-time watermarking. A generic YAML DSL cannot express these primitives without inventing a bespoke, unmaintainable programming language within YAML.
-2. **Performance & Index Impedance**: Universal AST transpilers generate naive queries that fail to utilize table clustering keys, partition pruning, Bloom filters, or materialized projections, causing massive scan overhead and cloud compute costs.
+2. **Performance & Index Impedance**: Universal AST transpilers generate naive queries that fail to use table clustering keys, partition pruning, Bloom filters, or materialized projections, causing massive scan overhead and cloud compute costs.
 3. **The Role of AI**: Generative AI models and LLM judges have fundamentally matured. Transpilation is no longer confined to brittle regex token rewriters; AI agents can synthesize and optimize dialect-native queries directly while validating semantic parity.
 
 How should TIDIR structure Detection-as-Code to preserve vendor-neutral governance and portability without crippling detection engineers or sacrificing query execution efficiency?
@@ -26,7 +26,7 @@ How should TIDIR structure Detection-as-Code to preserve vendor-neutral governan
 * **Expressive Freedom**: Detection engineers must be able to exploit the full analytical depth of specialized engines (KQL, SPL, ClickHouse/Snowflake SQL, Flink SQL).
 * **Vendor-Neutral Governance**: Lifecycles, OCSF class bindings, MITRE ATT&CK taxonomies, SRE noise budgets, and triage playbooks must remain 100% vendor-neutral and portable.
 * **Deterministic Verification**: Detections must be testable via synthetic test fixtures and adversary emulation before reaching production runtimes.
-* **Continuous Detection Engineering**: Architecture leverages agentic assistance to draft native query implementations from Attack Flows, with deterministic CI fixtures and human peer review enforcing cross-platform semantic parity.
+* **Continuous Detection Engineering**: Architecture uses agentic assistance to draft native query implementations from Attack Flows, with deterministic CI fixtures and human peer review enforcing cross-platform semantic parity.
 
 ---
 
@@ -102,11 +102,29 @@ threat_intel:
 
 data_requirements:
   ocsf_version: "1.1.0"
-  target_classes: [1007] # Process Activity
-  mandatory_attributes:
-    - "process.file.name"
-    - "process.file.signature.is_signed"
-    - "process.parent_process.file.name"
+  telemetry_dependencies:
+    required:
+      - class: 1007 # Process Activity
+        authority: "endpoint_edr" # e.g. defender_for_endpoint, crowdstrike_falcon
+        fields:
+          - "process.file.name"
+          - "process.file.signature.is_signed"
+          - "process.parent_process.file.name"
+        max_delivery_latency: "30s"
+    optional:
+      - class: 4001 # Network Connection Activity
+        authority: "network_ndr" # e.g. zeek_ndr, corelight
+        fields:
+          - "connection_info.direction"
+          - "dst_endpoint.ip"
+  context_dependencies:
+    - entity_type: "device"
+      required_attributes: ["criticality_tier", "owner_team"]
+    - entity_type: "user"
+      required_attributes: ["privilege_level"]
+  health_policy:
+    missing_required: "offline" # Marks rule inactive if endpoint_edr stream fails
+    missing_optional: "degraded" # Marks rule degraded; reduces alert confidence
 
 operational:
   intent: "finding" # Typed egress: finding | risk_increment | signal | telemetry_elevation_trigger
@@ -164,18 +182,19 @@ tests:
           parent_process: { file: { name: "services.exe" } }
 ```
 
-### Typed Detection Egress & Empirical Evasion Resilience
+### Typed Detection Egress, Empirical Evasion Resilience & Inverted Dependencies
 
-The Polyglot DaC envelope formalises two critical operational properties:
+The Polyglot DaC envelope formalises three critical operational properties:
 1. **Typed Egress Intent (`operational.intent`)**: Decouples detection matching from alert generation. Rules explicitly declare whether a match emits an actionable security `finding` (OCSF 2001/2004), increments an entity's `risk_increment` in the Bayesian Multi-Signal Risk Lens ([ADR-0009](0009-bayesian-multi-signal-risk-scoring.md)), tags raw events as an informational `signal` for retro-hunting, or fires a `telemetry_elevation_trigger` commanding Just-in-Time (JIT) ephemeral sensor verbosity ([ADR-0016](0016-just-in-time-telemetry-elevation-and-ephemeral-forensics.md)).
 2. **Empirical Evasion Resilience (`threat_intel.evasion_resilience`)**: Rather than relying on self-declared coverage checklists ("ATT&CK Bingo"), rules undergo automated mutation testing in CI ([ADR-0007](0007-continuous-automated-purple-teaming-and-multi-model-consensus.md)). Detections that withstand syntactic and procedural variations are classified as `functional`, intermediate sequences as `operational`, and brittle syntax matches as `tactical`.
+3. **Inverted Telemetry Dependencies (`data_requirements.telemetry_dependencies`)**: Traditional pipelines push raw data blindly toward detection engines. Polyglot DaC inverts this relationship: rules declare exactly which OCSF event classes, authority sources, and fields they require versus which are optional. If a supporting telemetry stream (e.g. NDR network flow) degrades or stalls, the detection runtime automatically marks the rule's operational status as `DEGRADED`, discounting the resulting finding's confidence ceiling and alerting SecOps pipeline engineering (e.g. in Cribl or Vector) to restore signal health.
 
 ---
 
 ## Positive Consequences
 
-* **Zero Expressive Bottlenecks**: Detection engineers can author complex analytical logic, windowed aggregations, and graph correlations utilizing the full power of native query engines.
-* **Engine Optimization**: Queries directly leverage native partitioning, clustering indexes, streaming window states, and cost-efficient execution plans.
+* **Zero Expressive Bottlenecks**: Detection engineers can author complex analytical logic, windowed aggregations, and graph correlations using the full power of native query engines.
+* **Engine Optimization**: Queries directly use native partitioning, clustering indexes, streaming window states, and cost-efficient execution plans.
 * **Uncompromised Governance**: Life-cycle states, threat taxonomy mappings, SRE noise budgets, and unit fixtures remain fully decoupled and vendor-neutral.
 * **AI-Driven Cross-Compilation & Parity**: Detection rule copilots can synthesize dialect-specific implementations from universal attack flows and verify them against shared OCSF test fixtures in CI/CD.
 

@@ -64,7 +64,7 @@ flowchart TB
    - Pre-deployment CI checks:
      - Rule syntax validation against canonical OCSF schema registries.
      - Synthetic unit testing (verifying true positives trigger and benign data passes across all target engine implementations).
-     - **Continuous Automated Purple Teaming & Mutation Testing**: Executes non-destructive atomic adversary emulation payloads in an isolated staging environment. The test harness applies automated syntactic and procedural mutations (CLI flag permutations, environment indirection, alternate system call bindings) to measure **Evasion Resilience** and empirically distinguish brittle tactical matches from robust functional primitive detections ([ADR-0007](../../adr/0007-continuous-automated-purple-teaming-and-multi-model-consensus.md)).
+     - **Continuous Automated Purple Teaming & Mutation Testing**: Executes non-destructive atomic adversary emulation payloads in an isolated staging environment. The test harness applies automated syntactic and procedural mutations (CLI flag permutations, environment indirection, alternate system call bindings) to measure **Evasion Resilience** and empirically distinguish brittle tactical matches from evasion-resilient functional primitive detections ([ADR-0007](../../adr/0007-continuous-automated-purple-teaming-and-multi-model-consensus.md)).
      - **Historical Lakehouse Backtesting**: Replays candidate rules across 30 days of historical data in pre-prod to calculate Expected Alert Volume (EAV) and reject rules exceeding noise budgets.
    - Immutable version tagging and GitOps rollbacks.
 
@@ -80,7 +80,18 @@ flowchart TB
    - Entity-centric graph correlation: links alerts sharing an entity ID (e.g., `user_id`, `hostname`, `ip_address`) within an active time window into a single compound finding.
    - Dynamic Risk Scoring: composite score evaluating alert severity, asset criticality, and threat actor confidence. Solves the operational challenge of noisy behavioral analytics by requiring multiple orthogonal signals before escalating to human review.
 
-5. **Threat-Led Backlog Prioritisation**:
+5. **Distributed Detection & Native Finding Federation**:
+   - **Detect Locally, Correlate Centrally**: Follows the architectural principle established in [ADR-0023](../../adr/0023-distributed-detection-and-edge-to-center-correlation.md): commodity domain detections (known malware hashes, local privilege escalations, suspicious parent-child process anomalies, impossible travel) are executed natively at the edge by domain security controls (EDR, NDR, CNAPP, IdP).
+   - **Line-Rate Standardized Finding Ingestion**: Native controls emit standardized OCSF Findings (Class 2001: Security Finding, Class 2004: Detection Finding). The central detection engine ingests these findings without requiring continuous raw telemetry streaming for routine matches, preserving vendor-native contexts in `unmapped_data`.
+   - **Central Engine Specialisation**: Reserves central streaming and batch compute resources for cross-domain correlations (e.g. joining an IdP MFA spray with an AWS IAM role assumption and an endpoint curl execution), multi-hop entity graphs, and bespoke enterprise business logic.
+   - **On-Demand Contextual Safeguard & Pre-Trigger Buffering**: Prevents degrading into an "alerts-only" silo by coupling Just-in-Time (JIT) telemetry elevation ([ADR-0016](../../adr/0016-just-in-time-telemetry-elevation-and-ephemeral-forensics.md)) with rolling 30–60 minute pre-trigger local ring buffers, ensuring the inception of an intrusion is never lost to post-trigger activation delays.
+
+6. **Exposure-Aware Prior Probability Estimation & Exposure Floor**:
+   - Ingests exposure context from the Exposure Intelligence fabric ([ADR-0022](../../adr/0022-exposure-management-and-continuous-threat-exposure-integration.md))—incorporating internet-facing reachability, known exploited vulnerability status (CISA KEV, EPSS), attack path graph centrality, and security control effectiveness.
+   - Dynamically parameterizes the Bayesian Multi-Signal Risk Lens prior probability $P(\text{Breach})$. High-exposure choke points dramatically lower the threshold for elevating weak behavioral signals.
+   - **Non-Zero Exposure Floor & Invariant Bypass**: Enforces $P(\text{Breach}) \ge \epsilon \gt 0$ to guarantee that unexpected attacks against supposedly isolated assets are never suppressed by stale asset graphs, while deterministic invariant violations (canary tokens, driver tampering) bypass prior weighting entirely.
+
+7. **Threat-Led Backlog Prioritisation**:
    - Detection engineering backlogs and automated purple team emulation suites are explicitly weighted by the empirical technique frequency curve established by CTI ([`CTI-03`](01-threat-intelligence.md)).
    - Prioritises achieving layered, mutation-resilient coverage across the top 20 high-prevalence techniques (accounting for over 80% of observed intrusion activity) before investing engineering velocity in peripheral or theoretical edge cases.
 

@@ -94,7 +94,7 @@ TIDIR establishes automated feedback loops connecting operational incident outco
 
 ### Option 1: Ad-Hoc Custom Logging & Cloud-Only Judges
 
-* Good, because it requires minimal upfront engineering and leverages out-of-the-box cloud APIs.
+* Good, because it requires minimal upfront engineering and uses standard cloud APIs.
 * Bad, because cloud token costs scale unsustainably with event volume ($2\times$–$3\times$ multiplier).
 * Bad, because non-standard logging formats prevent unified observability across SIEM/SOAR/Lakehouse boundaries.
 * Bad, because external cloud dependencies break under network partitions or WAN isolation.

@@ -14,7 +14,7 @@ As security architectures transition from single-turn conversational helpers to 
 2. **Zombie Agents & Unmanaged Concurrency**: In high-volume security environments with hundreds of elevated alerts daily, background agent sub-tasks frequently become orphaned when investigations are manually closed or prioritized by human operators. Unmanaged background tasks continue executing expensive multi-hop queries against storage backends, creating severe compute contention.
 3. **The Tool/MCP Fabric Observability Deficit**: Model Context Protocol (MCP) servers and tools are the operational hands of AI agents. If an MCP server suffers from network latency, database connection exhaustion, or schema drift (e.g., parameter type mismatches), agent reasoning stalls or yields degraded hallucinations. Without dedicated telemetry monitoring the health, latency, and error rates of the tool fabric itself, diagnosing agent failures becomes impossible.
 
-How does TIDIR provide robust, enterprise-grade lifecycle management for its autonomous agent fleet, enforce deterministic recursive circuit breakers, and monitor the operational health of its tool calling bus?
+How does TIDIR provide resilient operational lifecycle management for its autonomous agent fleet, enforce deterministic recursive circuit breakers, and monitor the operational health of its tool calling bus?
 
 ## Decision Drivers
 

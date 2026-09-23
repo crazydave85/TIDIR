@@ -75,6 +75,11 @@ flowchart TB
    - Automated collection audits continuously verify that the mandatory OCSF attributes required by the top 20 high-prevalence adversary techniques (e.g. process execution ancestry, memory access permissions, token impersonation, network egress flows) are actively collected across critical asset classes.
    - Sensor instrumentation deficits that would blind detection of top-prevalence techniques trigger immediate gap notifications, ensuring collection depth where adversary frequency is highest before expending budget on peripheral log sources.
 
+5. **Distributed Ingestion & Federated Context Pushdown**:
+   - Ingests line-rate normalized OCSF Finding objects (Classes 2001 and 2004) from native security controls ([ADR-0023](../../adr/0023-distributed-detection-and-edge-to-center-correlation.md)), bypassing the need to stream bulk commodity events centrally for standard matches.
+   - Preserves raw contextual telemetry in low-cost columnar object storage partitions or local forwarder ring buffers.
+   - Exposes federated query pushdown connectors that allow investigative subagents to execute targeted SQL sweeps directly across edge storage nodes and lakehouse partitions on demand.
+
 ---
 
 ## 3. Architectural Capability Archetypes & Protocol Standards

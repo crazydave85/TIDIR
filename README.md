@@ -47,6 +47,7 @@ The objective is to establish an actionable, vendor-neutral target technology ar
 The documentation is organized logically across strategy, capability mapping, detailed component engineering, and formal decisions:
 
 - **Target System Architecture**: [`docs/architecture/01-system-overview.md`](docs/architecture/01-system-overview.md) — Comprehensive target state component topology, dataflows, contracts, and interaction patterns.
+- **Strategic Position Paper**: [`docs/architecture/distributed-detection-and-the-finding-bus.md`](docs/architecture/distributed-detection-and-the-finding-bus.md) — Distributed detection, multi-inlet blended enterprise telemetry, and the vendor-neutral Finding Bus.
 - **Capability Model**: [`docs/architecture/02-capability-model.md`](docs/architecture/02-capability-model.md) — Core functional capabilities required across the TIDIR lifecycle.
 - **Component Specifications**:
   - [01 - Threat Intelligence (CTI)](docs/architecture/components/01-threat-intelligence.md): Feed ingestion, STIX/TAXII, IOC scoring, and campaign attribution.
@@ -54,7 +55,7 @@ The documentation is organized logically across strategy, capability mapping, de
   - [03 - Detection Engine](docs/architecture/components/03-detection-engine.md): Stream analytics, Sigma rule compilation, UEBA, and correlation.
   - [04 - Investigation & Case Management](docs/architecture/components/04-investigation-cases.md): Evidence graphs, entity timeline reconstruction, triage workflows.
   - [05 - Automated Response & Containment](docs/architecture/components/05-response-automation.md): Automated playbook orchestration, blast-radius simulation, Saga compensating rollbacks, human-in-the-loop gating, automated containment.
-- **Architectural Decision Records (ADRs)**: [`docs/adr/`](docs/adr/) — Immutable records of key architectural decisions.
+- **Architectural Decision Records (ADRs)**: [`docs/adr/`](docs/adr/) — Immutable records of key architectural decisions (26 ratified ADRs).
 - **Diagrams**: [`docs/diagrams/`](docs/diagrams/) — Source `.mmd` files for system diagrams.
 
 ---
@@ -92,6 +93,7 @@ TIDIR maintains strict discipline between what is specification-validated in the
 | **v1.0** | **Foundational 5-Layer Component Architecture**<br>• Core operational domains: CTI, Data Fabric, Detection, Cases, Automation.<br>• Open standards alignment (OCSF, STIX 2.1, Sigma DaC). | • [System Overview](docs/architecture/01-system-overview.md)<br>• [Capability Model](docs/architecture/02-capability-model.md)<br>• [ADR-0001: Architectural Governance](docs/adr/0001-record-architecture-decisions.md) |
 | **v1.1** | **The TIDIR Architectural Constitution & Invariant Discipline**<br>• 11 non-negotiable invariants codified.<br>• Trust Doctrine: probabilistic components propose, deterministic components authorize.<br>• Security-State Monotonicity ($s_{n+1} \preceq s_n$). | • [Constitutional Invariants](docs/architecture/00-architectural-invariants.md)<br>• [ADR-0005: Saga Pattern & Break-Glass](docs/adr/0005-saga-pattern-containment-and-break-glass-protocol.md)<br>• [ADR-0015: Sandboxed Agent Execution](docs/adr/0015-sandboxed-agent-execution-otlp-convergence-and-ephemeral-identity.md) |
 | **v1.2** | **Machine-Readable Graph & Threat-to-Assurance Closure**<br>• Full bi-directional assurance closure ($T_1..T_6 \to I_1..I_{11} \to \text{CAP} \to \text{ADR}$).<br>• Authoritative graph endpoints (`/architecture.json`, `/llms.txt`, `/llms-full.txt`).<br>• AI Orchestration Plane & 3-phase MVA roadmap.<br>• Automated verification suite (62 Mermaid diagrams, graph linting, MathJax audit). | • [Assurance Case Map](docs/architecture/assurance-map.md)<br>• [ADR-0012: AI Plane & MVA Roadmap](docs/adr/0012-ai-orchestration-runtime-mcp-and-mvp-roadmap.md)<br>• [ADR-0021: Graceful Degradation Plan B](docs/adr/0021-graceful-degradation-automated-fallback-and-continuity-plan-b.md)<br>• Machine Graph: [`/architecture.json`](docs/public/architecture.json) |
+| **v1.16** | **Distributed Detection & The Finding Bus (The Blended Enterprise)**<br>• Vendor-neutral Finding Bus architecture (OCSF Class 2001/2004).<br>• Pre-detection telemetry provenance & W3C Trace Context.<br>• End-to-end 10-step coverage assurance with degradation circuit breakers.<br>• Multi-inlet telemetry topology for blended enterprise estates. | • [Strategic Position Paper](docs/architecture/distributed-detection-and-the-finding-bus.md)<br>• [ADR-0024: Finding Bus Architecture](docs/adr/0024-finding-bus-architecture-lineage-and-finding-contract.md)<br>• [ADR-0025: Pre-Detection Provenance](docs/adr/0025-pre-detection-telemetry-provenance-and-ingestion-lineage.md)<br>• [ADR-0026: Coverage Assurance](docs/adr/0026-end-to-end-coverage-assurance-and-degradation-circuit-breakers.md) |
 
 ---
 

