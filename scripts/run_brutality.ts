@@ -2,6 +2,25 @@ import { $ } from "bun";
 
 console.log("🚀 Starting MD Agent assessment with Gemini...");
 
+// Security guard: Strictly deny modification or creation of maintenance, workflow, and script files
+const FORBIDDEN_PATTERNS = [
+  ".github",
+  "scripts",
+  "REVIEW.md",
+  "run_brutality",
+  "sync.yml",
+  "package.json",
+  "bun.lock"
+];
+
+function isForbiddenFile(filePath: string): boolean {
+  const normalized = filePath.replace(/\\/g, "/").toLowerCase();
+  return FORBIDDEN_PATTERNS.some(pattern => {
+    const p = pattern.toLowerCase();
+    return normalized === p || normalized.startsWith(`${p}/`) || normalized.includes(p);
+  });
+}
+
 // 1. Read agent instructions from REVIEW.md (from custom path, /tmp/agent-tools, or current dir)
 const reviewFileCandidates = [
   process.env.REVIEW_FILE,
@@ -22,38 +41,171 @@ if (!agentInstructions) {
   process.exit(1);
 }
 
-// 2. Dynamically read all Markdown files in the newly synced 'main' branch
-const glob = new Bun.Glob("**/*.md");
-let contentToAssess = "";
-for await (const file of glob.scan(".")) {
-  const normalized = file.replace(/\\/g, "/");
-  // Exclude REVIEW.md, workflows, scripts, and system folders from assessment
-  if (
-    normalized === "REVIEW.md" ||
-    normalized.startsWith(".github/") ||
-    normalized.startsWith("scripts/") ||
-    normalized.includes("node_modules")
-  ) continue;
-  const fileContent = await Bun.file(file).text();
-  contentToAssess += `\n\n--- Start of ${file} ---\n${fileContent}\n--- End of ${file} ---\n`;
+// 2. Discover Changed Files & Git Diff (Ingress)
+const beforeSha = process.env.BEFORE_SHA?.trim();
+const afterSha = process.env.AFTER_SHA?.trim();
+
+let changedFiles: string[] = [];
+let diffText = "";
+
+if (beforeSha && afterSha && beforeSha !== afterSha) {
+  try {
+    const diffFilesRaw = await $`git diff --name-only ${beforeSha} ${afterSha}`.text();
+    changedFiles = diffFilesRaw
+      .split("\n")
+      .map(f => f.trim().replace(/\\/g, "/"))
+      .filter(f => f.endsWith(".md") && !isForbiddenFile(f));
+    
+    diffText = (await $`git diff ${beforeSha} ${afterSha} -- "*.md"`.text()).trim();
+    console.log(`🔍 Detected ${changedFiles.length} changed markdown file(s) between ${beforeSha.slice(0, 7)}..${afterSha.slice(0, 7)}`);
+  } catch (err: any) {
+    console.warn(`⚠️ Could not diff ${beforeSha}..${afterSha}: ${err.message}. Trying HEAD~1.`);
+  }
 }
 
-// 3. System Prompt: Force JSON output so the script can route the decision
+// Fallback: check HEAD~1 if before/after SHA was not provided or produced no diff
+if (changedFiles.length === 0) {
+  try {
+    const diffFilesRaw = await $`git diff --name-only HEAD~1 HEAD`.text();
+    changedFiles = diffFilesRaw
+      .split("\n")
+      .map(f => f.trim().replace(/\\/g, "/"))
+      .filter(f => f.endsWith(".md") && !isForbiddenFile(f));
+    
+    diffText = (await $`git diff HEAD~1 HEAD -- "*.md"`.text()).trim();
+    if (changedFiles.length > 0) {
+      console.log(`🔍 Detected ${changedFiles.length} changed markdown file(s) in latest commit (HEAD~1..HEAD)`);
+    }
+  } catch {
+    // ignore
+  }
+}
+
+// If still empty (e.g. forced run with no new commits), inspect key architectural components
+if (changedFiles.length === 0) {
+  console.log("ℹ️ No specific commit diff detected. Running broad assessment of core components...");
+  const glob = new Bun.Glob("**/*.md");
+  for await (const file of glob.scan(".")) {
+    const normalized = file.replace(/\\/g, "/");
+    if (!isForbiddenFile(normalized)) {
+      changedFiles.push(normalized);
+    }
+  }
+}
+
+// 3. Tier 3: Complete Revised Text of Modified Files
+let modifiedFilesContent = "";
+for (const file of changedFiles) {
+  if (await Bun.file(file).exists()) {
+    const text = await Bun.file(file).text();
+    modifiedFilesContent += `\n\n--- Start of Modified File: ${file} ---\n${text}\n--- End of Modified File: ${file} ---\n`;
+  }
+}
+
+// 4. Tier 4: Discover Impact Radius (Dependent & Referencing Repository Files)
+const impactFiles = new Set<string>();
+const glob = new Bun.Glob("**/*.md");
+const allMarkdownFiles: string[] = [];
+
+for await (const file of glob.scan(".")) {
+  const normalized = file.replace(/\\/g, "/");
+  if (!isForbiddenFile(normalized) && !changedFiles.includes(normalized)) {
+    allMarkdownFiles.push(normalized);
+  }
+}
+
+for (const changedFile of changedFiles) {
+  const baseName = changedFile.split("/").pop()?.replace(/\.md$/, "") || "";
+  const slug = changedFile.replace(/^docs\//, "").replace(/\.md$/, "");
+
+  for (const otherFile of allMarkdownFiles) {
+    if (impactFiles.has(otherFile)) continue;
+    try {
+      const otherContent = await Bun.file(otherFile).text();
+      if (
+        otherContent.includes(changedFile) ||
+        (slug && otherContent.includes(slug)) ||
+        (baseName && otherContent.includes(baseName))
+      ) {
+        impactFiles.add(otherFile);
+      }
+    } catch {
+      // ignore read error
+    }
+  }
+}
+
+// Cap impact radius files to 8 to maintain optimal token efficiency (~10k-15k total tokens)
+const selectedImpactFiles = Array.from(impactFiles).slice(0, 8);
+let impactRadiusContent = "";
+if (selectedImpactFiles.length > 0) {
+  console.log(`🌐 Resolved Impact Radius: ${selectedImpactFiles.length} dependent/referencing file(s) (${selectedImpactFiles.join(", ")})`);
+  for (const file of selectedImpactFiles) {
+    const text = await Bun.file(file).text();
+    impactRadiusContent += `\n\n--- Start of Dependent File: ${file} ---\n${text}\n--- End of Dependent File: ${file} ---\n`;
+  }
+} else {
+  console.log("🌐 Resolved Impact Radius: No direct cross-referencing files found.");
+}
+
+// 5. Tier 1: Global Architectural Constitution & Invariants Context
+let globalConstitution = "";
+if (await Bun.file("docs/public/llms.txt").exists()) {
+  globalConstitution = await Bun.file("docs/public/llms.txt").text();
+} else if (await Bun.file("docs/architecture/00-architectural-invariants.md").exists()) {
+  globalConstitution = await Bun.file("docs/architecture/00-architectural-invariants.md").text();
+}
+
+// 6. Compile 4-Tier Assessment Payload
+const contentToAssess = `
+=== TIER 1: GLOBAL ARCHITECTURAL CONSTITUTION & 11 INVARIANTS ===
+The following is the authoritative specification of the 11 TIDIR Invariants, normative contracts, and component taxonomy:
+${globalConstitution}
+
+=== TIER 2: RECENT UPSTREAM MODIFICATIONS (GIT DIFF) ===
+The upstream repository recently introduced the following line-by-line diff:
+${diffText || "Full file inspection mode (no line diff available)."}
+
+=== TIER 3: FULL REVISED TEXT OF MODIFIED FILES ===
+Below is the complete revised content of each modified file:
+${modifiedFilesContent}
+
+=== TIER 4: IMPACT RADIUS (DEPENDENT & REFERENCING FILES ACROSS CODEBASE) ===
+The following files in the repository directly reference or depend upon the modified files:
+${impactRadiusContent || "No direct cross-referencing files found."}
+`;
+
+// 7. System Prompt: Direct Gemini using REVIEW.md criteria across the 4-tier payload
 const systemPrompt = `${agentInstructions}
 
-IMPORTANT INSTRUCTIONS:
-Assess the provided markdown files based on the REVIEW.md criteria. 
-- Only suggest updates for documentation files (such as files under docs/ or README.md). 
-- STRICTLY FORBIDDEN: NEVER suggest updates or create files for GitHub workflows (.github/**), automation scripts (scripts/**), or maintenance files (like REVIEW.md or run_brutality.ts).
-- If you find major architectural deviations or issues that require discussion, set action to "issue".
-- If you find minor typos or quick fixes that don't need discussion, set action to "pr" and provide the COMPLETE updated content for the files that need changing.
-- If everything is perfect, set action to "none".
+IMPORTANT INSTRUCTIONS FOR RECENT UPDATE ASSESSMENT:
+You are assessing the recent modifications made to the TIDIR reference architecture based strictly on the criteria, roles, templates, and principles defined in REVIEW.md.
+
+You are provided with a 4-tier context payload:
+- TIER 1: The authoritative TIDIR Architectural Constitution (11 Non-Negotiable Invariants) and reference contracts.
+- TIER 2: The exact git diff showing what was recently added, edited, or removed.
+- TIER 3: The complete text of the modified files.
+- TIER 4: The Impact Radius (dependent/referencing repository files that link to or rely upon the modified files).
+
+Assess the changes according to the two-phase assessment defined in REVIEW.md:
+1. Framework Alignment: Ensure data models, event logging, and telemetry ingestion strictly align with OCSF. Validate that threat behaviors map to MITRE ATT&CK, countermeasures to MITRE D3FEND, and AI/ML security to MITRE ATLAS.
+2. Strict Vendor Neutrality: The architecture must remain 100% open and vendor-neutral. Actively flag and reject commercial product promotions, vendor bias, or proprietary tool lock-in. Focus on capabilities, not specific commercial tools.
+3. Cross-Impact & Invariant Integrity: Do the modifications in Tier 2/3 violate any of the 11 Invariants in Tier 1, or break statements, references, or assumptions in the dependent documents in Tier 4?
+4. Sanity & Sense Checks: Adhere to established cybersecurity best practices and logical flow.
+5. Dual-Agent Action Decision (per REVIEW.md):
+   - "issue": Major architectural deviations, framework conflicts, vendor bias, or broken cross-component logic.
+   - "pr": Minor typos, broken link repairs, or small wording improvements (provide COMPLETE updated file text).
+   - "none": Everything is consistent, sound, and compliant.
+
+STRICT FILE SAFETY RESTRICTIONS:
+- Only propose PR updates for documentation files (under docs/ or README.md).
+- NEVER propose changes to .github workflows, scripts, or maintenance files (like REVIEW.md or run_brutality.ts).
 
 You MUST respond with ONLY valid JSON matching this schema:
 {
   "action": "issue" | "pr" | "none",
-  "title": "Short title for the issue or PR",
-  "body": "Detailed markdown body for the issue/PR explaining the assessment...",
+  "title": "Short title for the issue or PR (use conventional commits for PRs, e.g. fix(docs): ..., or [RFC] ... for issues)",
+  "body": "Detailed markdown body formatted strictly according to the PR or Issue template in REVIEW.md",
   "filesToUpdate": [
     { 
       "path": "path/to/file.md", 
@@ -236,25 +388,6 @@ const targetRepo = process.env.UPSTREAM_REPO || "Haribu/TIDIR";
 const repoOwner = process.env.GITHUB_REPOSITORY_OWNER || (repoName ? repoName.split("/")[0] : "");
 const isDryRun = process.env.DRY_RUN === "true";
 const rawFilesToUpdate = Array.isArray(assessment.filesToUpdate) ? assessment.filesToUpdate : [];
-
-// Security guard: Strictly deny modification or creation of maintenance, workflow, and script files
-const FORBIDDEN_PATTERNS = [
-  ".github",
-  "scripts",
-  "REVIEW.md",
-  "run_brutality",
-  "sync.yml",
-  "package.json",
-  "bun.lock"
-];
-
-function isForbiddenFile(filePath: string): boolean {
-  const normalized = filePath.replace(/\\/g, "/").toLowerCase();
-  return FORBIDDEN_PATTERNS.some(pattern => {
-    const p = pattern.toLowerCase();
-    return normalized === p || normalized.startsWith(`${p}/`) || normalized.includes(p);
-  });
-}
 
 if (assessment.action === "issue") {
   if (isDryRun) {

@@ -26,6 +26,8 @@ jobs:
     # Export this variable so the next job can read it
     outputs:
       has_updates: ${{ steps.verify.outputs.updated }} 
+      before_sha: ${{ steps.verify.outputs.before_sha }}
+      after_sha: ${{ steps.verify.outputs.after_sha }} 
 
     steps:
       - name: Record commit hash before sync
@@ -56,9 +58,13 @@ jobs:
           
           if [ "$BEFORE_SHA" != "$AFTER_SHA" ]; then
             echo "updated=true" >> $GITHUB_OUTPUT
+            echo "before_sha=$BEFORE_SHA" >> $GITHUB_OUTPUT
+            echo "after_sha=$AFTER_SHA" >> $GITHUB_OUTPUT
             echo "✅ **Status:** Updates were pulled. Triggering assessment agents." >> $GITHUB_STEP_SUMMARY
           else
             echo "updated=false" >> $GITHUB_OUTPUT
+            echo "before_sha=$BEFORE_SHA" >> $GITHUB_OUTPUT
+            echo "after_sha=$AFTER_SHA" >> $GITHUB_OUTPUT
             echo "⏸️ **Status:** No new updates found. Assessment skipped." >> $GITHUB_STEP_SUMMARY
           fi
           
@@ -111,6 +117,7 @@ jobs:
         with:
           ref: main
           clean: true
+          fetch-depth: 0
           
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -124,6 +131,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
           DRY_RUN: ${{ inputs.dry_run }}
           REVIEW_FILE: /tmp/agent-tools/REVIEW.md
+          BEFORE_SHA: ${{ needs.sync.outputs.before_sha }}
+          AFTER_SHA: ${{ needs.sync.outputs.after_sha }}
         run: |
           # Execute the script from the safe stash location (leaves the git workspace completely clean)
           AGENT_OUTPUT=$(bun run /tmp/agent-tools/scripts/run_brutality.ts)
