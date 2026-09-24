@@ -2,15 +2,38 @@ import { $ } from "bun";
 
 console.log("🚀 Starting MD Agent assessment with Gemini...");
 
-// 1. Read agent instructions from the new REVIEW.md file
-const agentInstructions = await Bun.file("REVIEW.md").text();
+// 1. Read agent instructions from REVIEW.md (from custom path, /tmp/agent-tools, or current dir)
+const reviewFileCandidates = [
+  process.env.REVIEW_FILE,
+  "/tmp/agent-tools/REVIEW.md",
+  "REVIEW.md"
+].filter(Boolean) as string[];
+
+let agentInstructions = "";
+for (const candidate of reviewFileCandidates) {
+  if (await Bun.file(candidate).exists()) {
+    agentInstructions = await Bun.file(candidate).text();
+    break;
+  }
+}
+
+if (!agentInstructions) {
+  console.error("❌ Could not find REVIEW.md instructions file in any candidate location.");
+  process.exit(1);
+}
 
 // 2. Dynamically read all Markdown files in the newly synced 'main' branch
 const glob = new Bun.Glob("**/*.md");
 let contentToAssess = "";
 for await (const file of glob.scan(".")) {
-  // Exclude the REVIEW.md file and hidden/system folders from the assessment
-  if (file === "REVIEW.md" || file.startsWith(".github/") || file.includes("node_modules")) continue; 
+  const normalized = file.replace(/\\/g, "/");
+  // Exclude REVIEW.md, workflows, scripts, and system folders from assessment
+  if (
+    normalized === "REVIEW.md" ||
+    normalized.startsWith(".github/") ||
+    normalized.startsWith("scripts/") ||
+    normalized.includes("node_modules")
+  ) continue;
   const fileContent = await Bun.file(file).text();
   contentToAssess += `\n\n--- Start of ${file} ---\n${fileContent}\n--- End of ${file} ---\n`;
 }
@@ -20,6 +43,8 @@ const systemPrompt = `${agentInstructions}
 
 IMPORTANT INSTRUCTIONS:
 Assess the provided markdown files based on the REVIEW.md criteria. 
+- Only suggest updates for documentation files (such as files under docs/ or README.md). 
+- STRICTLY FORBIDDEN: NEVER suggest updates or create files for GitHub workflows (.github/**), automation scripts (scripts/**), or maintenance files (like REVIEW.md or run_brutality.ts).
 - If you find major architectural deviations or issues that require discussion, set action to "issue".
 - If you find minor typos or quick fixes that don't need discussion, set action to "pr" and provide the COMPLETE updated content for the files that need changing.
 - If everything is perfect, set action to "none".
@@ -127,7 +152,7 @@ let delay = 60000; // Start with a 60-second wait
 for (let attempt = 1; attempt <= maxRetries; attempt++) {
   // Be sure to use your working model version here (e.g. gemini-1.5-flash or whatever you settled on)
   const model = process.env.GEMINI_MODEL || "gemini-3.6-flash";
-  response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, { 
+  response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -136,7 +161,7 @@ for (let attempt = 1; attempt <= maxRetries; attempt++) {
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: systemPrompt }] },
       contents: [{ role: "user", parts: [{ text: contentToAssess }] }],
-      generationConfig: { 
+      generationConfig: {
         response_mime_type: "application/json",
         response_schema: {
           type: "OBJECT",
@@ -158,7 +183,7 @@ for (let attempt = 1; attempt <= maxRetries; attempt++) {
           },
           required: ["action", "title", "body"]
         }
-      } 
+      }
     })
   });
 
@@ -167,11 +192,11 @@ for (let attempt = 1; attempt <= maxRetries; attempt++) {
   }
 
   const errorText = await response.text();
-  
+
   // If it's a 503 (Unavailable) or 429 (Rate Limit), try again
   if (response.status === 503 || response.status === 429) {
     console.warn(`⚠️ API busy (Attempt ${attempt}/${maxRetries}): ${response.status}`);
-    
+
     if (attempt < maxRetries) {
       console.log(`⏳ Waiting ${delay / 1000} seconds before retrying...`);
       await Bun.sleep(delay);
@@ -207,40 +232,90 @@ const assessment = parseAssessmentJson(rawText);
 console.log(`🤖 AI Decision: ${(assessment.action || "NONE").toUpperCase()}`);
 
 const repoName = process.env.GITHUB_REPOSITORY;
+const targetRepo = process.env.UPSTREAM_REPO || "Haribu/TIDIR";
+const repoOwner = process.env.GITHUB_REPOSITORY_OWNER || (repoName ? repoName.split("/")[0] : "");
 const isDryRun = process.env.DRY_RUN === "true";
-const filesToUpdate = Array.isArray(assessment.filesToUpdate) ? assessment.filesToUpdate : [];
+const rawFilesToUpdate = Array.isArray(assessment.filesToUpdate) ? assessment.filesToUpdate : [];
+
+// Security guard: Strictly deny modification or creation of maintenance, workflow, and script files
+const FORBIDDEN_PATTERNS = [
+  ".github",
+  "scripts",
+  "REVIEW.md",
+  "run_brutality",
+  "sync.yml",
+  "package.json",
+  "bun.lock"
+];
+
+function isForbiddenFile(filePath: string): boolean {
+  const normalized = filePath.replace(/\\/g, "/").toLowerCase();
+  return FORBIDDEN_PATTERNS.some(pattern => {
+    const p = pattern.toLowerCase();
+    return normalized === p || normalized.startsWith(`${p}/`) || normalized.includes(p);
+  });
+}
 
 if (assessment.action === "issue") {
   if (isDryRun) {
-    console.log(`[DRY RUN] 🛡️ Would have created Issue in Haribu/TIDIR: ${assessment.title}`);
+    console.log(`[DRY RUN] 🛡️ Would have created Issue in ${targetRepo}: ${assessment.title}`);
   } else {
-    await $`gh issue create --repo Haribu/TIDIR --title ${assessment.title} --body ${assessment.body}`;
-    console.log(`✅ Created Issue in parent repo: ${assessment.title}`);
+    await $`gh issue create --repo ${targetRepo} --title ${assessment.title} --body ${assessment.body}`;
+    console.log(`✅ Created Issue in parent repo (${targetRepo}): ${assessment.title}`);
   }
 
 } else if (assessment.action === "pr") {
   const branchName = `agent-updates-${Date.now()}`;
-  
+  const headRef = repoOwner ? `${repoOwner}:${branchName}` : branchName;
+
+  // Filter out any attempt to touch maintenance, script, or workflow files
+  const safeFilesToUpdate = rawFilesToUpdate.filter((file: { path: string }) => {
+    if (isForbiddenFile(file.path)) {
+      console.warn(`🛡️ Security filter: Blocked attempt to update forbidden/maintenance file in PR: ${file.path}`);
+      return false;
+    }
+    return true;
+  });
+
+  if (safeFilesToUpdate.length === 0) {
+    console.log("ℹ️ No eligible documentation files to update. Skipping PR creation.");
+    process.exit(0);
+  }
+
   if (isDryRun) {
-    console.log(`[DRY RUN] 🛡️ Would have created PR to Haribu/TIDIR from branch: ${branchName}`);
+    console.log(`[DRY RUN] 🛡️ Would have created PR to ${targetRepo} from branch: ${headRef}`);
     console.log(`[DRY RUN] 🛡️ PR Title: ${assessment.title}`);
-    console.log(`[DRY RUN] 🛡️ Files it wanted to update: ${filesToUpdate.map((f: any) => f.path).join(', ')}`);
+    console.log(`[DRY RUN] 🛡️ Files it wanted to update: ${safeFilesToUpdate.map((f: any) => f.path).join(', ')}`);
   } else {
     await $`git checkout -b ${branchName}`;
 
-    for (const file of filesToUpdate) {
+    for (const file of safeFilesToUpdate) {
       await Bun.write(file.path, file.content);
       console.log(`✏️ Updated: ${file.path}`);
+      await $`git add ${file.path}`;
+    }
+
+    const stagedChanges = (await $`git diff --cached --name-only`.text()).trim();
+    if (!stagedChanges) {
+      console.log("⚠️ No staged file changes detected after applying updates. Skipping commit and PR creation.");
+      process.exit(0);
+    }
+
+    // Safety assertion: ensure zero forbidden files leaked into staged changes
+    const stagedList = stagedChanges.split("\n").map(s => s.trim()).filter(Boolean);
+    const forbiddenStaged = stagedList.filter(f => isForbiddenFile(f));
+    if (forbiddenStaged.length > 0) {
+      console.error(`❌ Security Violation: Staged changes contain forbidden maintenance files: ${forbiddenStaged.join(", ")}`);
+      process.exit(1);
     }
 
     await $`git config user.name "github-actions[bot]"`;
     await $`git config user.email "github-actions[bot]@users.noreply.github.com"`;
-    await $`git add .`;
     await $`git commit -m ${assessment.title}`;
-    await $`git push origin ${branchName}`;
-    
-    await $`gh pr create --repo Haribu/TIDIR --base main --title ${assessment.title} --body ${assessment.body} --head ${branchName}`;
-    console.log(`✅ Created Pull Request: ${assessment.title}`);
+    await $`git push -u origin ${branchName}`;
+
+    await $`gh pr create --repo ${targetRepo} --base main --title ${assessment.title} --body ${assessment.body} --head ${headRef}`;
+    console.log(`✅ Created Pull Request on ${targetRepo}: ${assessment.title}`);
   }
 
 } else {

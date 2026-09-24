@@ -120,14 +120,12 @@ jobs:
       - name: Execute MD Agents
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} 
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }} 
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }} 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
           DRY_RUN: ${{ inputs.dry_run }}
+          REVIEW_FILE: /tmp/agent-tools/REVIEW.md
         run: |
-          # Copy the REVIEW.md file into the main branch workspace so the script finds it
-          cp /tmp/agent-tools/REVIEW.md ./REVIEW.md
-          
-          # Execute the script from the safe stash location
+          # Execute the script from the safe stash location (leaves the git workspace completely clean)
           AGENT_OUTPUT=$(bun run /tmp/agent-tools/scripts/run_brutality.ts)
           
           echo "### 🤖 MD Agent Assessment Results" >> $GITHUB_STEP_SUMMARY
