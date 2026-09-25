@@ -83,16 +83,34 @@ for (const file of architectureFiles) {
   }
 }
 
+// 4. Assert Zero Local Filesystem Paths or file:/// URLs in Documentation
+const allDocs = findMarkdownFiles("docs");
+const localPathRegex = /(?:file:\/\/\/|\/(?:Users|home)\/[a-zA-Z0-9_-]+|[A-Za-z]:\\(?:Users|home)\\[a-zA-Z0-9_-]+)/;
+
+for (const docFile of allDocs) {
+  const content = readFileSync(docFile, "utf-8");
+  const lines = content.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (localPathRegex.test(line)) {
+      errors.push(
+        `❌ Local filesystem path or file:/// URL detected in '${docFile}' (line ${i + 1}): ${line.trim()}`
+      );
+    }
+  }
+}
+
 // Summary Output
 if (errors.length > 0) {
   console.error("❌ Documentation structure violations detected:\n");
   for (const err of errors) {
     console.error(`  ${err}`);
   }
-  console.error("\nPlease update docs/adr/index.md and docs/.vitepress/config.ts to resolve these discrepancies.\n");
+  console.error("\nPlease update docs/adr/index.md, docs/.vitepress/config.ts, or clean up local paths to resolve these discrepancies.\n");
   process.exit(1);
 } else {
   console.log(`✅ All ${adrFiles.length} ADRs are registered in index.md and wired into navigation.`);
   console.log(`✅ All ${architectureFiles.length} architecture specifications are linked in navigation.`);
+  console.log(`✅ Audited ${allDocs.length} markdown documents: zero local filesystem paths or file:/// URLs detected.`);
   console.log("🎉 Documentation structure and navigation are fully congruent!\n");
 }

@@ -197,6 +197,15 @@ TIDIR is an open, vendor-neutral research project. We actively welcome contribut
 
 ---
 
+## 👥 Contributors
+
+TIDIR is an open-source research initiative shaped by the community. We gratefully recognize and celebrate our contributors:
+
+- **Harry McLaren** ([@Haribu](https://github.com/Haribu)) — *Author & Lead Architect*
+- **Dave B.** ([@crazydave85](https://github.com/crazydave85)) — *Documentation & link hygiene*
+
+---
+
 ## 📄 License & Attribution
 
 This open architecture and research documentation is published under the **Apache License 2.0**. You are free to adopt, modify, and reference these patterns in your own security operations.

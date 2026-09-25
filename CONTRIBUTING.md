@@ -55,3 +55,12 @@ TIDIR is an open, vendor-neutral research project establishing target technology
 
 For collaboration inquiries, research discussions, or private feedback:
 - **Harry McLaren**: [`info@harrymclaren.co.uk`](mailto:info@harrymclaren.co.uk)
+
+---
+
+## 👥 Contributors
+
+TIDIR is an open research initiative shaped by the community. We gratefully recognize and celebrate everyone contributing:
+
+- **Harry McLaren** ([@Haribu](https://github.com/Haribu)) — *Author & Lead Architect*
+- **Dave B.** ([@crazydave85](https://github.com/crazydave85)) — *Documentation & link hygiene*

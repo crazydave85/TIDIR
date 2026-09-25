@@ -133,7 +133,7 @@ Compute substrates are chosen dynamically based on activity execution requiremen
 ### 4. Ephemeral Identity & Dynamic Secrets Broker
 
 * **Zero Long-Lived Static Secrets**: Execution workers do not store static passwords, long-lived API tokens, or SSH keys.
-* **Task-Scoped SPIFFE SVIDs**: Workers receive short-lived X.509 certificates attested via SPIFFE/SPIRE ([AIGOV-06](file:///Users/harrymclaren/Projects/TIDIR/docs/architecture/02-capability-model.md#L143)) with a maximum Time-To-Live of 15 minutes ($\text{TTL} \le 15\text{m}$).
+* **Task-Scoped SPIFFE SVIDs**: Workers receive short-lived X.509 certificates attested via SPIFFE/SPIRE ([AIGOV-06](/architecture/02-capability-model)) with a maximum Time-To-Live of 15 minutes ($\text{TTL} \le 15\text{m}$).
 * **Dynamic Secret Leasing**: The secrets broker issues Just-In-Time (JIT) credentials restricted exclusively to the target service and operation authorized for that task. A worker querying a Configuration Management Database (CMDB) receives read-only CMDB tokens; it never has access to firewall or identity administrator keys.
 
 ---
