@@ -14,7 +14,9 @@ Attempting a "rip-and-replace" migration creates severe operational hazards:
 2. **Operational Disruption**: Forcing tier-1 and tier-2 triage analysts to adopt unproven tooling overnight destroys muscle memory and spikes Mean Time to Detect (MTTD).
 3. **Budgetary Gridlock**: Demanding massive capital expenditure to replace working contracts invites executive pushback.
 
-TIDIR addresses this through **Incremental Architectural Convergence**. Organizations do not swap tools; they decouple the layers of their architecture in four sequential, risk-mitigated phases:
+TIDIR addresses this through **Incremental Architectural Convergence**. Organizations do not swap tools; they decouple the layers of their architecture in four sequential, risk-mitigated phases that operationalise the paradigm shift outlined in [The Four Generations of Security Engineering](/architecture/generational-security-engineering):
+* **Phases 1 & 2** transition the estate from **Generation 2 (Centralised Platform Operations)** to **Generation 3 (Software-Defined SecOps & Open Lakehouses)**.
+* **Phases 3 & 4** establish the deterministic guardrails required to enter **Generation 4 (Agentic Systems & Monotonic Response)** without operational disruption.
 
 ```mermaid
 flowchart LR

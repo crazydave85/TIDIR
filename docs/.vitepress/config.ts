@@ -224,6 +224,7 @@ export default withMermaid(
               { text: "Architectural Invariants & Constitution", link: "/architecture/00-architectural-invariants" },
               { text: "System Overview & 4-Plane Model", link: "/architecture/01-system-overview" },
               { text: "Distributed Detection & Finding Bus", link: "/architecture/distributed-detection-and-the-finding-bus" },
+              { text: "Generations of SecOps Engineering", link: "/architecture/generational-security-engineering" },
               { text: "Concrete Reference Stacks", link: "/architecture/reference-stacks" },
               { text: "Failure Modes & Tradeoffs", link: "/architecture/failure-modes-and-tradeoffs" },
               { text: "Foundational Research & Literature", link: "/architecture/foundational-research" },

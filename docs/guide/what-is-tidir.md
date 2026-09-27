@@ -13,6 +13,8 @@ Modern security operations are trapped in an escalating asymmetry:
 
 Traditional Security Information and Event Management (SIEM) and Security Orchestration, Automation, and Response (SOAR) stacks attempt to bridge this gap through heuristic alert rules and unconstrained playbook scripts. In practice, this produces either paralysis (thousands of low-fidelity alerts) or dangerous fragility (uncontrolled automation causing self-inflicted business outages). Detailed lineage of these claims is cataloged in [Foundational Research & Literature](/architecture/foundational-research).
 
+This breakdown reflects a deeper structural transition across the discipline: security operations is transitioning from **Generation 3 (Software-Defined SecOps & Detection-as-Code)** into **Generation 4 (Agentic Systems & Intent Architecture)**. Attempting to deploy autonomous AI agents on top of legacy Generation 2 log aggregation platforms produces systemic failure. For an analysis of these 30-year evolutionary paradigms, see [The Four Generations of Security Engineering](/architecture/generational-security-engineering).
+
 ---
 
 ## The TIDIR Response: A Closed-Loop Cyber Defence Control System
@@ -51,6 +53,7 @@ To explore the architecture systematically, proceed through the architectural or
 
 * ➡️ **Step 2**: [The Architectural Constitution & Invariants](/architecture/00-architectural-invariants)
 * ➡️ **Step 3**: [System Overview & The 4-Plane Model](/architecture/01-system-overview)
+* ➡️ **Strategic History**: [The Four Generations of Security Engineering](/architecture/generational-security-engineering)
 * ➡️ **Scientific Foundations**: [Foundational Research & Literature](/architecture/foundational-research)
 * ➡️ **Step 4**: [The Capability & Service Delivery Model](/architecture/02-capability-model)
 * ➡️ **Step 5**: [The Target Threat Model & Assurance Case](/architecture/09-threat-model)
