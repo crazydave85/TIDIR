@@ -1,7 +1,8 @@
 # Component Specification: Workflow Automation, Containment & Systems Integration
 
 > **Tier 3: Technical Specifications** · **Audience**: Automation Engineers, Incident Commanders, Platform Engineers · **Normative Status**: Reference Component  
-> **Prerequisites**: [Investigation & Cases](04-investigation-cases.md) · **Next Step**: [AI & Agent Orchestration](06-ai-orchestration.md)
+> **Prerequisites**: [Investigation & Cases](04-investigation-cases.md) · **Next Step**: [AI & Agent Orchestration](06-ai-orchestration.md)  
+> **Operational Context**: [Cyber Defence Operations Architecture](/architecture/02-cyber-defence-operations)
 
 ---
 

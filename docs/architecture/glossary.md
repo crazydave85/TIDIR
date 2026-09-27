@@ -140,3 +140,43 @@ Before examining specialized terms, it is essential to state what TIDIR does **n
 - **Concrete Engineering Example**: The automated quarantine playbook is configured with a threshold of isolating at most 5 hosts per 10-minute window. If a faulty rule attempts to isolate a 6th host, the circuit breaker trips, blocks further quarantines, and pages the lead incident responder.
 - **Technical Explanation**: A distributed systems resilience pattern (Nygard, 2007) that wraps operations in a stateful monitor. If failure rates or execution counts cross configured thresholds within a time window, the circuit trips open, immediately failing subsequent requests and alerting human operators.
 - **Why TIDIR Uses It**: In automated incident response, a malfunctioning rule or attacker deception could cause a playbook to isolate hundreds of innocent machines. A circuit breaker stops the loop before widespread damage occurs.
+
+---
+
+### Finding Contract
+<span style="background: #1e1b4b; color: #a855f7; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">ADAPTED</span> · **Invariants**: `INV-02`, `INV-03` · **ADRs**: `ADR-0024` · **Capabilities**: `CAP-DET-008`
+
+- **Plain-English Definition**: A standardised specification defining what information a security detection must produce—including detector version, affected entities, and links to raw evidence—independently of whatever message broker or database is used to transmit it.
+- **Concrete Engineering Example**: An endpoint sensor and a cloud posture scanner both emit findings using the same YAML/JSON envelope structure, allowing a central correlation engine to evaluate both tools without custom integration code.
+- **Technical Explanation**: A normative logical schema envelope standardising the metadata, timestamps, affected entities, ATT&CK mappings, and evidence lineage references required for any security conclusion, decoupling detection semantics from physical messaging transports (such as the Finding Bus).
+- **Why TIDIR Uses It**: Prevents the enterprise from being locked into a single proprietary SIEM format and ensures that downstream correlation engines always have the necessary provenance to verify evidence.
+
+---
+
+### Response Intent
+<span style="background: #1e1b4b; color: #a855f7; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">ADAPTED</span> · **Invariants**: `INV-04`, `INV-07` · **ADRs**: `ADR-0027` · **Capabilities**: `CAP-RSP-001`
+
+- **Plain-English Definition**: An abstract declaration of what containment or recovery action needs to occur (such as "isolate this computer"), separated from the vendor-specific API code that actually carries it out.
+- **Concrete Engineering Example**: An automated triage workflow issues the intent `CONTAIN_HOST` for a server. The policy engine verifies permissions, and the system translates the intent into the correct vendor API call (such as CrowdStrike, Defender, or AWS security group update) without the workflow needing to know vendor details.
+- **Technical Explanation**: A declarative operational goal (`CONTAIN`, `ERADICATE`, `RECOVER`) evaluated against policy and blast-radius constraints before being mapped to vendor-specific actuation capabilities, enforcing Confidence–Authority Separation.
+- **Why TIDIR Uses It**: Decouples incident workflows and AI agents from brittle vendor APIs, ensuring security playbooks remain portable, maintainable, and verifiable.
+
+---
+
+### End-to-End Coverage Assurance
+<span style="background: #1e1b4b; color: #a855f7; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">ADAPTED</span> · **Invariants**: `INV-01`, `INV-08` · **ADRs**: `ADR-0026` · **Capabilities**: `CAP-DET-003`
+
+- **Plain-English Definition**: The principle that a detection rule is only truly "working" if every step in the pipeline—from sensor logging to network transport, rule execution, case triage, and response capability—is healthy and verified.
+- **Concrete Engineering Example**: An organisation has a rule enabled for detecting DCSync attacks. However, because directory audit logging was disabled during a domain controller upgrade, the rule never fires. End-to-end coverage assurance flags the gap because the underlying telemetry stream is absent.
+- **Technical Explanation**: A continuous verification model evaluating the health of the entire ten-stage dependency chain (from threat behaviour to telemetry collection, transport, engine execution, correlation, investigation, and response capability).
+- **Why TIDIR Uses It**: Prevents false confidence caused by static MITRE ATT&CK heatmaps that report coverage simply because a rule exists in a repository, even when underlying sensors or data pipelines are silent.
+
+---
+
+### Security Knowledge Management
+<span style="background: #064e3b; color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">ESTABLISHED</span> · **Invariants**: `INV-10` · **ADRs**: `ADR-0010` · **Capabilities**: `SKM-01`
+
+- **Plain-English Definition**: A shared system for recording, organising, and reusing security knowledge—including threat actor profiles, tuning notes, and post-incident lessons—so it is accessible to human analysts, automated rules, and AI assistants.
+- **Concrete Engineering Example**: After an incident involving a compromised service account, the investigation team documents the attacker's persistence mechanism. That post-mortem note is indexed so that both automated detection queries and future triage agents can reference the pattern.
+- **Technical Explanation**: A centralized, programmatic institutional knowledge repository capturing adversary intelligence, environmental exceptions, detection baselines, and post-mortem recommendations across human and machine interfaces.
+- **Why TIDIR Uses It**: Ensures institutional memory is retained and reused across the enterprise rather than lost in scattered tickets, email threads, or tribal knowledge.

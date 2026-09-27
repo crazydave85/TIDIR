@@ -1,7 +1,8 @@
 # Component Specification: Investigation & Case Management
 
 > **Tier 3: Technical Specifications** · **Audience**: SOC Analysts, Incident Responders · **Normative Status**: Reference Component  
-> **Prerequisites**: [Detection Engine](03-detection-engine.md) · **Next Step**: [Response & Automation](05-response-automation.md)
+> **Prerequisites**: [Detection Engine](03-detection-engine.md) · **Next Step**: [Response & Automation](05-response-automation.md)  
+> **Operational Context**: [Cyber Defence Operations Architecture](/architecture/02-cyber-defence-operations)
 
 ---
 

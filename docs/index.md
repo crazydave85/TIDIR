@@ -133,8 +133,8 @@ TIDIR addresses executive strategy, operational engineering, and formal system s
 <ul style="padding-left: 1.25rem; font-size: 0.88rem; line-height: 1.6;">
   <li><a href="/architecture/00-architectural-invariants">The 11 Architectural Invariants</a></li>
   <li><a href="/architecture/01-system-overview">System Overview & 4-Plane Model</a></li>
+  <li><a href="/architecture/03-information-architecture">Conceptual Information Architecture</a></li>
   <li><a href="/architecture/distributed-detection-and-the-finding-bus">Distributed Detection & Finding Bus</a></li>
-  <li><a href="/architecture/reference-stacks">Concrete Reference Stacks (AWS, Azure, CNCF)</a></li>
 </ul>
 </div>
 
@@ -142,10 +142,10 @@ TIDIR addresses executive strategy, operational engineering, and formal system s
 <h3 style="margin-top: 0; color: #34d399;">⚡ Detection & SecOps Engineers</h3>
 <p style="font-size: 0.92rem; color: #94a3b8; line-height: 1.5;">Dive into Polyglot Detection-as-Code, open lakehouse queries, and continuous CI/CD testing.</p>
 <ul style="padding-left: 1.25rem; font-size: 0.88rem; line-height: 1.6;">
+  <li><a href="/architecture/detection-engineering-lifecycle">Detection Engineering Lifecycle</a></li>
+  <li><a href="/architecture/02-cyber-defence-operations">Cyber Defence Operations Architecture</a></li>
   <li><a href="/architecture/02-capability-model">Capability Taxonomy & Matrix</a></li>
   <li><a href="/architecture/components/03-detection-engine">Detection Engine Subsystem</a></li>
-  <li><a href="/adr/0019-polyglot-detection-as-code-and-native-engine-adaptation">ADR-0019: Polyglot Detection-as-Code</a></li>
-  <li><a href="/adr/0023-distributed-detection-and-edge-to-center-correlation">ADR-0023: Edge-to-Center Correlation</a></li>
 </ul>
 </div>
 

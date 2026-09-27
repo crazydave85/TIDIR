@@ -237,6 +237,9 @@ export default withMermaid(
             text: "Tier 2: Capabilities & Taxonomy",
             items: [
               { text: "Capability Model & Taxonomy", link: "/architecture/02-capability-model" },
+              { text: "Cyber Defence Operations Architecture", link: "/architecture/02-cyber-defence-operations" },
+              { text: "Conceptual Information Architecture", link: "/architecture/03-information-architecture" },
+              { text: "Detection Engineering Lifecycle", link: "/architecture/detection-engineering-lifecycle" },
               { text: "Macro Capabilities & Services", link: "/architecture/10-macro-capabilities-and-services" },
               { text: "Operational User Stories", link: "/architecture/08-user-stories" }
             ]

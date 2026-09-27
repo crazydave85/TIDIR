@@ -169,7 +169,41 @@ flowchart TB
 
 ---
 
-## 3. Multi-Framework Assurance & Operational Cross-Walk
+### Cross-Cutting Domain: Security Knowledge Management (SKM)
+
+| Capability ID | Name | Execution Mode & D3FEND ACF | MITRE D3FEND & Frameworks | Description | Reference Target SLO |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **SKM-01** | Structured Threat & Adversary Knowledge | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-TIE`](https://d3fend.mitre.org/technique/d3f:InboundTrafficFiltering/)<br>[`D3-TTPM`](https://d3fend.mitre.org/technique/d3f:IdentifierActivityAnalysis/) | Programmatic repository of adversary profiles, campaign flows, and internal TTP notes accessible to both human analysts and AI agents. | Sub-second knowledge retrieval; continuous GitOps sync |
+| **SKM-02** | Institutional Incident & Post-Mortem Retrospective | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-IRA`](https://d3fend.mitre.org/technique/d3f:FileAccessPatternAnalysis/) | Retains forensic lessons learned, root-cause attack paths, and engineering improvements to prevent repeating historical mistakes. | Automated post-mortem indexing < 15 min from case seal |
+| **SKM-03** | Detection & Tuning Baseline Registry | `[Deterministic Engine]`<br>*(ACF: Symbolic Logic)* | [`D3-SRE`](https://d3fend.mitre.org/technique/d3f:AuthorizationEventThresholding/) | Stores detection engineering context, known environment-specific false positive exceptions, and rationale for tuned rule parameters. | Pre-deployment DaC validation check < 2 sec |
+
+---
+
+## 3. Automation Authority & Execution Governance
+
+TIDIR rejects linear maturity models that assume higher autonomy is inherently superior. In modern enterprise cyber defence, **authority is a property of risk, consequence, reversibility, and asset criticality**:
+
+$$\text{Authority Level} = f(\text{Risk Tier}, \text{Confidence}, \text{Blast Radius}, \text{Reversibility}, \text{Asset Criticality})$$
+
+```mermaid
+flowchart LR
+  L1["<b>1. Inform</b><br>Summarise findings & context"] --> L2["<b>2. Recommend</b><br>Suggest candidate responses"]
+  L2 --> L3["<b>3. Draft</b><br>Stage payload & test impact"]
+  L3 --> L4["<b>4. Execute with Approval</b><br>Human consensus ratifies"]
+  L4 --> L5["<b>5. Execute Autonomously</b><br>Machine-speed containment"]
+```
+
+* **Inform**: Machine or agent synthesises observations and surfaces factual summaries. Zero mutation.
+* **Recommend**: Evaluates decision trees or models to propose candidate containment options.
+* **Draft**: Compiles containment parameters, runs pre-execution blast-radius simulation, and stages the execution payload.
+* **Execute with Approval**: Dispatches execution only upon explicit digital signature / consensus gate from an authorized human operator.
+* **Execute Autonomously**: Executes task-scoped, reversible containment actions at machine speed within pre-approved low-blast-radius parameters (e.g. non-disruptive credential rotation or Tier 1 host isolation on non-critical endpoints).
+
+High-impact actions against critical enterprise assets remain subject to deterministic policy and explicit human authority regardless of algorithmic confidence.
+
+---
+
+## 4. Multi-Framework Assurance & Operational Cross-Walk
 
 TIDIR synthesizes defensive strategy, analytic taxonomy, API safety, and operational controls into a unified framework alignment:
 

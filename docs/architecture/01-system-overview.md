@@ -1,13 +1,21 @@
 # TIDIR Target System Architecture: Cyber Defence Control System
 
 > **Tier 1: Strategic Architecture** · **Golden Path Step 3 of 5** · **Audience**: Enterprise Architects, SecOps Leaders · **Normative Status**: Normative Architecture  
-> **Prerequisites**: [Step 2: Invariants & Constitution](/architecture/00-architectural-invariants) · **Next Step**: [Step 4: Capability Model](/architecture/02-capability-model)
+> **Prerequisites**: [Step 2: Invariants & Constitution](/architecture/00-architectural-invariants) · **Next Step**: [Step 4: Capability Model](/architecture/02-capability-model)  
+> **Related Views**: [Conceptual Information Architecture](/architecture/03-information-architecture) · [Detection Engineering Lifecycle](/architecture/detection-engineering-lifecycle)
 
 ---
 
-This document defines the target component architecture for **TIDIR** (Threat Intelligence, Detection, Investigation & Response). TIDIR is architected as a closed-loop **Cyber Defence Control System** that governs the bidirectional operational progression:
+This document defines the target component architecture for **TIDIR** (Threat Intelligence, Detection, Investigation & Response). TIDIR is architected as an integrated **Cyber Defence Control System** that governs the bidirectional operational progression:
 
 $$\text{Exposure} \longleftrightarrow \text{Observe} \longrightarrow \text{Normalise} \longrightarrow \text{Infer} \longrightarrow \text{Investigate} \longrightarrow \text{Decide} \longrightarrow \text{Actuate} \longrightarrow \text{Learn} \longleftrightarrow \text{Exposure}$$
+
+### The TIDIR Reference Architecture Set
+To translate this conceptual control loop into a practical enterprise target architecture without overburdening a single view, TIDIR is formalised across a modular reference architecture set:
+1. **System & Capability Architecture (Level 1)**: Defines the overarching 4-plane control system topology, cross-domain ownership boundaries, and core capability taxonomy.
+2. **Cyber Defence Operations Architecture (Level 2)**: Details how capabilities are operated to detect, correlate, triage, investigate, and respond to threats across distributed hybrid environments.
+3. **Cyber Defence Engineering Architecture (Level 2)**: Formalises how detection, intelligence, automation, and deception capabilities are engineered, tested, and continuously improved ([Detection Engineering Lifecycle](/architecture/detection-engineering-lifecycle)).
+4. **Conceptual Information Architecture (Level 2)**: Establishes vendor-neutral semantic definitions for the core information objects—Observations, Context, Findings, Alerts, Cases, Decisions, and Knowledge ([Information Architecture](/architecture/03-information-architecture)).
 
 with deterministic controls wrapped around all probabilistic stages:
 * **Exposure Intelligence**: Continuous Threat Exposure Management (CTEM) integration, asset criticality scoring, and attack path mapping providing dynamic Bayesian priors, updated continuously by incident reality.
