@@ -9,6 +9,14 @@ Modern security operations cannot rely on monolithic assumptions of correctness.
 
 **TIDIR** (Threat Intelligence, Detection, Investigation & Response) is fundamentally a **safety architecture for autonomous cyber defence**. Rather than merely presenting a collection of technology components, it defines the invariant boundaries and mathematical constraints governing the interaction between uncertain evidence, probabilistic reasoning, deterministic authority, and physical actuation.
 
+> [!TIP]
+> **OPERATOR QUICK-TAKE: What the Constitution Means in Plain English**
+> * **Confidence is not Authority (Principle 1):** Just because an analytical rule or model is 99.9% confident a server is compromised does not give it permission to pull the network cable. Operational authority is independently derived from policy, asset criticality, and blast-radius rules.
+> * **Never Roll Back into Danger ($s_{n+1} \preceq s_n$ / Invariant 7):** Automated response scripts must never behave like traditional database rollbacks. If an automation workflow fails halfway through isolating a compromised cluster, it must freeze in place or escalate forward—it must *never* roll back to reopening firewall ports or unquarantining a server.
+> * **Agents Propose, Kernels Authorise (Invariant 4):** Autonomous AI agents can formulate hypotheses and propose containment actions, but they hold zero execution keys. Only deterministic policy engines and short-lived cryptographic workload tokens (SPIFFE SVIDs) can authorize mutations.
+> * **The Master Emergency Stop (Invariant 9):** There is always an independent out-of-band "big red button" that human responders can press to freeze autonomous agents instantly, without needing permission from the AI control plane.
+> * **Show Your Work (Invariants 2 & 10):** Every alert, containment proposal, and agent deduction must link back to immutable raw event IDs in an append-only Incident Decision DAG. Unsubstantiated claims cannot trigger automated response.
+
 ---
 
 ## 1. The Confidence–Authority Separation Principle

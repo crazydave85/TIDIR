@@ -224,6 +224,7 @@ export default withMermaid(
               { text: "Architectural Invariants & Constitution", link: "/architecture/00-architectural-invariants" },
               { text: "System Overview & 4-Plane Model", link: "/architecture/01-system-overview" },
               { text: "Distributed Detection & Finding Bus", link: "/architecture/distributed-detection-and-the-finding-bus" },
+              { text: "Generations of SecOps Engineering", link: "/architecture/generational-security-engineering" },
               { text: "Concrete Reference Stacks", link: "/architecture/reference-stacks" },
               { text: "Failure Modes & Tradeoffs", link: "/architecture/failure-modes-and-tradeoffs" },
               { text: "Foundational Research & Literature", link: "/architecture/foundational-research" },
@@ -236,6 +237,9 @@ export default withMermaid(
             text: "Tier 2: Capabilities & Taxonomy",
             items: [
               { text: "Capability Model & Taxonomy", link: "/architecture/02-capability-model" },
+              { text: "Cyber Defence Operations Architecture", link: "/architecture/02-cyber-defence-operations" },
+              { text: "Conceptual Information Architecture", link: "/architecture/03-information-architecture" },
+              { text: "Detection Engineering Lifecycle", link: "/architecture/detection-engineering-lifecycle" },
               { text: "Macro Capabilities & Services", link: "/architecture/10-macro-capabilities-and-services" },
               { text: "Operational User Stories", link: "/architecture/08-user-stories" }
             ]

@@ -1,13 +1,21 @@
 # TIDIR Target System Architecture: Cyber Defence Control System
 
 > **Tier 1: Strategic Architecture** · **Golden Path Step 3 of 5** · **Audience**: Enterprise Architects, SecOps Leaders · **Normative Status**: Normative Architecture  
-> **Prerequisites**: [Step 2: Invariants & Constitution](/architecture/00-architectural-invariants) · **Next Step**: [Step 4: Capability Model](/architecture/02-capability-model)
+> **Prerequisites**: [Step 2: Invariants & Constitution](/architecture/00-architectural-invariants) · **Next Step**: [Step 4: Capability Model](/architecture/02-capability-model)  
+> **Related Views**: [Conceptual Information Architecture](/architecture/03-information-architecture) · [Detection Engineering Lifecycle](/architecture/detection-engineering-lifecycle)
 
 ---
 
-This document defines the target component architecture for **TIDIR** (Threat Intelligence, Detection, Investigation & Response). TIDIR is architected as a closed-loop **Cyber Defence Control System** that governs the bidirectional operational progression:
+This document defines the target component architecture for **TIDIR** (Threat Intelligence, Detection, Investigation & Response). TIDIR is architected as an integrated **Cyber Defence Control System** that governs the bidirectional operational progression:
 
 $$\text{Exposure} \longleftrightarrow \text{Observe} \longrightarrow \text{Normalise} \longrightarrow \text{Infer} \longrightarrow \text{Investigate} \longrightarrow \text{Decide} \longrightarrow \text{Actuate} \longrightarrow \text{Learn} \longleftrightarrow \text{Exposure}$$
+
+### The TIDIR Reference Architecture Set
+To translate this conceptual control loop into a practical enterprise target architecture without overburdening a single view, TIDIR is formalised across a modular reference architecture set:
+1. **System & Capability Architecture (Level 1)**: Defines the overarching 4-plane control system topology, cross-domain ownership boundaries, and core capability taxonomy.
+2. **Cyber Defence Operations Architecture (Level 2)**: Details how capabilities are operated to detect, correlate, triage, investigate, and respond to threats across distributed hybrid environments.
+3. **Cyber Defence Engineering Architecture (Level 2)**: Formalises how detection, intelligence, automation, and deception capabilities are engineered, tested, and continuously improved ([Detection Engineering Lifecycle](/architecture/detection-engineering-lifecycle)).
+4. **Conceptual Information Architecture (Level 2)**: Establishes vendor-neutral semantic definitions for the core information objects—Observations, Context, Findings, Alerts, Cases, Decisions, and Knowledge ([Information Architecture](/architecture/03-information-architecture)).
 
 with deterministic controls wrapped around all probabilistic stages:
 * **Exposure Intelligence**: Continuous Threat Exposure Management (CTEM) integration, asset criticality scoring, and attack path mapping providing dynamic Bayesian priors, updated continuously by incident reality.
@@ -20,17 +28,24 @@ with deterministic controls wrapped around all probabilistic stages:
 * **Feedback & Learning**: Continuous Red, Blue, Green Team, and Exposure Management calibration loops.
 * **Resilience**: Four-tier graceful degradation, local NVMe spooling, and air-gapped continuity modes.
 
+> [!TIP]
+> **OPERATOR QUICK-TAKE: The 4 Planes in 30 Seconds**
+> * **1. Telemetry Data Plane (Untrusted Ingest):** Ingests raw endpoint, network, and cloud telemetry alongside native edge findings (EDR, NDR, CNAPP), standardises them into open OCSF schemas, and stores them across hot search indices (ClickHouse) and columnar lakehouses (Iceberg/Parquet).
+> * **2. Analytical & Reasoning Plane (Advisory Only):** Evaluates streaming detection queries, correlates multi-stage attack chains, and deploys autonomous AI triage agents. Everything in this plane is **advisory**—it produces proposals, hypotheses, and evidence links, never direct environment mutations.
+> * **3. Defence Control Plane (The Safety Kernel):** The hardened, minimal Trusted Computing Base (TCB). It evaluates proposals against deterministic security policies, simulates blast radiuses against critical business assets, and issues short-lived cryptographic authorization credentials.
+> * **4. Actuation Plane (Task-Scoped Execution):** Connectors that call vendor APIs (EDR isolation, identity revocation, firewall shunting). It only executes when presented with a valid cryptographic credential from the Defence Control Plane, enforcing Security-State Monotonicity ($s_{n+1} \preceq s_n$).
+
 ---
 
 ## Strategic Context: The Four Generations & The Shadow Risk Register
 
 ### The Four Generations of Cyber Engineering
-To understand why TIDIR is architected as an integrated Cyber Defence Control System rather than an unbundled collection of discrete security tools, consider the historical evolution of the cyber engineering discipline across four distinct archetypes:
+To understand why TIDIR is architected as an integrated Cyber Defence Control System rather than an unbundled collection of discrete security tools, consider the historical evolution of the cyber engineering discipline across four distinct generations (analyzed in full in [The Four Generations of Security Engineering](/architecture/generational-security-engineering)):
 
-1. **Generation 1: The Gatekeeper (Pre-2010)**: Focused on static perimeter defence, network access control lists (ACLs), stateful firewalls, and manual host patching. Control was maintained through physical and logical network boundaries—an operating model that dissolved with the advent of distributed cloud infrastructure, microservices, and dynamic ephemeral APIs.
-2. **Generation 2: The Integrator (2010–2020)**: Characterized by the explosion of point solutions, Software-as-a-Service (SaaS), and best-of-breed product acquisition. Security engineers lived inside vendor graphical user interfaces ("ClickOps"), acting as human routers manually copying data between unintegrated consoles ("swivel-chair security").
-3. **Generation 3: The Builder (2020–Present)**: Recognizing that security is fundamentally a software and systems problem, Gen 3 adopted software engineering discipline: Infrastructure-as-Code (IaC), GitOps, version-controlled Detection-as-Code (DaC), and automated Continuous Integration and Continuous Delivery (CI/CD) pipelines.
-4. **Generation 4: The Optimiser (TIDIR Target Architecture, 2023+)**: Resolves the scalability, cost, and cognitive crisis of Gen 3. Ingesting every log into monolithic indices is financially unsustainable; running thousands of uncalibrated rules creates crushing alert fatigue. Gen 4 engineering treats security operations as an optimized distributed data systems and bounded artificial intelligence (AI) problem: combining line-rate schema validation (OCSF), unbundled query engines on columnar lakehouses, and autonomous agent orchestration governed by deterministic safety boundaries.
+1. **Generation 1: Perimeter & Host Infrastructure (~1995–2008)**: Focused on static perimeter defence, network access control lists (ACLs), stateful firewalls, and manual host patching. Control was maintained through physical network boundaries—an operating model that dissolved with cloud infrastructure, remote endpoints, and living-off-the-land techniques.
+2. **Generation 2: Centralised Platform Operations (~2008–2018)**: Characterized by commercial SIEM platforms and the dedicated SOC. Engineers focused on log forwarders, heavy indexing clusters, and alert queues. Broken by volume-based licensing taxes and alert fatigue driven by the Base-Rate Fallacy.
+3. **Generation 3: Software-Defined SecOps & Detection-as-Code (~2018–2024)**: Security operations adopted software engineering discipline: GitOps version control, Detection-as-Code (DaC), open schemas (OCSF), columnar lakehouses, and continuous CI/CD testing. Broken by the limits of human rule authoring against machine-speed polymorphic attacks.
+4. **Generation 4: Agentic Systems & Intent Architecture (2024+)**: The TIDIR target architecture. Engineers define declarative objectives, state invariants, and blast-radius bounds, while supervising autonomous agent swarms that conduct investigation and monotonic containment within deterministic safety boundaries.
 
 ### The Shadow Risk Register: Engineering Constraints as Business Risk Acceptance
 In conventional Security Operations Centers (SOCs), operational compromises are routinely justified as mere engineering constraints, storage quotas, or performance tuning. In practice, **every engineering constraint functions as an unacknowledged proxy for business risk acceptance**—creating an invisible **Shadow Risk Register**:
