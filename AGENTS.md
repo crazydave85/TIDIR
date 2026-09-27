@@ -35,7 +35,7 @@ TIDIR/
 │   │       ├── 03-detection-engine.md
 │   │       ├── 04-investigation-cases.md
 │   │       └── 05-response-automation.md
-│   ├── adr/                       # Architectural Decision Records (MADR format; 26 ADRs)
+│   ├── adr/                       # Architectural Decision Records (MADR format; 27 ADRs)
 │   │   ├── template.md            # Standard ADR template
 │   │   └── 0001-record-architecture-decisions.md
 │   ├── diagrams/                  # Standalone Mermaid diagrams (.mmd)

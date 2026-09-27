@@ -20,6 +20,9 @@ hero:
       text: "Start the 15-Min Tour ➔"
       link: /guide/golden-path
     - theme: alt
+      text: "Choose Your Role Track ▾"
+      link: "/#role-tracks"
+    - theme: alt
       text: Explore System Architecture
       link: /architecture/01-system-overview
     - theme: alt
@@ -107,7 +110,61 @@ flowchart TB
 
 ---
 
-## 2. Why TIDIR Exists: The Asymmetric Deficit in SecOps
+<h2 id="role-tracks">2. Choose Your Lens: Role-Based Fast-Tracks</h2>
+
+TIDIR addresses executive strategy, operational engineering, and formal system safety simultaneously. Select your primary lens to navigate straight to the specifications that matter to you (or explore the complete [Role-Based Persona Journeys](/guide/persona-journeys)):
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin: 1.5rem 0 2rem 0;">
+
+<div style="border: 1px solid #334155; border-radius: 8px; padding: 1.25rem; background: #0b0f19;">
+<h3 style="margin-top: 0; color: #38bdf8;">👔 Security Leadership (CISO / Heads of SecOps)</h3>
+<p style="font-size: 0.92rem; color: #94a3b8; line-height: 1.5;">Focus on economics, the 4-phase brownfield migration roadmap, and business defensibility.</p>
+<ul style="padding-left: 1.25rem; font-size: 0.88rem; line-height: 1.6;">
+  <li><a href="/guide/what-is-tidir">What is TIDIR? (Executive Orientation)</a></li>
+  <li><a href="/architecture/generational-security-engineering">The Four Generations of Security Engineering</a></li>
+  <li><a href="/guide/adoption-roadmap">Enterprise Adoption Roadmap</a></li>
+  <li><a href="/adr/0008-secops-error-budgets-and-chaos-security-engineering">ADR-0008: SecOps Error Budgets</a></li>
+</ul>
+</div>
+
+<div style="border: 1px solid #334155; border-radius: 8px; padding: 1.25rem; background: #0b0f19;">
+<h3 style="margin-top: 0; color: #a855f7;">📐 Enterprise Security Architects</h3>
+<p style="font-size: 0.92rem; color: #94a3b8; line-height: 1.5;">Examine the 4-plane control model, finding bus topology, concrete reference stacks, and invariants.</p>
+<ul style="padding-left: 1.25rem; font-size: 0.88rem; line-height: 1.6;">
+  <li><a href="/architecture/00-architectural-invariants">The 11 Architectural Invariants</a></li>
+  <li><a href="/architecture/01-system-overview">System Overview & 4-Plane Model</a></li>
+  <li><a href="/architecture/distributed-detection-and-the-finding-bus">Distributed Detection & Finding Bus</a></li>
+  <li><a href="/architecture/reference-stacks">Concrete Reference Stacks (AWS, Azure, CNCF)</a></li>
+</ul>
+</div>
+
+<div style="border: 1px solid #334155; border-radius: 8px; padding: 1.25rem; background: #0b0f19;">
+<h3 style="margin-top: 0; color: #34d399;">⚡ Detection & SecOps Engineers</h3>
+<p style="font-size: 0.92rem; color: #94a3b8; line-height: 1.5;">Dive into Polyglot Detection-as-Code, open lakehouse queries, and continuous CI/CD testing.</p>
+<ul style="padding-left: 1.25rem; font-size: 0.88rem; line-height: 1.6;">
+  <li><a href="/architecture/02-capability-model">Capability Taxonomy & Matrix</a></li>
+  <li><a href="/architecture/components/03-detection-engine">Detection Engine Subsystem</a></li>
+  <li><a href="/adr/0019-polyglot-detection-as-code-and-native-engine-adaptation">ADR-0019: Polyglot Detection-as-Code</a></li>
+  <li><a href="/adr/0023-distributed-detection-and-edge-to-center-correlation">ADR-0023: Edge-to-Center Correlation</a></li>
+</ul>
+</div>
+
+<div style="border: 1px solid #334155; border-radius: 8px; padding: 1.25rem; background: #0b0f19;">
+<h3 style="margin-top: 0; color: #f59e0b;">🤖 AI & Automation Engineers</h3>
+<p style="font-size: 0.92rem; color: #94a3b8; line-height: 1.5;">Interrogate the Agent Trust Boundary, ephemeral SPIFFE SVIDs, and monotonic containment.</p>
+<ul style="padding-left: 1.25rem; font-size: 0.88rem; line-height: 1.6;">
+  <li><a href="/architecture/components/06-ai-orchestration">AI & Agent Orchestration Plane</a></li>
+  <li><a href="/adr/0004-defensive-ai-runtime-and-prompt-injection-firewall">ADR-0004: Agent Trust Boundary</a></li>
+  <li><a href="/adr/0015-sandboxed-agent-execution-otlp-convergence-and-ephemeral-identity">ADR-0015: Sandboxed Agent Execution</a></li>
+  <li><a href="/adr/0006-cryptographic-audit-lineage-and-decision-provenance">ADR-0006: Incident Decision DAGs</a></li>
+</ul>
+</div>
+
+</div>
+
+---
+
+## 3. Why TIDIR Exists: The Asymmetric Deficit in SecOps
 
 Modern security operations struggle with three basic problems:
 
@@ -119,7 +176,7 @@ Modern security operations struggle with three basic problems:
 
 ---
 
-## 3. The Core Architectural Thesis
+## 4. The Core Architectural Thesis
 
 TIDIR is built on seven core ideas. Each idea pairs an intuitive rule with a technical safety mechanism:
 
@@ -135,7 +192,7 @@ TIDIR is built on seven core ideas. Each idea pairs an intuitive rule with a tec
 
 ---
 
-## 4. What TIDIR Is (and Is NOT) Claiming
+## 5. What TIDIR Is (and Is NOT) Claiming
 
 To maintain engineering clarity, TIDIR explicitly distinguishes between established industry patterns and its own architectural contributions:
 
@@ -151,14 +208,14 @@ For detailed definitions of established, adapted, and TIDIR-specific concepts, e
 
 ---
 
-## 5. The 3-Tier Architectural Model
+## 6. The 3-Tier Architectural Model
 
 To serve executive leaders, enterprise architects, and engineering practitioners simultaneously, TIDIR organizes its specifications across three increasing levels of technical specificity:
 
 ```mermaid
 flowchart LR
     T1["<b>Tier 1: Strategic Architecture</b><br>11 Invariants, 4-Plane Model, Threat Model, Assurance Map"] --> T2["<b>Tier 2: Capabilities & Services</b><br>36 Capabilities, 10 Services, User Stories, Reference SLOs"]
-    T2 --> T3["<b>Tier 3: Technical Specifications</b><br>Schemas (OCSF), Protocols (STIX/SPIFFE), State Machines, 21 ADRs"]
+    T2 --> T3["<b>Tier 3: Technical Specifications</b><br>Schemas (OCSF), Protocols (STIX/SPIFFE), State Machines, 27 ADRs"]
 
     classDef tierStyle fill:#0f172a,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
     class T1,T2,T3 tierStyle;
@@ -170,7 +227,7 @@ flowchart LR
 
 ---
 
-## 6. Open Security Frameworks Alignment
+## 7. Open Security Frameworks Alignment
 
 TIDIR synthesizes defensive strategy, analytic taxonomy, API safety, and operational controls into a unified multi-framework alignment:
 
@@ -179,60 +236,6 @@ TIDIR synthesizes defensive strategy, analytic taxonomy, API safety, and operati
 * **Active Defense & Deception Operations**: [MITRE ENGAGE](https://engage.mitre.org/) (Expose, Affect, Elicit, Understand).
 * **AI & API Tool Safety**: [OWASP Top 10 for LLMs](https://owasp.org/www-project-top-10-for-large-language-model-applications/) (Prompt Injection & Agency), [OWASP API Security Top 10](https://owasp.org/API-Security/) (BOLA, Broken Auth, Tool Boundaries).
 * **Enterprise Assurance & Data Schemas**: [CIS Controls v8](https://www.cisecurity.org/controls/v8) (Controls 5, 6, 8, 13, 17), [OCSF](https://ocsf.io/) (Open Cybersecurity Schema Framework), [STIX 2.1 / TAXII](https://oasis-open.github.io/cti-documentation/).
-
----
-
-## 7. Explore by Role & Architectural Intent
-
-Select an entry point tailored to your focus, or view the complete [Role-Based Persona Journeys](/guide/persona-journeys):
-
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1.5rem;">
-
-<div style="border: 1px solid #334155; border-radius: 8px; padding: 1.25rem; background: #0b0f19;">
-<h3 style="margin-top: 0; color: #38bdf8;">👔 Security Leaders (CISO / SecOps Heads)</h3>
-<p style="font-size: 0.95rem; color: #94a3b8;">Understand strategic business defensibility, compliance guarantees, and the phased enterprise adoption path.</p>
-<ul style="padding-left: 1.25rem; font-size: 0.9rem;">
-  <li><a href="/guide/what-is-tidir">What is TIDIR? (Executive Summary)</a></li>
-  <li><a href="/guide/adoption-roadmap">Enterprise Adoption Roadmap</a></li>
-  <li><a href="/architecture/10-macro-capabilities-and-services">Enterprise Service Delivery Model</a></li>
-  <li><a href="/architecture/00-architectural-invariants">The Architectural Constitution</a></li>
-</ul>
-</div>
-
-<div style="border: 1px solid #334155; border-radius: 8px; padding: 1.25rem; background: #0b0f19;">
-<h3 style="margin-top: 0; color: #a855f7;">📐 Enterprise Security Architects</h3>
-<p style="font-size: 0.95rem; color: #94a3b8;">Examine the 4-plane control model, concrete technology stacks, trust boundaries, and failure tradeoffs.</p>
-<ul style="padding-left: 1.25rem; font-size: 0.9rem;">
-  <li><a href="/architecture/01-system-overview">System Overview & 4-Plane Model</a></li>
-  <li><a href="/architecture/reference-stacks">Concrete Reference Stacks (CNCF, AWS, Azure)</a></li>
-  <li><a href="/architecture/failure-modes-and-tradeoffs">Failure Modes & Engineering Tradeoffs</a></li>
-  <li><a href="/architecture/assurance-map">The Assurance Case Map</a></li>
-</ul>
-</div>
-
-<div style="border: 1px solid #334155; border-radius: 8px; padding: 1.25rem; background: #0b0f19;">
-<h3 style="margin-top: 0; color: #34d399;">⚡ Detection & SecOps Engineers</h3>
-<p style="font-size: 0.95rem; color: #94a3b8;">Dive into Polyglot Detection-as-Code, SRE noise budgeting, OCSF schema normalisation, and incident playbooks.</p>
-<ul style="padding-left: 1.25rem; font-size: 0.9rem;">
-  <li><a href="/architecture/02-capability-model">Capability Taxonomy</a></li>
-  <li><a href="/architecture/components/03-detection-engine">Detection Engine Architecture</a></li>
-  <li><a href="/adr/0019-polyglot-detection-as-code-and-native-engine-adaptation">ADR-0019: Polyglot Detection-as-Code</a></li>
-  <li><a href="/adr/0023-distributed-detection-and-edge-to-center-correlation">ADR-0023: Distributed Detection & Edge Correlation</a></li>
-</ul>
-</div>
-
-<div style="border: 1px solid #334155; border-radius: 8px; padding: 1.25rem; background: #0b0f19;">
-<h3 style="margin-top: 0; color: #f59e0b;">🤖 AI & Automation Researchers</h3>
-<p style="font-size: 0.95rem; color: #94a3b8;">Interrogate the Agent Trust Boundary, ephemeral SPIFFE SVIDs, SLM judges, and continuous Evals-as-Code.</p>
-<ul style="padding-left: 1.25rem; font-size: 0.9rem;">
-  <li><a href="/architecture/components/06-ai-orchestration">AI & Agent Orchestration Plane</a></li>
-  <li><a href="/adr/0004-defensive-ai-runtime-and-prompt-injection-firewall">ADR-0004: Agent Trust Boundary</a></li>
-  <li><a href="/adr/0015-sandboxed-agent-execution-otlp-convergence-and-ephemeral-identity">ADR-0015: Sandboxed Agent Execution</a></li>
-  <li><a href="/adr/0018-non-human-identity-lifecycle-and-machine-attestation">ADR-0018: Ephemeral Workload Attestation</a></li>
-</ul>
-</div>
-
-</div>
 
 ---
 

@@ -7,6 +7,16 @@
 
 This document specifies the functional capability taxonomy required across the Threat Intelligence, Detection, Investigation & Response lifecycle.
 
+> [!TIP]
+> **OPERATOR QUICK-TAKE: The Capability Taxonomy in Plain English**
+> The 46 capabilities define what a modern security operations platform must execute to achieve closed-loop defense:
+> * **Exposure & Intel (EXPO / CTI):** Map attack paths and asset criticality upfront, decaying threat indicators automatically rather than hoarding static IP blocklists forever.
+> * **Telemetry & Fabric (DATA):** Ingest raw telemetry without volume-based licensing penalties, normalising to open OCSF schemas across hot search indices and low-cost columnar lakehouses.
+> * **Detection Engineering (DET):** Manage detections as version-controlled code (Polyglot DaC) with automated CI/CD testing, alert noise error budgets, and canary deception sensors.
+> * **Investigation & Cases (INV):** Resolve IP addresses and usernames into concrete entities, build chronological decision DAGs, and deploy autonomous agents behind the Agent Trust Boundary.
+> * **Automated Containment (RESP):** Execute containment playbooks governed by Security-State Monotonicity ($s_{n+1} \preceq s_n$), preventing partial failures from reopening security perimeters.
+> * **AI Governance (AIGOV):** Ensure autonomous agents operate with task-scoped ephemeral credentials (SPIFFE SVIDs) and continuous benchmark evaluations.
+
 ---
 
 ## 1. Capability Taxonomy Matrix

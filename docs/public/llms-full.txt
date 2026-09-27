@@ -43,6 +43,14 @@ Modern security operations cannot rely on monolithic assumptions of correctness.
 
 **TIDIR** (Threat Intelligence, Detection, Investigation & Response) is fundamentally a **safety architecture for autonomous cyber defence**. Rather than merely presenting a collection of technology components, it defines the invariant boundaries and mathematical constraints governing the interaction between uncertain evidence, probabilistic reasoning, deterministic authority, and physical actuation.
 
+> [!TIP]
+> **OPERATOR QUICK-TAKE: What the Constitution Means in Plain English**
+> * **Confidence is not Authority (Principle 1):** Just because an analytical rule or model is 99.9% confident a server is compromised does not give it permission to pull the network cable. Operational authority is independently derived from policy, asset criticality, and blast-radius rules.
+> * **Never Roll Back into Danger ($s_{n+1} \preceq s_n$ / Invariant 7):** Automated response scripts must never behave like traditional database rollbacks. If an automation workflow fails halfway through isolating a compromised cluster, it must freeze in place or escalate forward—it must *never* roll back to reopening firewall ports or unquarantining a server.
+> * **Agents Propose, Kernels Authorise (Invariant 4):** Autonomous AI agents can formulate hypotheses and propose containment actions, but they hold zero execution keys. Only deterministic policy engines and short-lived cryptographic workload tokens (SPIFFE SVIDs) can authorize mutations.
+> * **The Master Emergency Stop (Invariant 9):** There is always an independent out-of-band "big red button" that human responders can press to freeze autonomous agents instantly, without needing permission from the AI control plane.
+> * **Show Your Work (Invariants 2 & 10):** Every alert, containment proposal, and agent deduction must link back to immutable raw event IDs in an append-only Incident Decision DAG. Unsubstantiated claims cannot trigger automated response.
+
 ---
 
 ## 1. The Confidence–Authority Separation Principle
@@ -265,17 +273,24 @@ with deterministic controls wrapped around all probabilistic stages:
 * **Feedback & Learning**: Continuous Red, Blue, Green Team, and Exposure Management calibration loops.
 * **Resilience**: Four-tier graceful degradation, local NVMe spooling, and air-gapped continuity modes.
 
+> [!TIP]
+> **OPERATOR QUICK-TAKE: The 4 Planes in 30 Seconds**
+> * **1. Telemetry Data Plane (Untrusted Ingest):** Ingests raw endpoint, network, and cloud telemetry alongside native edge findings (EDR, NDR, CNAPP), standardises them into open OCSF schemas, and stores them across hot search indices (ClickHouse) and columnar lakehouses (Iceberg/Parquet).
+> * **2. Analytical & Reasoning Plane (Advisory Only):** Evaluates streaming detection queries, correlates multi-stage attack chains, and deploys autonomous AI triage agents. Everything in this plane is **advisory**—it produces proposals, hypotheses, and evidence links, never direct environment mutations.
+> * **3. Defence Control Plane (The Safety Kernel):** The hardened, minimal Trusted Computing Base (TCB). It evaluates proposals against deterministic security policies, simulates blast radiuses against critical business assets, and issues short-lived cryptographic authorization credentials.
+> * **4. Actuation Plane (Task-Scoped Execution):** Connectors that call vendor APIs (EDR isolation, identity revocation, firewall shunting). It only executes when presented with a valid cryptographic credential from the Defence Control Plane, enforcing Security-State Monotonicity ($s_{n+1} \preceq s_n$).
+
 ---
 
 ## Strategic Context: The Four Generations & The Shadow Risk Register
 
 ### The Four Generations of Cyber Engineering
-To understand why TIDIR is architected as an integrated Cyber Defence Control System rather than an unbundled collection of discrete security tools, consider the historical evolution of the cyber engineering discipline across four distinct archetypes:
+To understand why TIDIR is architected as an integrated Cyber Defence Control System rather than an unbundled collection of discrete security tools, consider the historical evolution of the cyber engineering discipline across four distinct generations (analyzed in full in [The Four Generations of Security Engineering](/architecture/generational-security-engineering)):
 
-1. **Generation 1: The Gatekeeper (Pre-2010)**: Focused on static perimeter defence, network access control lists (ACLs), stateful firewalls, and manual host patching. Control was maintained through physical and logical network boundaries—an operating model that dissolved with the advent of distributed cloud infrastructure, microservices, and dynamic ephemeral APIs.
-2. **Generation 2: The Integrator (2010–2020)**: Characterized by the explosion of point solutions, Software-as-a-Service (SaaS), and best-of-breed product acquisition. Security engineers lived inside vendor graphical user interfaces ("ClickOps"), acting as human routers manually copying data between unintegrated consoles ("swivel-chair security").
-3. **Generation 3: The Builder (2020–Present)**: Recognizing that security is fundamentally a software and systems problem, Gen 3 adopted software engineering discipline: Infrastructure-as-Code (IaC), GitOps, version-controlled Detection-as-Code (DaC), and automated Continuous Integration and Continuous Delivery (CI/CD) pipelines.
-4. **Generation 4: The Optimiser (TIDIR Target Architecture, 2023+)**: Resolves the scalability, cost, and cognitive crisis of Gen 3. Ingesting every log into monolithic indices is financially unsustainable; running thousands of uncalibrated rules creates crushing alert fatigue. Gen 4 engineering treats security operations as an optimized distributed data systems and bounded artificial intelligence (AI) problem: combining line-rate schema validation (OCSF), unbundled query engines on columnar lakehouses, and autonomous agent orchestration governed by deterministic safety boundaries.
+1. **Generation 1: Perimeter & Host Infrastructure (~1995–2008)**: Focused on static perimeter defence, network access control lists (ACLs), stateful firewalls, and manual host patching. Control was maintained through physical network boundaries—an operating model that dissolved with cloud infrastructure, remote endpoints, and living-off-the-land techniques.
+2. **Generation 2: Centralised Platform Operations (~2008–2018)**: Characterized by commercial SIEM platforms and the dedicated SOC. Engineers focused on log forwarders, heavy indexing clusters, and alert queues. Broken by volume-based licensing taxes and alert fatigue driven by the Base-Rate Fallacy.
+3. **Generation 3: Software-Defined SecOps & Detection-as-Code (~2018–2024)**: Security operations adopted software engineering discipline: GitOps version control, Detection-as-Code (DaC), open schemas (OCSF), columnar lakehouses, and continuous CI/CD testing. Broken by the limits of human rule authoring against machine-speed polymorphic attacks.
+4. **Generation 4: Agentic Systems & Intent Architecture (2024+)**: The TIDIR target architecture. Engineers define declarative objectives, state invariants, and blast-radius bounds, while supervising autonomous agent swarms that conduct investigation and monotonic containment within deterministic safety boundaries.
 
 ### The Shadow Risk Register: Engineering Constraints as Business Risk Acceptance
 In conventional Security Operations Centers (SOCs), operational compromises are routinely justified as mere engineering constraints, storage quotas, or performance tuning. In practice, **every engineering constraint functions as an unacknowledged proxy for business risk acceptance**—creating an invisible **Shadow Risk Register**:
@@ -1017,6 +1032,16 @@ Source: docs/architecture/02-capability-model.md
 ---
 
 This document specifies the functional capability taxonomy required across the Threat Intelligence, Detection, Investigation & Response lifecycle.
+
+> [!TIP]
+> **OPERATOR QUICK-TAKE: The Capability Taxonomy in Plain English**
+> The 46 capabilities define what a modern security operations platform must execute to achieve closed-loop defense:
+> * **Exposure & Intel (EXPO / CTI):** Map attack paths and asset criticality upfront, decaying threat indicators automatically rather than hoarding static IP blocklists forever.
+> * **Telemetry & Fabric (DATA):** Ingest raw telemetry without volume-based licensing penalties, normalising to open OCSF schemas across hot search indices and low-cost columnar lakehouses.
+> * **Detection Engineering (DET):** Manage detections as version-controlled code (Polyglot DaC) with automated CI/CD testing, alert noise error budgets, and canary deception sensors.
+> * **Investigation & Cases (INV):** Resolve IP addresses and usernames into concrete entities, build chronological decision DAGs, and deploy autonomous agents behind the Agent Trust Boundary.
+> * **Automated Containment (RESP):** Execute containment playbooks governed by Security-State Monotonicity ($s_{n+1} \preceq s_n$), preventing partial failures from reopening security perimeters.
+> * **AI Governance (AIGOV):** Ensure autonomous agents operate with task-scoped ephemeral credentials (SPIFFE SVIDs) and continuous benchmark evaluations.
 
 ---
 
