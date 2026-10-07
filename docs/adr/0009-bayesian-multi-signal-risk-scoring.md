@@ -11,6 +11,11 @@ A fundamental mathematical challenge in detection engineering is the **False Pos
 Under Bayes' theorem:
 $$P(\text{Intrusion} \mid \text{Alert}) = \frac{P(\text{Alert} \mid \text{Intrusion}) \cdot P(\text{Intrusion})}{P(\text{Alert})}$$
 
+::: tip Intuition (ELI5)
+**The needle in the haystack problem.**  
+If you search 10,000,000 harmless emails and have a super-smart detector that is 99% accurate, it will still trigger 100,000 false alarms. Why? Because actual malicious emails are so rare (the "base rate" is tiny) that false alarms completely drown out the real ones. The solution is never to page an analyst for a single clue; you require multiple, completely independent clues (e.g. suspicious login + unexpected file download + beaconing IP) to point to the same user before waking a human.
+:::
+
 If the prior probability of an intrusion $P(\text{Intrusion})$ is negligible, even a detection rule or machine learning classifier with 99% specificity will generate an overwhelming majority of false-positive alarms. Elevating isolated, single-event anomalies (e.g. an unusual PowerShell flag or a new administrative IP) directly to analyst queues inevitably causes severe cognitive fatigue and missed intrusions.
 
 How does the architecture mathematically suppress the Base Rate Fallacy and ensure that only high-probability, actionable findings reach human operators?

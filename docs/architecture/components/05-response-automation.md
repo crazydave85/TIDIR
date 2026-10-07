@@ -143,6 +143,12 @@ flowchart LR
 - Multi-step containment and mitigation workflows are executed as distributed state machines structured under **Security-State Monotonicity**:
   $$\forall s \in \mathcal{S}, \quad R(s_{\text{post}}) \subseteq R(s_{\text{pre}})$$
   *No automated compensation or error recovery may expand attacker reachability beyond the current verified-safe security posture.*
+
+::: tip Intuition (ELI5)
+**Lock the doors, but never unlock them when things break.**  
+Imagine an automated building security system locking fire exits and doors during an intruder alarm. If one door's electronic lock fails or crashes halfway through, the system must never "roll back" and unlock the doors it already secured. It keeps every barrier locked and calls human security. In software terms: containment actions only ever shrink an attacker's reach ($R(s_{\text{post}}) \subseteq R(s_{\text{pre}})$)—they never undo protection on partial failure.
+:::
+
 - **Action Monotonicity vs. Security-State Monotonicity**: Individual operational actions need not be monotonic (e.g. an egress firewall shunt might be replaced by a switch-port isolation, or a lease may be renewed). However, the *security posture* is strictly monotonic: the system never symmetrically unrolls containment controls upon partial failure. Reversing containment (e.g. un-quarantining a host or un-blocking an IP because a downstream token API timed out) actively restores attacker access.
 - If any downstream API fails during a containment sequence after exponential retries are exhausted, the orchestrator freezes the existing containment boundary and executes **Forward Containment Escalation**: applying broader out-of-band perimeter network fences (e.g. upstream firewall route drops) and triggering high-priority incident commander paging.
 - Every containment and remediation action is bound to the immutable **Incident Decision Directed Acyclic Graph (DAG)** ([ADR-0005](../../adr/0005-saga-pattern-containment-and-break-glass-protocol.md) and [Layer 4](../../architecture/07-layer-4-incident-response.md)), recording the exact causal lineage from Evidence through Authorisation to Action and Outcome.

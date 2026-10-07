@@ -78,6 +78,11 @@ Executes non-destructive atomic adversary emulation payloads in an isolated stag
   - In plain language, CER scores how cleanly an analytic separates malicious tradecraft from benign telemetry across its complete Receiver Operating Characteristic (ROC) curve, independent of the operational alert threshold chosen for production. Lower CER indicates intrinsically superior separation.
   - Candidate rules with $\text{CER} \gt 10\%$ are flagged as low-discrimination heuristics; they are barred from standalone paging and routed to multi-signal risk lenses.
 
+::: tip Intuition (ELI5)
+**The smoke detector factory test.**  
+Imagine testing a smoke detector on an assembly line. If you set the sensitivity dial to the exact middle point where it misses as many real fires as it sounds false alarms for burnt toast, that error percentage is the Crossover Error Rate (CER). It measures how good the physical sensor hardware is at distinguishing smoke from steam in a lab, completely separate from how you configure it in a real house.
+:::
+
 ### Stage 7: Staged Deployment
 Rollout into production via automated GitOps pipelines:
 * **Canary Phase**: Deployed in "silent" mode (emitting `signal` or shadow findings) across a representative fraction of endpoints or accounts to verify compute overhead and real-world noise.
@@ -94,6 +99,11 @@ Monitors the live operational health of the detection:
   - **Cost-Weighted Detection Thresholding**: Production operating points are calibrated against the **Minimum Detection Cost Function (MinDCF)**, balancing operational loss against the empirical prior attack probability $P(\text{Attack})$:
     $$\text{Cost}(\theta) = C_{\text{FP}} \cdot P(\text{Benign}) \cdot \text{FPR}(\theta) + C_{\text{FN}} \cdot P(\text{Attack}) \cdot \text{FNR}(\theta)$$
     In natural language, the production decision threshold $\theta$ is shifted toward minimizing total enterprise loss, accepting a bounded rate of false positives to drive false negatives toward zero for high-consequence techniques, while delegating low-discrimination rules to multi-signal graph correlation.
+
+::: tip Intuition (ELI5)
+**Tuning the alarm for a real kitchen.**  
+A missed fire burns down the house (\$1,000,000 catastrophe); a false alarm annoys you for 10 minutes while you open the kitchen windows (\$50 nuisance). Because the consequences are radically unequal, you would never set your kitchen smoke detector to the 50/50 factory crossover setting. You intentionally tune it to tolerate a little burnt toast smoke to guarantee you never sleep through an actual inferno. MinDCF calculates that exact mathematical sweet spot.
+:::
 
 ### Stage 9: Continuous Improvement & Retirement
 Detections are treated as living software artefacts:
