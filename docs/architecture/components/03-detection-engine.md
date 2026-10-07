@@ -65,13 +65,13 @@ flowchart TB
      - Rule syntax validation against canonical OCSF schema registries.
      - Synthetic unit testing (verifying true positives trigger and benign data passes across all target engine implementations).
      - **Continuous Automated Purple Teaming & Mutation Testing**: Executes non-destructive atomic adversary emulation payloads in an isolated staging environment. The test harness applies automated syntactic and procedural mutations (CLI flag permutations, environment indirection, alternate system call bindings) to measure **Evasion Resilience** and empirically distinguish brittle tactical matches from evasion-resilient functional primitive detections ([ADR-0007](../../adr/0007-continuous-automated-purple-teaming-and-multi-model-consensus.md)).
-     - **Historical Lakehouse Backtesting**: Replays candidate rules across 30 days of historical data in pre-prod to calculate Expected Alert Volume (EAV) and reject rules exceeding noise budgets.
+     - **Historical Lakehouse Backtesting & CER Benchmarking**: Replays candidate rules across 30 days of historical data in pre-production to calculate Expected Alert Volume (EAV) and compute the **Crossover Error Rate (CER)**. Benchmarking $\text{CER} = \text{FPR}(\theta^*) = \text{FNR}(\theta^*)$ evaluates the intrinsic discriminatory power of the analytic prior to production threshold tuning.
    - Immutable version tagging and GitOps rollbacks.
 
 3. **Decoupled Multi-Action Detection Egress**:
-   - **Matching Decoupled from Alerting**: Rule execution is separated from incident generation. Detections do not assume that every match warrants human paging. Every rule in the Polyglot DaC envelope explicitly declares its operational `intent`:
-     - `finding`: High-confidence, high-impact security observations that route to deduplication, entity graph clustering, and OCSF 2001/2004 Security Finding queues for triage.
-     - `risk_increment`: Evidential observations (such as noisy Living-off-the-Land administrative executions) that increment an entity's risk state in the Bayesian Multi-Signal Risk Lens ([ADR-0009](../../adr/0009-bayesian-multi-signal-risk-scoring.md)) without waking an analyst.
+   - **Matching Decoupled from Alerting**: Rule execution is separated from incident generation. Detections do not assume that every match warrants human paging. The rule's intrinsic selectivity (measured via CER) and operational cost curve directly govern its declared `intent`:
+     - `finding`: High-confidence, high-impact security observations exhibiting low intrinsic Crossover Error Rate ($\text{CER} \lt 1\%$) that route to deduplication, entity graph clustering, and OCSF 2001/2004 Security Finding queues for triage.
+     - `risk_increment`: Evidential observations with moderate discriminatory power or higher CER (such as noisy Living-off-the-Land administrative executions) that increment an entity's risk state in the Bayesian Multi-Signal Risk Lens ([ADR-0009](../../adr/0009-bayesian-multi-signal-risk-scoring.md)) without waking an analyst.
      - `signal`: Contextual decoration that tags raw events in the streaming bus and lakehouse partitions, accelerating retro-hunting and exploratory graph traversal without affecting risk scores.
      - `telemetry_elevation_trigger`: Precursor operational indicators that emit a control directive to the telemetry plane, initiating Just-in-Time ephemeral sensor elevation ([ADR-0016](../../adr/0016-just-in-time-telemetry-elevation-and-ephemeral-forensics.md)).
 

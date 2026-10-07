@@ -38,7 +38,18 @@ Chosen option: **SecOps Error Budgets and Chaos Security Engineering**, because:
   - If a specific detection domain burns through its monthly Noise Budget ($\gt 5\%$ false-positive rate), the deployment pipeline automatically places an **Engineering Deployment Freeze** on that domain.
   - No new detection rules can be merged for that category until the noisy rules are tuned, refactored, or decommissioned in Git.
 
-### 2. Chaos Security Engineering in Continuous Purple Teaming
+### 2. Intrinsic Discrimination Benchmarking & Cost-Weighted Operating Thresholds
+- **Crossover Error Rate (CER / Equal Error Rate)**:
+  - During pre-production validation, detection rules are evaluated for intrinsic discriminatory power by computing the threshold $\theta^*$ where the False Positive Rate equals the False Negative Rate:
+    $$\text{CER} = \text{FPR}(\theta^*) = \text{FNR}(\theta^*) = \frac{\text{FP}}{\text{FP} + \text{TN}} = \frac{\text{FN}}{\text{TP} + \text{FN}}$$
+  - In plain language, CER measures how cleanly a detection rule separates attacker techniques from benign baseline behavior across its entire Receiver Operating Characteristic (ROC) curve, independent of any arbitrary operational alert threshold. Lower CER indicates superior intrinsic separation.
+- **The Asymmetric Operating Reality & Minimum Detection Cost (MinDCF)**:
+  - While CER provides an objective benchmark of intrinsic analytic quality, deploying a production detector *at* the crossover point ($\text{FPR} = \text{FNR}$) is operationally disastrous due to extreme class imbalance ($10^9$ benign events vs $10^1$ malicious events) and asymmetric error costs ($\text{Cost}(\text{FN}) \gg \text{Cost}(\text{FP})$).
+  - Production operational thresholds are calibrated against the **Minimum Detection Cost Function (MinDCF)**:
+    $$\text{Cost}(\theta) = C_{\text{FP}} \cdot P(\text{Benign}) \cdot \text{FPR}(\theta) + C_{\text{FN}} \cdot P(\text{Attack}) \cdot \text{FNR}(\theta)$$
+    weighting operational triage cost against enterprise breach impact.
+
+### 3. Chaos Security Engineering in Continuous Purple Teaming
 - The automated adversary emulation pipeline ([ADR-0007](0007-continuous-automated-purple-teaming-and-multi-model-consensus.md)) is extended with an active **Chaos Security Engine**.
 - During pre-production validation, the test harness injects synthetic faults while adversary techniques are executing:
   - *Telemetry Partitions*: Artificially drops or delays streaming log partitions to test late-arrival watermarking.
