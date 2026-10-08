@@ -112,6 +112,11 @@ The correlation engine MUST recognize that $F_A$ and $F_B$ are co-derived signal
 $$P(\text{Incident} \mid F_A, F_B) = P(\text{Incident} \mid F_A) + (1 - \text{OverlapRatio}) \cdot P(F_B \mid \neg F_A)$$
 *This equation ensures that when signals share underlying raw observations, the correlation engine discounts the overlapping portion, preventing artificial amplification of incident severity.*
 
+::: tip Intuition (ELI5)
+**Three witnesses reading the same newspaper article.**  
+If your endpoint agent, network monitor, and SIEM all raise high-priority alarms, it looks like overwhelming corroboration. But if all three are just reacting to the exact same underlying process execution, you do not have three independent witnesses—you have one witness repeated three times. This formula inspects the "family tree" of each alert and discounts overlapping copies so you do not mistake echo chambers for certainty.
+:::
+
 ---
 
 ## Positive Consequences

@@ -61,6 +61,11 @@ flowchart LR
      $$\text{Score}(t) = \text{InitialScore} \times e^{-\lambda t}$$
      where $\lambda$ varies by indicator type (e.g., dynamic IP addresses decay rapidly with high $\lambda$; actor-controlled command-and-control domains or binary hashes decay slowly).
 
+::: tip Intuition (ELI5)
+**Milk spoils faster than canned food.**  
+A malicious IP address used by an adversary today will likely be reassigned to an innocent coffee shop or cloud tenant tomorrow (it spoils quickly, like fresh milk, so its score decays fast). A custom malicious binary or TLS certificate, however, takes months for an attacker to re-engineer (it lasts like canned goods, so its score decays slowly). This exponential decay ensures stale network indicators automatically expire before they cause collateral business blocks.
+:::
+
 4. **Integration Interfaces**:
    - **Streaming Detection**: In-memory key-value lookup cache updated via change-data-capture (CDC) for sub-millisecond matching in stream detection pipelines.
    - **Retroactive Hunting**: Automated triggering of historical lakehouse scans when high-severity zero-day indicators are ingested.

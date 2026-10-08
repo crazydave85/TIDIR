@@ -22,7 +22,8 @@
           <div class="divider"></div>
           <button class="ctrl-btn" @click.stop="zoomIn" title="Zoom In (+)">➕</button>
           <button class="ctrl-btn" @click.stop="zoomOut" title="Zoom Out (-)">➖</button>
-          <button class="ctrl-btn" @click.stop="resetTransform" title="Reset View">↺ 100%</button>
+          <button class="ctrl-btn" @click.stop="fitToScreen" title="Fit to Screen">⛶ Fit</button>
+          <button class="ctrl-btn" @click.stop="resetTransform" title="Actual Size (100%)">↺ 100%</button>
           <button class="ctrl-btn close-btn" @click.stop="closeModal" title="Close (Esc)">✕</button>
         </div>
       </div>
@@ -40,6 +41,8 @@
         <div
           class="diagram-canvas-content"
           :style="{
+            width: `${diagramWidth}px`,
+            height: `${diagramHeight}px`,
             transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
             transformOrigin: 'center center'
           }"
@@ -58,6 +61,9 @@ const currentSvgHtml = ref("");
 const scale = ref(1);
 const translateX = ref(0);
 const translateY = ref(0);
+const diagramWidth = ref(1200);
+const diagramHeight = ref(800);
+const initialFitScale = ref(1);
 const modalRef = ref(null);
 const viewportRef = ref(null);
 const activeSvgElement = ref(null);
@@ -197,23 +203,52 @@ function openModal(svgElement) {
 
   activeSvgElement.value = svgElement;
 
+  // Determine native dimensions from viewBox or bounding box
+  const viewBox = svgElement.getAttribute("viewBox");
+  let naturalWidth = 1200;
+  let naturalHeight = 800;
+
+  if (viewBox) {
+    const parts = viewBox.split(/[\s,]+/).map(Number);
+    if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
+      naturalWidth = parts[2];
+      naturalHeight = parts[3];
+    }
+  } else {
+    const rect = svgElement.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      naturalWidth = rect.width;
+      naturalHeight = rect.height;
+    }
+  }
+
+  diagramWidth.value = naturalWidth;
+  diagramHeight.value = naturalHeight;
+
   // Clone SVG so we don't mutate or move the inline diagram
   const clone = svgElement.cloneNode(true);
   
-  // Strip constraining inline styles from Mermaid (e.g. max-width: 0px or max-width: 400px)
+  // Set explicit native pixel width and height matching viewBox
   clone.removeAttribute("style");
-  clone.removeAttribute("height");
-  clone.setAttribute("width", "100%");
+  clone.setAttribute("width", String(naturalWidth));
+  clone.setAttribute("height", String(naturalHeight));
   
-  // Ensure the SVG fills the responsive lightbox container
+  // Ensure the SVG renders at its native vector resolution
   clone.style.display = "block";
-  clone.style.width = "100%";
-  clone.style.height = "auto";
-  clone.style.maxHeight = "85vh";
+  clone.style.width = naturalWidth + "px";
+  clone.style.height = naturalHeight + "px";
 
   currentSvgHtml.value = clone.outerHTML;
-  const isMobile = window.innerWidth < 768;
-  scale.value = isMobile ? 1.8 : 1;
+
+  // Calculate clean initial fit scale to viewport
+  const paddingX = 80;
+  const paddingY = 120; // top bar + margins
+  const availW = Math.max(window.innerWidth - paddingX, 320);
+  const availH = Math.max(window.innerHeight - paddingY, 320);
+  const fitScale = Math.min(availW / naturalWidth, availH / naturalHeight);
+
+  initialFitScale.value = fitScale;
+  scale.value = fitScale;
   translateX.value = 0;
   translateY.value = 0;
   isOpen.value = true;
@@ -230,12 +265,10 @@ function closeModal() {
   copied.value = false;
 }
 
-function zoomIn() {
-  scale.value = Math.min(scale.value * 1.3, 6);
-}
-
-function zoomOut() {
-  scale.value = Math.max(scale.value / 1.3, 0.3);
+function fitToScreen() {
+  scale.value = initialFitScale.value;
+  translateX.value = 0;
+  translateY.value = 0;
 }
 
 function resetTransform() {
@@ -244,9 +277,17 @@ function resetTransform() {
   translateY.value = 0;
 }
 
+function zoomIn() {
+  scale.value = Math.min(scale.value * 1.3, 10);
+}
+
+function zoomOut() {
+  scale.value = Math.max(scale.value / 1.3, 0.05);
+}
+
 function onWheel(e) {
   const delta = e.deltaY < 0 ? 1.15 : 0.85;
-  scale.value = Math.min(Math.max(scale.value * delta, 0.3), 6);
+  scale.value = Math.min(Math.max(scale.value * delta, 0.05), 10);
 }
 
 function onMouseDown(e) {
@@ -474,25 +515,24 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 92vw;
-  max-width: 1200px;
-  will-change: transform;
+  flex-shrink: 0;
   user-select: none;
 }
 
 :deep(.diagram-canvas-content svg) {
   display: block !important;
   width: 100% !important;
-  max-width: 100% !important;
-  height: auto !important;
-  max-height: 85vh !important;
-  filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.6));
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  overflow: visible !important;
 }
 
 :deep(.diagram-canvas-content foreignObject) {
   overflow: visible !important;
 }
 
+:deep(.diagram-canvas-content text),
 :deep(.diagram-canvas-content .nodeLabel),
 :deep(.diagram-canvas-content .label),
 :deep(.diagram-canvas-content .cluster-label),
@@ -502,7 +542,8 @@ onUnmounted(() => {
 :deep(.diagram-canvas-content foreignObject p) {
   line-height: 1.25 !important;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 </style>
