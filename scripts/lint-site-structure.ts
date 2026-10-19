@@ -76,8 +76,8 @@ function findMarkdownFiles(dir: string, baseDir: string = dir): string[] {
 
 const architectureFiles = findMarkdownFiles("docs/architecture");
 for (const file of architectureFiles) {
-  // Convert filepath to VitePress route, e.g. "docs/architecture/01-system-overview.md" -> "/architecture/01-system-overview"
-  const route = "/" + file.replace(/^docs\//, "").replace(/\.md$/, "");
+  const normalizedFile = file.replace(/\\/g, "/");
+  const route = "/" + normalizedFile.replace(/^docs\//, "").replace(/\.md$/, "");
   if (!configuredLinks.has(route)) {
     errors.push(`❌ Architecture document '${file}' is orphaned: not linked in docs/.vitepress/config.ts navigation (route: ${route})`);
   }

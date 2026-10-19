@@ -38,12 +38,18 @@ jobs:
 
       - name: Sync main branch with upstream
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          SYNC_OUTPUT=$(gh repo sync ${{ github.repository }} --branch main --source Haribu/TIDIR 2>&1)
+          set +e
+          SYNC_OUTPUT=$(gh repo sync ${{ github.repository }} --branch main --source Haribu/TIDIR --force 2>&1)
+          SYNC_STATUS=$?
+          set -e
           
           echo "### 🔄 Fork Sync Result" >> $GITHUB_STEP_SUMMARY
           echo "Attempted to sync \`${{ github.repository }}:main\` with \`Haribu/TIDIR\`." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Command Exit Code:** \`$SYNC_STATUS\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Command Output:**" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`text" >> $GITHUB_STEP_SUMMARY
